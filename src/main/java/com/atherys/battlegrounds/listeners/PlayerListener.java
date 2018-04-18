@@ -9,6 +9,8 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
@@ -16,19 +18,24 @@ public class PlayerListener {
 
     @Listener
     public void onPlayerMove( MoveEntityEvent event, @Root Player player ) {
-        Optional<BattlePoint> to = BattlePointManager.getInstance().getPointFromLocation( event.getToTransform().getLocation() );
-        Optional<BattlePoint> from = BattlePointManager.getInstance().getPointFromLocation( event.getFromTransform().getLocation() );
+        Location<World> fromLoc = event.getFromTransform().getLocation();
+        Location<World> toLoc = event.getToTransform().getLocation();
+        if ( fromLoc.getBlockX() != toLoc.getBlockX() || fromLoc.getBlockZ() != toLoc.getBlockZ() ) {
 
-        if ( to.isPresent() && !from.isPresent() ) {
-            BattleMsg.info( player, "You have entered ", to.get().getName() );
-        }
+            Optional<BattlePoint> to = BattlePointManager.getInstance().getPointFromLocation( event.getToTransform().getLocation() );
+            Optional<BattlePoint> from = BattlePointManager.getInstance().getPointFromLocation( event.getFromTransform().getLocation() );
 
-        if ( to.isPresent() && from.isPresent() ) {
-            BattleMsg.info( player, "You have moved from ", from.get().getName(), " to ", to.get().getName() );
-        }
+            if ( to.isPresent() && !from.isPresent() ) {
+                BattleMsg.info( player, "You have entered ", to.get().getName() );
+            }
 
-        if ( !to.isPresent() && from.isPresent() ) {
-            BattleMsg.info( player, "You have left ", from.get().getName() );
+            if ( to.isPresent() && from.isPresent() ) {
+                BattleMsg.info( player, "You have moved from ", from.get().getName(), " to ", to.get().getName() );
+            }
+
+            if ( !to.isPresent() && from.isPresent() ) {
+                BattleMsg.info( player, "You have left ", from.get().getName() );
+            }
         }
     }
 
