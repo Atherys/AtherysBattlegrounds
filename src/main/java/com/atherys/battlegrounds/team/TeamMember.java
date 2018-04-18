@@ -12,8 +12,8 @@ public class TeamMember {
 
     private UUID player;
 
-    private Team primaryTeam;
-    private List<Team> secondaryTeams;
+    private int primaryTeam;
+    private List<Team> teams;
 
     public UUID getUUID() {
         return player;
@@ -24,15 +24,20 @@ public class TeamMember {
      * @return The primary team this player is part of
      */
     public Team getPrimaryTeam() {
-        return primaryTeam;
+        return teams.get( primaryTeam );
+    }
+
+    public void setPrimaryTeam( Team team ) {
+        if ( !teams.contains( team ) ) teams.add( team );
+        primaryTeam = teams.indexOf( team );
     }
 
     public void joinSecondaryTeam( Team team ) {
-        this.secondaryTeams.add( team );
+        teams.add( team );
     }
 
     public void leaveSecondaryTeam( Team team ) {
-        if ( this.secondaryTeams.contains( team ) ) secondaryTeams.remove( team );
+        if ( teams.contains( team ) ) teams.remove( team );
     }
 
     /**
@@ -40,6 +45,6 @@ public class TeamMember {
      * @return The list of secondary teams this player is a part of
      */
     public List<Team> getSecondaryTeams() {
-        return secondaryTeams;
+        return teams;
     }
 }

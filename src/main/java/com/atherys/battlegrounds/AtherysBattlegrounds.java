@@ -1,6 +1,8 @@
 package com.atherys.battlegrounds;
 
+import com.atherys.battlegrounds.listeners.PlayerListener;
 import org.slf4j.Logger;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
@@ -58,7 +60,7 @@ public class AtherysBattlegrounds {
     }
 
     private void start() {
-
+        Sponge.getEventManager().registerListeners( this, new PlayerListener() );
     }
 
     private void stop() {

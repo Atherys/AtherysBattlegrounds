@@ -45,15 +45,15 @@ public class BattlePoint {
         return name;
     }
 
-    Location<World> getOrigin() {
+    public Location<World> getOrigin() {
         return origin;
     }
 
-    float getOuterRadius() {
+    public float getOuterRadius() {
         return outerRadius;
     }
 
-    float getInnerRadius() {
+    public float getInnerRadius() {
         return innerRadius;
     }
 
