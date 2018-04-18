@@ -1,5 +1,6 @@
 package com.atherys.battlegrounds;
 
+import com.atherys.battlegrounds.commands.RespawnReadyCommand;
 import com.atherys.battlegrounds.listeners.PlayerListener;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -61,6 +62,8 @@ public class AtherysBattlegrounds {
 
     private void start() {
         Sponge.getEventManager().registerListeners( this, new PlayerListener() );
+
+        Sponge.getCommandManager().register( this, new RespawnReadyCommand().getSpec() );
     }
 
     private void stop() {

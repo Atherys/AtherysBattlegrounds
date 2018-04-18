@@ -16,6 +16,12 @@ public class BattlegroundsConfig extends PluginConfig {
     @Setting( "battle_points" )
     public List<BattlePoint> BATTLE_POINTS = new ArrayList<>();
 
+    @Setting( "respawn_timeout" )
+    public final long RESPAWN_TIMEOUT = 60*1000;
+
+    @Setting( "respawn_tick" )
+    public final long RESPAWN_TICK = 60;
+
     protected BattlegroundsConfig() throws IOException {
         super( "config/" + AtherysBattlegrounds.ID, "config.conf" );
     }
