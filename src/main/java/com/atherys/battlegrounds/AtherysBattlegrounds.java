@@ -68,17 +68,17 @@ public class AtherysBattlegrounds {
     }
 
     @Listener
-    public void onInit (GameInitializationEvent event) {
+    public void onInit( GameInitializationEvent event ) {
         init();
     }
 
     @Listener
-    public void onStart (GameStartingServerEvent event) {
+    public void onStart( GameStartingServerEvent event ) {
         if ( init ) start();
     }
 
     @Listener
-    public void onStop (GameStoppingServerEvent event) {
+    public void onStop( GameStoppingServerEvent event ) {
         if ( init ) stop();
     }
 

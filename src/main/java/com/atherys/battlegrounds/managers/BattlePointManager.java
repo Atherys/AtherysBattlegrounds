@@ -15,7 +15,7 @@ public class BattlePointManager {
 
     List<BattlePoint> battlePoints = new ArrayList<>();
 
-    private BattlePointManager () {
+    private BattlePointManager() {
         this.battlePoints = AtherysBattlegrounds.getConfig().BATTLE_POINTS;
     }
 
@@ -24,13 +24,14 @@ public class BattlePointManager {
      * The algorithm used here will take the ratios of all intersecting BattlePoint radii,
      * compare them against eachother, and return the one with the smallest ratio.
      * This ensures the location will be placed within the most appropriate radius.
+     *
      * @param location The location to be checked
      * @return An optional containing a battlepoint. If no battlepoints are intersected, this is empty.
      */
-    public Optional<BattlePoint> getPointFromLocation ( Location<World> location ) {
+    public Optional<BattlePoint> getPointFromLocation( Location<World> location ) {
         List<BattlePoint> points = getPointsFromLocation( location );
         if ( points.size() == 0 ) return Optional.empty();
-        if ( points.size() == 1 ) return Optional.of(points.get( 0 ));
+        if ( points.size() == 1 ) return Optional.of( points.get( 0 ) );
 
         double temp = 0;
         BattlePoint result = points.get( 0 );
@@ -48,10 +49,11 @@ public class BattlePointManager {
 
     /**
      * Returns a list of all {@link BattlePoint}s which contain this location
+     *
      * @param location the location to be checked
      * @return the battlepoints
      */
-    public List<BattlePoint> getPointsFromLocation ( Location<World> location ) {
+    public List<BattlePoint> getPointsFromLocation( Location<World> location ) {
         List<BattlePoint> result = new ArrayList<>();
 
         battlePoints.forEach( point -> {

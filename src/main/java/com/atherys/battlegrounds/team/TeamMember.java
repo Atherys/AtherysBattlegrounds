@@ -21,6 +21,7 @@ public class TeamMember {
 
     /**
      * The primary team is the one the TeamMember will be capturing {@link BattlePoint}s for.
+     *
      * @return The primary team this player is part of
      */
     public Team getPrimaryTeam() {
@@ -42,6 +43,7 @@ public class TeamMember {
 
     /**
      * A secondary team will not receive any benefits from the capture of {@link BattlePoint}s.
+     *
      * @return The list of secondary teams this player is a part of
      */
     public List<Team> getSecondaryTeams() {

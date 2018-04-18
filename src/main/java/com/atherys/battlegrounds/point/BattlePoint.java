@@ -5,12 +5,17 @@ import com.atherys.battlegrounds.team.Team;
 import com.flowpowered.math.vector.Vector3d;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.apache.commons.lang3.RandomUtils;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @ConfigSerializable
@@ -21,8 +26,6 @@ public class BattlePoint {
 
     @Setting
     private Text name;
-    @Setting
-    private TextColor color;
 
     @Setting
     private Location<World> origin;
@@ -32,6 +35,7 @@ public class BattlePoint {
     private float innerRadius;
 
     @Setting
+    @Nullable
     private Team team;
 
     @Setting
@@ -68,7 +72,7 @@ public class BattlePoint {
 
         return origin.getExtent().equals( location.getExtent() ) &&
                 (
-                        Math.pow( x-cx, 2 ) + Math.pow( y-cy, 2 ) + Math.pow( z-cz, 2 ) < Math.pow( outerRadius, 2 )
+                        Math.pow( x - cx, 2 ) + Math.pow( y - cy, 2 ) + Math.pow( z - cz, 2 ) < Math.pow( outerRadius, 2 )
                 );
     }
 
@@ -76,15 +80,23 @@ public class BattlePoint {
         return contains( new Location<>( world, position ) );
     }
 
-    public boolean contains ( World world, double x, double y, double z ) {
+    public boolean contains( World world, double x, double y, double z ) {
         return contains( new Location<>( world, x, y, z ) );
     }
 
-    public Team getTeam() {
-        return team;
+    public Optional<Team> getTeam() {
+        return Optional.ofNullable( team );
+    }
+
+    public TextColor getColor() {
+        return team == null ? TextColors.WHITE : team.getColor();
     }
 
     public List<RespawnPoint> getRespawnPoints() {
         return respawnPoints;
+    }
+
+    public void respawn( Player player ) {
+        respawnPoints.get( RandomUtils.nextInt( 0, respawnPoints.size() ) ).respawn( player );
     }
 }
