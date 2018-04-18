@@ -26,6 +26,7 @@ public class RespawnManager {
             Respawn respawn = respawnQueue.get( player.getUniqueId() );
             if ( respawn != null ) respawn.invoke( player );
             BattleMsg.info( player, "You have been teleported to a respawn point within the Battlepoint where you last perished." );
+            respawnQueue.remove( player.getUniqueId() );
         } );
     }
 
