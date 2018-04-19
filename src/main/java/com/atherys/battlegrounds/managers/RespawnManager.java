@@ -2,6 +2,7 @@ package com.atherys.battlegrounds.managers;
 
 import com.atherys.battlegrounds.AtherysBattlegrounds;
 import com.atherys.battlegrounds.BattleMsg;
+import com.atherys.battlegrounds.events.RespawnTickEvent;
 import com.atherys.battlegrounds.respawn.Respawn;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -34,6 +35,12 @@ public class RespawnManager {
         Sponge.getServer().getOnlinePlayers().forEach( player -> {
             Respawn respawn = respawnQueue.get( player.getUniqueId() );
             if ( respawn != null ) {
+
+                RespawnTickEvent event = new RespawnTickEvent( respawn );
+                Sponge.getEventManager().post( event );
+
+                if ( event.isCancelled() ) return;
+
                 if ( respawn.isValid() ) {
                     if ( respawn.isReady() ) {
                         respawn.invoke( player );

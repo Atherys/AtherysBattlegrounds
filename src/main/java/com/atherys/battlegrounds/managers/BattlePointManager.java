@@ -1,13 +1,17 @@
 package com.atherys.battlegrounds.managers;
 
 import com.atherys.battlegrounds.AtherysBattlegrounds;
+import com.atherys.battlegrounds.events.BattlePointTickEvent;
 import com.atherys.battlegrounds.point.BattlePoint;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class BattlePointManager {
 
@@ -17,6 +21,11 @@ public class BattlePointManager {
 
     private BattlePointManager() {
         this.battlePoints = AtherysBattlegrounds.getConfig().BATTLE_POINTS;
+        Task.builder()
+                .name( "atherysbattlegrounds-battlepoint-manager" )
+                .interval( AtherysBattlegrounds.getConfig().CAPTURE_TICK, TimeUnit.SECONDS )
+                .execute( this::tick )
+                .submit( AtherysBattlegrounds.getInstance() );
     }
 
     /**
@@ -61,6 +70,15 @@ public class BattlePointManager {
         } );
 
         return result;
+    }
+
+    public void tick() {
+        battlePoints.forEach( point -> {
+            BattlePointTickEvent event = new BattlePointTickEvent( point );
+            Sponge.getEventManager().post( event );
+
+            if ( !event.isCancelled() ) point.tick();
+        } );
     }
 
     public static BattlePointManager getInstance() {

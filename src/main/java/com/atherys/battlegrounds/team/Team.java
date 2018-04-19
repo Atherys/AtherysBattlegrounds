@@ -1,16 +1,12 @@
 package com.atherys.battlegrounds.team;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 
 import java.util.UUID;
 
-@ConfigSerializable
 public class Team {
 
-    @Setting
     private UUID uuid;
 
     private TextColor color;
@@ -38,6 +34,6 @@ public class Team {
     }
 
     public void removeTeamMember( TeamMember teamMember ) {
-        teamMember.joinSecondaryTeam( this );
+        teamMember.leaveSecondaryTeam( this );
     }
 }

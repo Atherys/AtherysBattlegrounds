@@ -1,11 +1,14 @@
 package com.atherys.battlegrounds.point;
 
+import com.atherys.battlegrounds.AtherysBattlegrounds;
+import com.atherys.battlegrounds.managers.TeamManager;
 import com.atherys.battlegrounds.respawn.RespawnPoint;
 import com.atherys.battlegrounds.team.Team;
 import com.flowpowered.math.vector.Vector3d;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.apache.commons.lang3.RandomUtils;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
@@ -13,10 +16,7 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @ConfigSerializable
 public class BattlePoint {
@@ -35,11 +35,10 @@ public class BattlePoint {
     private float innerRadius;
 
     @Setting
-    @Nullable
-    private Team team;
+    private CaptureData captureData;
 
     @Setting
-    private List<RespawnPoint> respawnPoints;
+    private List<RespawnPoint> respawnPoints = new ArrayList<>();
 
     public UUID getUUID() {
         return uuid;
@@ -62,9 +61,9 @@ public class BattlePoint {
     }
 
     public boolean contains( Location<World> location ) {
-        double cx = origin.getX();
-        double cy = origin.getY();
-        double cz = origin.getZ();
+        double cx = getOrigin().getX();
+        double cy = getOrigin().getY();
+        double cz = getOrigin().getZ();
 
         double x = location.getX();
         double y = location.getY();
@@ -72,7 +71,22 @@ public class BattlePoint {
 
         return origin.getExtent().equals( location.getExtent() ) &&
                 (
-                        Math.pow( x - cx, 2 ) + Math.pow( y - cy, 2 ) + Math.pow( z - cz, 2 ) < Math.pow( outerRadius, 2 )
+                        Math.pow( x - cx, 2 ) + Math.pow( y - cy, 2 ) + Math.pow( z - cz, 2 ) < Math.pow( getOuterRadius(), 2 )
+                );
+    }
+
+    public boolean containsInner ( Location<World> location ) {
+        double cx = getOrigin().getX();
+        double cy = getOrigin().getY();
+        double cz = getOrigin().getZ();
+
+        double x = location.getX();
+        double y = location.getY();
+        double z = location.getZ();
+
+        return origin.getExtent().equals( location.getExtent() ) &&
+                (
+                        Math.pow( x - cx, 2 ) + Math.pow( y - cy, 2 ) + Math.pow( z - cz, 2 ) < Math.pow( getInnerRadius(), 2 )
                 );
     }
 
@@ -85,11 +99,13 @@ public class BattlePoint {
     }
 
     public Optional<Team> getTeam() {
-        return Optional.ofNullable( team );
+        return captureData.getControllingTeam();
     }
 
     public TextColor getColor() {
-        return team == null ? TextColors.WHITE : team.getColor();
+        Optional<Team> controllingTeam = captureData.getControllingTeam();
+        if ( controllingTeam.isPresent() ) return controllingTeam.get().getColor();
+        else return TextColors.WHITE;
     }
 
     public List<RespawnPoint> getRespawnPoints() {
@@ -97,6 +113,24 @@ public class BattlePoint {
     }
 
     public void respawn( Player player ) {
-        respawnPoints.get( RandomUtils.nextInt( 0, respawnPoints.size() ) ).respawn( player );
+        getRespawnPoints().get( RandomUtils.nextInt( 0, getRespawnPoints().size() ) ).respawn( player );
+    }
+
+    public void tick() {
+        Map<Team,Integer> capturingTeams = new HashMap<>();
+
+        for ( Player player : Sponge.getServer().getOnlinePlayers() ) {
+            if ( !containsInner( player.getLocation() ) ) return;
+
+            Optional<Team> team = TeamManager.getInstance().getPrimaryTeam( player );
+            if ( !team.isPresent() ) return;
+
+            if ( !capturingTeams.containsKey( team.get() ) ) capturingTeams.put( team.get(), 1 );
+            else capturingTeams.put( team.get(), capturingTeams.get( team.get() ) + 1 );
+        }
+
+        capturingTeams.forEach( (team,numberOfPlayers) -> {
+            if ( numberOfPlayers >= AtherysBattlegrounds.getConfig().MIN_PLAYERS_PER_TEAM ) captureData.tick( this, team );
+        } );
     }
 }

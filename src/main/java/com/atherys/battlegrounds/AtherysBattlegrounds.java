@@ -2,6 +2,9 @@ package com.atherys.battlegrounds;
 
 import com.atherys.battlegrounds.commands.RespawnReadyCommand;
 import com.atherys.battlegrounds.listeners.PlayerListener;
+import com.atherys.battlegrounds.managers.BattlePointManager;
+import com.atherys.battlegrounds.managers.RespawnManager;
+import com.atherys.battlegrounds.managers.TeamManager;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
@@ -62,6 +65,10 @@ public class AtherysBattlegrounds {
 
     private void start() {
         Sponge.getEventManager().registerListeners( this, new PlayerListener() );
+
+        BattlePointManager.getInstance();
+        RespawnManager.getInstance();
+        TeamManager.getInstance();
 
         Sponge.getCommandManager().register( this, new RespawnReadyCommand().getSpec() );
     }

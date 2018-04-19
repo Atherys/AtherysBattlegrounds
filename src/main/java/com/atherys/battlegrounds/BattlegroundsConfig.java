@@ -17,10 +17,22 @@ public class BattlegroundsConfig extends PluginConfig {
     public List<BattlePoint> BATTLE_POINTS = new ArrayList<>();
 
     @Setting( "respawn_timeout" )
-    public final long RESPAWN_TIMEOUT = 60*1000;
+    public long RESPAWN_TIMEOUT = 60*1000;
 
     @Setting( "respawn_tick" )
-    public final long RESPAWN_TICK = 60;
+    public long RESPAWN_TICK = 60;
+
+    @Setting( "minimum_players" )
+    public int MIN_PLAYERS_PER_TEAM = 3;
+
+    @Setting( "capture_tick" )
+    public long CAPTURE_TICK = 10;
+
+    @Setting( "capture_rate" )
+    public double CAPTURE_RATE = 10;
+
+    @Setting( "max_capture" )
+    public double MAX_CAPTURE = 100;
 
     protected BattlegroundsConfig() throws IOException {
         super( "config/" + AtherysBattlegrounds.ID, "config.conf" );

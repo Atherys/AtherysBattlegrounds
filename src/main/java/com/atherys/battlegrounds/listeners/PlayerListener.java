@@ -16,8 +16,20 @@ public class PlayerListener {
 
     @Listener
     public void onPlayerMove( MoveEntityEvent event, @Root Player player ) {
-        Optional<BattlePoint> point = BattlePointManager.getInstance().getPointFromLocation( event.getToTransform().getLocation() );
-        point.ifPresent( battlePoint -> BattleMsg.info( player, "You have entered ", battlePoint.getName() ) );
+        Optional<BattlePoint> to = BattlePointManager.getInstance().getPointFromLocation( event.getToTransform().getLocation() );
+        Optional<BattlePoint> from = BattlePointManager.getInstance().getPointFromLocation( event.getFromTransform().getLocation() );
+
+        if ( to.isPresent() && !from.isPresent() ) {
+            BattleMsg.info( player, "You have entered ", to.get().getName() );
+        }
+
+        if ( to.isPresent() && from.isPresent() ) {
+            BattleMsg.info( player, "You have moved from ", from.get().getName(), " to ", to.get().getName() );
+        }
+
+        if ( !to.isPresent() && from.isPresent() ) {
+            BattleMsg.info( player, "You have left ", from.get().getName() );
+        }
     }
 
     @Listener
