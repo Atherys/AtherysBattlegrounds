@@ -61,33 +61,13 @@ public class BattlePoint {
     }
 
     public boolean contains( Location<World> location ) {
-        double cx = getOrigin().getX();
-        double cy = getOrigin().getY();
-        double cz = getOrigin().getZ();
-
-        double x = location.getX();
-        double y = location.getY();
-        double z = location.getZ();
-
         return origin.getExtent().equals( location.getExtent() ) &&
-                (
-                        Math.pow( x - cx, 2 ) + Math.pow( y - cy, 2 ) + Math.pow( z - cz, 2 ) < Math.pow( getOuterRadius(), 2 )
-                );
+                location.getPosition().distanceSquared( getOrigin().getPosition() ) < Math.pow( getOuterRadius(), 2 );
     }
 
     public boolean containsInner ( Location<World> location ) {
-        double cx = getOrigin().getX();
-        double cy = getOrigin().getY();
-        double cz = getOrigin().getZ();
-
-        double x = location.getX();
-        double y = location.getY();
-        double z = location.getZ();
-
-        return origin.getExtent().equals( location.getExtent() ) &&
-                (
-                        Math.pow( x - cx, 2 ) + Math.pow( y - cy, 2 ) + Math.pow( z - cz, 2 ) < Math.pow( getInnerRadius(), 2 )
-                );
+        return origin.getExtent().equals( location.getExtent() ) &
+                location.getPosition().distanceSquared( getOrigin().getPosition() ) < Math.pow( getInnerRadius(), 2 );
     }
 
     public boolean contains( World world, Vector3d position ) {
