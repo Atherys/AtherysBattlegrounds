@@ -1,6 +1,8 @@
 package com.atherys.battlegrounds;
 
 import com.atherys.battlegrounds.point.BattlePoint;
+import com.atherys.battlegrounds.team.Team;
+import com.atherys.core.database.mongo.MongoDatabaseConfig;
 import com.atherys.core.utils.PluginConfig;
 import ninja.leaping.configurate.objectmapping.Setting;
 
@@ -15,6 +17,9 @@ public class BattlegroundsConfig extends PluginConfig {
 
     @Setting( "battle_points" )
     public List<BattlePoint> BATTLE_POINTS = new ArrayList<>();
+
+    @Setting( "teams" )
+    public List<Team> TEAMS = new ArrayList<>();
 
     @Setting( "respawn_timeout" )
     public long RESPAWN_TIMEOUT = 60*1000;
@@ -33,6 +38,9 @@ public class BattlegroundsConfig extends PluginConfig {
 
     @Setting( "max_capture" )
     public double MAX_CAPTURE = 100;
+
+    @Setting( "database" )
+    public MongoDatabaseConfig DATABASE = new MongoDatabaseConfig();
 
     protected BattlegroundsConfig() throws IOException {
         super( "config/" + AtherysBattlegrounds.ID, "config.conf" );

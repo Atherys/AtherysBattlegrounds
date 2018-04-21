@@ -1,6 +1,7 @@
 package com.atherys.battlegrounds.team;
 
 import com.atherys.battlegrounds.point.BattlePoint;
+import com.atherys.core.database.api.DBObject;
 
 import java.util.List;
 import java.util.UUID;
@@ -8,15 +9,26 @@ import java.util.UUID;
 /**
  * Wrapper object around a Player. Uses UUID internally to keep track of its player.
  */
-public class TeamMember {
+public class TeamMember implements DBObject {
 
     private UUID player;
 
     private int primaryTeam;
     private List<Team> teams;
 
+    public TeamMember ( UUID uuid, List<Team> teams, int primaryTeam ) {
+        this.player = uuid;
+        this.primaryTeam = primaryTeam;
+        this.teams = teams;
+    }
+
+    @Override
     public UUID getUUID() {
         return player;
+    }
+
+    public int getPrimaryTeamIndex() {
+        return primaryTeam;
     }
 
     /**

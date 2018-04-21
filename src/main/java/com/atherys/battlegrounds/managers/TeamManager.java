@@ -1,19 +1,28 @@
 package com.atherys.battlegrounds.managers;
 
+import com.atherys.battlegrounds.AtherysBattlegrounds;
 import com.atherys.battlegrounds.team.Team;
-import com.atherys.battlegrounds.team.TeamMember;
-import org.spongepowered.api.entity.living.player.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class TeamManager {
 
     private static TeamManager instance = new TeamManager();
 
     private List<Team> teams = new ArrayList<>();
-    private Map<UUID,TeamMember> teamMembers = new HashMap<>();
 
-    private TeamManager() {
+    private TeamManager () {
+        teams = AtherysBattlegrounds.getConfig().TEAMS;
+    }
+
+    public Optional<Team> getTeam ( UUID uuid ) {
+        for ( Team team : teams ) {
+            if ( team.getUUID().equals( uuid ) ) return Optional.of( team );
+        }
+        return Optional.empty();
     }
 
     public void registerTeam ( Team team ) {
@@ -24,13 +33,7 @@ public class TeamManager {
         teams.remove( team );
     }
 
-    public Optional<Team> getPrimaryTeam( Player player ) {
-        TeamMember member = teamMembers.get( player.getUniqueId() );
-        if ( member == null ) return Optional.empty();
-        return Optional.of( member.getPrimaryTeam() );
-    }
-
-    public static TeamManager getInstance() {
+    public TeamManager getInstance() {
         return instance;
     }
 
