@@ -28,8 +28,7 @@ import static com.atherys.battlegrounds.AtherysBattlegrounds.*;
         description = DESCRIPTION,
         version = VERSION,
         dependencies = {
-                @Dependency( id = "atheryscore" ),
-                @Dependency( id = "atherystowns" )
+                @Dependency( id = "atheryscore" )
         }
 )
 public class AtherysBattlegrounds {
