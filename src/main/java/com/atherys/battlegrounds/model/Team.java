@@ -14,13 +14,13 @@ public class Team implements CatalogType {
 
     public static final Team NONE = new Team("none", "Nobody", TextColors.WHITE);
 
-    @Setting
+    @Setting("id")
     private String id;
 
-    @Setting
+    @Setting("name")
     private String name;
 
-    @Setting
+    @Setting("color")
     private TextColor color;
 
     private Team() {}

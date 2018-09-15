@@ -8,10 +8,10 @@ import org.spongepowered.api.world.World;
 @ConfigSerializable
 public class RespawnPoint {
 
-    @Setting
+    @Setting("location")
     private Location<World> location;
 
-    @Setting
+    @Setting("radius")
     private double radius;
 
     private RespawnPoint() {}

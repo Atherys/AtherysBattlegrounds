@@ -76,6 +76,7 @@ public class BattlepointService implements CatalogRegistryModule<Battlepoint> {
                             )
                     )
                     .percent(battlepoint.getTeamProgress(controllingTeam))
+                    .color(battlepoint.getColor())
                     .overlay(BossBarOverlays.PROGRESS)
                     .playEndBossMusic(false)
                     .visible(true)

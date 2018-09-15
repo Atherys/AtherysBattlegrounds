@@ -2,6 +2,7 @@ package com.atherys.battlegrounds;
 
 import com.atherys.battlegrounds.listener.BattlepointListener;
 import com.atherys.battlegrounds.model.Battlepoint;
+import com.atherys.battlegrounds.model.RespawnPoint;
 import com.atherys.battlegrounds.model.Team;
 import com.atherys.battlegrounds.persistence.BattlegroundsDatabase;
 import com.atherys.battlegrounds.persistence.TeamMemberManager;
@@ -10,12 +11,14 @@ import com.atherys.battlegrounds.service.RespawnService;
 import com.atherys.battlegrounds.service.TeamService;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.boss.BossBarColors;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.world.Location;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -59,6 +62,7 @@ public class AtherysBattlegrounds {
 
         try {
             config = new BattlegroundsConfig();
+            config.init();
         } catch ( IOException e ) {
             init = false;
             logger.info( "Failed to create config." );
@@ -68,6 +72,8 @@ public class AtherysBattlegrounds {
 
         if ( config.IS_DEFAULT ) {
             logger.info( "AtherysBattlegrounds config.conf is set to default. Change 'is_default' to false in order for the plugin to continue." );
+            init = false;
+            return;
         }
 
         init = true;
@@ -88,6 +94,33 @@ public class AtherysBattlegrounds {
         teamMemberManager.loadAll();
 
         Sponge.getEventManager().registerListeners(this, new BattlepointListener());
+
+        Battlepoint defaultBattlepoint = new Battlepoint(
+                "default-point",
+                "Default Point",
+                new Location<>(
+                        Sponge.getServer().getWorld("world").get(),
+                        0.0d,
+                        0.0d,
+                        0.0d
+                ),
+                BossBarColors.PINK,
+                10.0,
+                100.0
+        );
+
+        defaultBattlepoint.addRespawnPoint(new RespawnPoint(
+                new Location<>(
+                        Sponge.getServer().getWorld("world").get(),
+                        10.0d,
+                        0.0d,
+                        10.0d
+                ),
+                10.0d
+        ));
+
+        getConfig().BATTLEPOINTS.add(defaultBattlepoint);
+        getConfig().save();
     }
 
     private void stop() {
