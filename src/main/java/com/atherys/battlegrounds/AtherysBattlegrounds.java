@@ -1,10 +1,13 @@
 package com.atherys.battlegrounds;
 
-import com.atherys.battlegrounds.commands.RespawnReadyCommand;
-import com.atherys.battlegrounds.listeners.PlayerListener;
-import com.atherys.battlegrounds.managers.BattlePointManager;
-import com.atherys.battlegrounds.managers.RespawnManager;
-import com.atherys.battlegrounds.managers.TeamManager;
+import com.atherys.battlegrounds.listener.BattlepointListener;
+import com.atherys.battlegrounds.model.Battlepoint;
+import com.atherys.battlegrounds.model.Team;
+import com.atherys.battlegrounds.persistence.BattlegroundsDatabase;
+import com.atherys.battlegrounds.persistence.TeamMemberManager;
+import com.atherys.battlegrounds.service.BattlepointService;
+import com.atherys.battlegrounds.service.RespawnService;
+import com.atherys.battlegrounds.service.TeamService;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
@@ -44,6 +47,14 @@ public class AtherysBattlegrounds {
 
     private BattlegroundsConfig config;
 
+    private BattlegroundsDatabase database;
+
+    private TeamMemberManager teamMemberManager;
+
+    private TeamService teamService;
+    private BattlepointService battlepointService;
+    private RespawnService respawnService;
+
     private void init() {
         instance = this;
 
@@ -64,17 +75,24 @@ public class AtherysBattlegrounds {
     }
 
     private void start() {
-        Sponge.getEventManager().registerListeners( this, new PlayerListener() );
+        teamService = TeamService.getInstance();
+        battlepointService = BattlepointService.getInstance();
 
-        BattlePointManager.getInstance();
-        RespawnManager.getInstance();
-        TeamManager.getInstance();
+        Sponge.getRegistry().registerModule(Team.class, teamService);
+        Sponge.getRegistry().registerModule(Battlepoint.class, battlepointService);
 
-        Sponge.getCommandManager().register( this, new RespawnReadyCommand().getSpec() );
+        database = BattlegroundsDatabase.getInstance();
+
+        respawnService = RespawnService.getInstance();
+
+        teamMemberManager = TeamMemberManager.getInstance();
+        teamMemberManager.loadAll();
+
+        Sponge.getEventManager().registerListeners(this, new BattlepointListener());
     }
 
     private void stop() {
-
+        teamMemberManager.saveAll();
     }
 
     @Listener
@@ -104,4 +122,23 @@ public class AtherysBattlegrounds {
         return getInstance().config;
     }
 
+    public TeamService getTeamService() {
+        return teamService;
+    }
+
+    public BattlepointService getBattlepointService() {
+        return battlepointService;
+    }
+
+    public BattlegroundsDatabase getDatabase() {
+        return database;
+    }
+
+    public RespawnService getRespawnService() {
+        return respawnService;
+    }
+
+    public TeamMemberManager getTeamMemberManager() {
+        return teamMemberManager;
+    }
 }

@@ -1,9 +1,7 @@
-package com.atherys.battlegrounds.respawn;
+package com.atherys.battlegrounds.model;
 
-import com.atherys.battlegrounds.managers.RespawnManager;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -12,19 +10,23 @@ public class RespawnPoint {
 
     @Setting
     private Location<World> location;
+
     @Setting
-    private float radius;
+    private double radius;
+
+    private RespawnPoint() {}
+
+    public RespawnPoint(Location<World> location, double radius) {
+        this.location = location;
+        this.radius = radius;
+    }
 
     public Location<World> getLocation() {
         return location;
     }
 
-    public float getRadius() {
+    public double getRadius() {
         return radius;
-    }
-
-    public void respawn( Player player ) {
-        RespawnManager.getInstance().queueRespawn( new Respawn( this, player ) );
     }
 
     public Location<World> getRandomPointWithin() {

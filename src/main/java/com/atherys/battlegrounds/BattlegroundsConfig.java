@@ -1,41 +1,77 @@
 package com.atherys.battlegrounds;
 
-import com.atherys.battlegrounds.point.BattlePoint;
+import com.atherys.battlegrounds.model.Battlepoint;
+import com.atherys.battlegrounds.model.RespawnPoint;
+import com.atherys.battlegrounds.model.Team;
+import com.atherys.core.database.mongo.MongoDatabaseConfig;
 import com.atherys.core.utils.PluginConfig;
 import ninja.leaping.configurate.objectmapping.Setting;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.world.Location;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class BattlegroundsConfig extends PluginConfig {
 
-    @Setting( "is_default" )
+    @Setting
+    public MongoDatabaseConfig DATABASE = new MongoDatabaseConfig();
+
+    @Setting
     public boolean IS_DEFAULT = true;
 
-    @Setting( "battle_points" )
-    public List<BattlePoint> BATTLE_POINTS = new ArrayList<>();
+    @Setting
+    public Set<Battlepoint> BATTLEPOINTS = new HashSet<>();
 
-    @Setting( "respawn_timeout" )
-    public long RESPAWN_TIMEOUT = 60*1000;
+    {
+        Battlepoint defaultBattlepoint = new Battlepoint(
+                "default-point",
+                "Default Point",
+                new Location<>(
+                        Sponge.getServer().getWorld("world").get(),
+                        0.0d,
+                        0.0d,
+                        0.0d
+                ),
+                10.0,
+                100.0
+        );
 
-    @Setting( "respawn_tick" )
-    public long RESPAWN_TICK = 60;
+        defaultBattlepoint.addRespawnPoint(new RespawnPoint(
+                new Location<>(
+                        Sponge.getServer().getWorld("world").get(),
+                        10.0d,
+                        0.0d,
+                        10.0d
+                ),
+                10.0d
+        ));
 
-    @Setting( "minimum_players" )
-    public int MIN_PLAYERS_PER_TEAM = 3;
+        BATTLEPOINTS.add(defaultBattlepoint);
+    }
 
-    @Setting( "capture_tick" )
-    public long CAPTURE_TICK = 10;
+    @Setting
+    public long BATTLEPOINTS_UPDATE_INTERVAL = 500;
 
-    @Setting( "capture_rate" )
-    public double CAPTURE_RATE = 10;
+    @Setting
+    public float CAPTURE_AMOUNT = 0.01f;
 
-    @Setting( "max_capture" )
-    public double MAX_CAPTURE = 100;
+    @Setting
+    public Set<Team> TEAMS = new HashSet<>();
+
+    {
+        TEAMS.add(Team.NONE);
+    }
+
+    @Setting
+    public long RESPAWN_INTERVAL = 1;
+
+    @Setting
+    public long RESPAWN_DURATION = 30;
 
     protected BattlegroundsConfig() throws IOException {
-        super( "config/" + AtherysBattlegrounds.ID, "config.conf" );
+        super("config/" + AtherysBattlegrounds.ID, "config.conf");
     }
 
 }
