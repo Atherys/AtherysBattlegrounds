@@ -1,6 +1,7 @@
 package com.atherys.battlegrounds.model;
 
 import com.atherys.core.utils.MathUtils;
+import com.flowpowered.math.vector.Vector3d;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.spongepowered.api.CatalogType;
@@ -9,7 +10,10 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @ConfigSerializable
 public class Battlepoint implements CatalogType {
@@ -23,8 +27,11 @@ public class Battlepoint implements CatalogType {
     @Setting("color")
     private BossBarColor color;
 
+    @Setting("world")
+    private World world;
+
     @Setting("location")
-    private Location<World> location;
+    private Vector3d position;
 
     @Setting("inner_radius")
     private double innerRadius;
@@ -43,7 +50,8 @@ public class Battlepoint implements CatalogType {
     public Battlepoint(String id, String name, Location<World> location, BossBarColor color, double innerRadius, double outerRadius) {
         this.id = id;
         this.name = name;
-        this.location = location;
+        this.world = location.getExtent();
+        this.position = location.getPosition();
         this.color = color;
         this.innerRadius = innerRadius;
         this.outerRadius = outerRadius;
@@ -62,7 +70,7 @@ public class Battlepoint implements CatalogType {
     }
 
     public Location<World> getLocation() {
-        return location;
+        return world.getLocation(position);
     }
 
     public double getInnerRadius() {

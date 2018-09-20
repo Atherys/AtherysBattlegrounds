@@ -81,6 +81,8 @@ public class BattlepointService implements CatalogRegistryModule<Battlepoint> {
                     .playEndBossMusic(false)
                     .visible(true)
                     .build();
+
+            bossBars.put(battlepoint, bossBar);
         }
 
         bossBar.removePlayers(bossBar.getPlayers());
@@ -92,16 +94,15 @@ public class BattlepointService implements CatalogRegistryModule<Battlepoint> {
     private void tickBattlepoint(Battlepoint battlepoint) {
         // get the entities within the inner radius
         Collection<Entity> innerRadiusEntities = getEntitiesWithinInnerRadius(battlepoint);
+
         innerRadiusEntities.forEach(entity -> {
             if (!(entity instanceof Player)) return;
 
             Player player = (Player) entity;
-            Optional<TeamMember> teamMember = AtherysBattlegrounds.getInstance().getTeamMemberManager().get(player.getUniqueId());
+            TeamMember tm = AtherysBattlegrounds.getInstance().getTeamMemberManager().getOrCreate(player.getUniqueId());
 
-            teamMember.ifPresent(tm -> {
-                tm.getPrimary().ifPresent(primaryTeam -> {
-                    this.captureBattlepoint(battlepoint, primaryTeam, AtherysBattlegrounds.getConfig().CAPTURE_AMOUNT);
-                });
+            tm.getPrimary().ifPresent(primaryTeam -> {
+                this.captureBattlepoint(battlepoint, primaryTeam, AtherysBattlegrounds.getConfig().CAPTURE_AMOUNT);
             });
         });
 
@@ -111,13 +112,12 @@ public class BattlepointService implements CatalogRegistryModule<Battlepoint> {
     }
 
     private void captureBattlepoint(Battlepoint battlepoint, Team team, float capAmount) {
-
         battlepoint.getAllTeamProgress().forEach((t, progress) -> {
             if (t.equals(team)) battlepoint.addTeamProgress(team, capAmount);
             else battlepoint.removeTeamProgress(t, capAmount);
         });
 
-        if ( battlepoint.getTeamProgress(team) == 1.0d ) {
+        if ( battlepoint.getTeamProgress(team) == 1.0f ) {
             BattlepointEvent.Capture captureEvent = new BattlepointEvent.Capture(battlepoint, team);
             Sponge.getEventManager().post(captureEvent);
         }
