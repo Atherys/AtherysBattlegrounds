@@ -1,5 +1,5 @@
 package com.atherys.battlegrounds.service;
 
-public class TeamService {
+public class RespawnPointService {
 
 }
