@@ -1,11 +1,9 @@
 package com.atherys.battlegrounds.model;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import javax.annotation.Nonnull;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,99 +28,127 @@ public class BattlePoint {
 
     private Duration respawnInterval;
 
-    private Duration respawnDuration;
+    private Duration respawnTimeout;
 
     private Set<RespawnPoint> respawnPoints = new HashSet<>();
 
+    private Set<Award> captureAwards = new HashSet<>();
+
+    private Set<Award> tickAwards = new HashSet<>();
+
     private Map<Team, Float> teamProgress = new HashMap<>();
+
+    private Team controllingTeam;
 
     public BattlePoint(String id) {
         this.id = id;
     }
 
-    @Nonnull
     public String getId() {
         return id;
     }
 
-    @Nonnull
     public String getName() {
         return name;
-    }
-
-    public BossBarColor getColor() {
-        return color;
-    }
-
-    public Location<World> getLocation() {
-        return location;
-    }
-
-    public double getInnerRadius() {
-        return innerRadius;
-    }
-
-    public double getOuterRadius() {
-        return outerRadius;
-    }
-
-    public float getPerTickCaptureAmount() {
-        return perTickCaptureAmount;
-    }
-
-    public Duration getRespawnInterval() {
-        return respawnInterval;
-    }
-
-    public Duration getRespawnDuration() {
-        return respawnDuration;
-    }
-
-    public Set<RespawnPoint> getRespawnPoints() {
-        return respawnPoints;
-    }
-
-    public Map<Team, Float> getTeamProgress() {
-        return teamProgress;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
+    public BossBarColor getColor() {
+        return color;
+    }
+
     public void setColor(BossBarColor color) {
         this.color = color;
+    }
+
+    public Location<World> getLocation() {
+        return location;
     }
 
     public void setLocation(Location<World> location) {
         this.location = location;
     }
 
+    public double getInnerRadius() {
+        return innerRadius;
+    }
+
     public void setInnerRadius(double innerRadius) {
         this.innerRadius = innerRadius;
+    }
+
+    public double getOuterRadius() {
+        return outerRadius;
     }
 
     public void setOuterRadius(double outerRadius) {
         this.outerRadius = outerRadius;
     }
 
+    public float getPerTickCaptureAmount() {
+        return perTickCaptureAmount;
+    }
+
     public void setPerTickCaptureAmount(float perTickCaptureAmount) {
         this.perTickCaptureAmount = perTickCaptureAmount;
+    }
+
+    public Duration getRespawnInterval() {
+        return respawnInterval;
     }
 
     public void setRespawnInterval(Duration respawnInterval) {
         this.respawnInterval = respawnInterval;
     }
 
-    public void setRespawnDuration(Duration respawnDuration) {
-        this.respawnDuration = respawnDuration;
+    public Duration getRespawnTimeout() {
+        return respawnTimeout;
+    }
+
+    public void setRespawnTimeout(Duration respawnTimeout) {
+        this.respawnTimeout = respawnTimeout;
+    }
+
+    public Set<RespawnPoint> getRespawnPoints() {
+        return respawnPoints;
     }
 
     public void setRespawnPoints(Set<RespawnPoint> respawnPoints) {
         this.respawnPoints = respawnPoints;
     }
 
+    public Set<Award> getCaptureAwards() {
+        return captureAwards;
+    }
+
+    public void setCaptureAwards(Set<Award> captureAwards) {
+        this.captureAwards = captureAwards;
+    }
+
+    public Set<Award> getTickAwards() {
+        return tickAwards;
+    }
+
+    public void setTickAwards(Set<Award> tickAwards) {
+        this.tickAwards = tickAwards;
+    }
+
+    public Map<Team, Float> getTeamProgress() {
+        return teamProgress;
+    }
+
     public void setTeamProgress(Map<Team, Float> teamProgress) {
         this.teamProgress = teamProgress;
+    }
+
+    public Team getControllingTeam() {
+        return controllingTeam;
+    }
+
+    public void setControllingTeam(Team controllingTeam) {
+        this.controllingTeam = controllingTeam;
     }
 }

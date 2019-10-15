@@ -2,6 +2,7 @@ package com.atherys.battlegrounds.facade;
 
 import com.atherys.battlegrounds.AtherysBattlegrounds;
 import com.atherys.battlegrounds.BattlegroundsConfig;
+import com.atherys.battlegrounds.model.Award;
 import com.atherys.battlegrounds.model.BattlePoint;
 import com.atherys.battlegrounds.model.RespawnPoint;
 import com.atherys.battlegrounds.service.BattlePointService;
@@ -9,10 +10,10 @@ import com.atherys.battlegrounds.service.RespawnService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.time.temporal.ChronoUnit;
+import java.util.Currency;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -37,8 +38,10 @@ public class BattlePointFacade {
     }
 
     public void init() {
+        // create the battlepoints from the configuration
         config.BATTLE_POINTS.forEach(pointConfig -> {
-            Set<RespawnPoint> respawnPoints = pointConfig.getRespawnPoints().stream()
+            // parse the respawn point configs
+            Set<RespawnPoint> respawnPoints = pointConfig.getRespawnPoints().parallelStream()
                     .map(respawnConfig -> respawnService.createRespawnPoint(
                             pointConfig.getLocation().getExtent(),
                             respawnConfig.getPosition(),
@@ -46,6 +49,17 @@ public class BattlePointFacade {
                     ))
                     .collect(Collectors.toSet());
 
+            // parse the capture awards config
+            Set<Award> captureAwards = pointConfig.getOnCaptureAwards().parallelStream()
+                    .map(awardConfig -> battlePointService.createAward(awardConfig.getCurrency()))
+                    .collect(Collectors.toSet());
+
+            // parse the tick awards config
+            Set<Award> tickAwards = pointConfig.getOnTickAwards().parallelStream()
+                    .map(awardConfig -> battlePointService.createAward(awardConfig.getCurrency()))
+                    .collect(Collectors.toSet());
+
+            // create the battlepoint
             BattlePoint battlePoint = battlePointService.createBattlePoint(
                     pointConfig.getId(),
                     pointConfig.getName(),
@@ -55,13 +69,17 @@ public class BattlePointFacade {
                     pointConfig.getOuterRadius(),
                     pointConfig.getPerTickCaptureAmount(),
                     pointConfig.getRespawnInterval(),
-                    pointConfig.getRespawnDuration(),
-                    respawnPoints
+                    pointConfig.getRespawnTimeout(),
+                    respawnPoints,
+                    captureAwards,
+                    tickAwards
             );
 
+            // keep it in memory for future use
             battlePoints.add(battlePoint);
         });
 
+        // start the tick task
         battlepointTask = Task.builder()
                 .interval(config.TICK_INTERVAL.get(ChronoUnit.MILLIS), TimeUnit.MILLISECONDS)
                 .execute(this::tickAll)

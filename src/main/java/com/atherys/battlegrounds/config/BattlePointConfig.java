@@ -1,8 +1,5 @@
 package com.atherys.battlegrounds.config;
 
-import com.atherys.battlegrounds.model.RespawnPoint;
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.spongepowered.api.boss.BossBarColor;
@@ -11,7 +8,6 @@ import org.spongepowered.api.world.World;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -42,11 +38,17 @@ public class BattlePointConfig {
     @Setting("respawn-interval")
     private Duration respawnInterval = Duration.of(1, ChronoUnit.SECONDS);
 
-    @Setting("respawn-duration")
-    private Duration respawnDuration = Duration.of(30, ChronoUnit.SECONDS);
+    @Setting("respawn-timeout")
+    private Duration respawnTimeout = Duration.of(30, ChronoUnit.SECONDS);
 
     @Setting("respawn-points")
     private Set<RespawnPointConfig> respawnPoints = new HashSet<>();
+
+    @Setting("on-capture-awards")
+    private Set<AwardConfig> onCaptureAwards = new HashSet<>();
+
+    @Setting("on-tick-awards")
+    private Set<AwardConfig> onTickAwards = new HashSet<>();
 
     public BattlePointConfig() {
     }
@@ -83,11 +85,19 @@ public class BattlePointConfig {
         return respawnInterval;
     }
 
-    public Duration getRespawnDuration() {
-        return respawnDuration;
+    public Duration getRespawnTimeout() {
+        return respawnTimeout;
     }
 
     public Set<RespawnPointConfig> getRespawnPoints() {
         return respawnPoints;
+    }
+
+    public Set<AwardConfig> getOnCaptureAwards() {
+        return onCaptureAwards;
+    }
+
+    public Set<AwardConfig> getOnTickAwards() {
+        return onTickAwards;
     }
 }
