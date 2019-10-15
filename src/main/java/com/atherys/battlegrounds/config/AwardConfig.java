@@ -2,8 +2,8 @@ package com.atherys.battlegrounds.config;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.spongepowered.api.service.economy.Currency;
 
-import java.util.Currency;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,7 +11,7 @@ import java.util.Map;
 public class AwardConfig {
 
     @Setting("currency")
-    private Map<Currency, Double> currency = new HashMap<>();
+    private Map<org.spongepowered.api.service.economy.Currency, Double> currency = new HashMap<>();
 
     public AwardConfig() {
     }

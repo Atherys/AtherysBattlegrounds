@@ -1,6 +1,7 @@
 package com.atherys.battlegrounds.model;
 
-import java.util.Currency;
+import org.spongepowered.api.service.economy.Currency;
+
 import java.util.HashMap;
 import java.util.Map;
 

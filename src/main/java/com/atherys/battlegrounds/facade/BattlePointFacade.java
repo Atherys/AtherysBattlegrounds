@@ -9,10 +9,14 @@ import com.atherys.battlegrounds.service.BattlePointService;
 import com.atherys.battlegrounds.service.RespawnService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.boss.*;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.time.temporal.ChronoUnit;
-import java.util.Currency;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -59,11 +63,14 @@ public class BattlePointFacade {
                     .map(awardConfig -> battlePointService.createAward(awardConfig.getCurrency()))
                     .collect(Collectors.toSet());
 
+            // create the boss bar for the battlepoint
+            BossBar battlePointBossBar = createBattlePointBossBar(pointConfig.getName(), pointConfig.getColor());
+
             // create the battlepoint
             BattlePoint battlePoint = battlePointService.createBattlePoint(
                     pointConfig.getId(),
                     pointConfig.getName(),
-                    pointConfig.getColor(),
+                    battlePointBossBar,
                     pointConfig.getLocation(),
                     pointConfig.getInnerRadius(),
                     pointConfig.getOuterRadius(),
@@ -88,6 +95,21 @@ public class BattlePointFacade {
 
     protected void tickAll() {
         battlePoints.forEach(battlePointService::tickBattlePoint);
+    }
+
+    public void updateBattlePointBossBar(BattlePoint battlePoint) {
+        // TODO
+    }
+
+    protected BossBar createBattlePointBossBar(String battlePointName, BossBarColor color) {
+        return ServerBossBar.builder()
+                .name(Text.of(battlePointName))
+                .color(color)
+                .overlay(BossBarOverlays.PROGRESS)
+                .playEndBossMusic(false)
+                .createFog(false)
+                .darkenSky(false)
+                .build();
     }
 
 }
