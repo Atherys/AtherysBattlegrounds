@@ -1,11 +1,16 @@
 package com.atherys.battlegrounds;
 
+import com.atherys.battlegrounds.command.TeamCommand;
 import com.atherys.battlegrounds.facade.BattlePointFacade;
 import com.atherys.battlegrounds.facade.TeamFacade;
+import com.atherys.battlegrounds.listener.BattlePointListener;
+import com.atherys.battlegrounds.listener.PlayerListener;
 import com.atherys.battlegrounds.persistence.TeamMemberRepository;
 import com.atherys.battlegrounds.service.BattlePointService;
 import com.atherys.battlegrounds.service.RespawnService;
 import com.atherys.battlegrounds.service.TeamService;
+import com.atherys.core.AtherysCore;
+import com.atherys.core.command.CommandService;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import org.slf4j.Logger;
@@ -58,14 +63,20 @@ public class AtherysBattlegrounds {
         battlegroundsInjector = spongeInjector.createChildInjector();
         battlegroundsInjector.injectMembers(components);
 
+        try {
+            AtherysCore.getCommandService().register(new TeamCommand(), this);
+        } catch (CommandService.AnnotatedCommandException e) {
+            e.printStackTrace();
+        }
+
         init = true;
     }
 
     private void start() {
-        components.teamMemberRepository.initCache();
-
         components.battlePointFacade.init();
         components.teamFacade.init();
+
+        components.teamMemberRepository.initCache();
     }
 
     private void stop() {
@@ -85,6 +96,14 @@ public class AtherysBattlegrounds {
     @Listener
     public void onStop( GameStoppingServerEvent event ) {
         if ( init ) stop();
+    }
+
+    public TeamFacade getTeamFacade() {
+        return components.teamFacade;
+    }
+
+    public TeamService getTeamService() {
+        return components.teamService;
     }
 
     private static class Components {
@@ -109,6 +128,12 @@ public class AtherysBattlegrounds {
 
         @Inject
         private TeamFacade teamFacade;
+
+        @Inject
+        private PlayerListener playerListener;
+
+        @Inject
+        private BattlePointListener battlePointListener;
     }
 
 }

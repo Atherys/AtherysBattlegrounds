@@ -6,24 +6,35 @@ import com.atherys.battlegrounds.model.BattlePoint;
 import com.atherys.battlegrounds.model.Team;
 import com.atherys.battlegrounds.model.entity.TeamMember;
 import com.atherys.core.AtherysCore;
+import com.google.inject.Singleton;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContext;
+import org.spongepowered.api.text.format.TextColor;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+@Singleton
 public class TeamService {
 
-    public void distributeTickAwards(BattlePoint battlePoint, Team team) {
-        distributeAwards(battlePoint.getTickAwards(), team);
+    private Set<Team> teams = new HashSet<>();
+
+    public TeamService() {
     }
 
-    public void distributeCaptureAwards(BattlePoint battlePoint, Team team) {
-        distributeAwards(battlePoint.getCaptureAwards(), team);
+    public Team createTeam(String id, String name, TextColor color) {
+        Team team = new Team(id);
+        team.setName(name);
+        team.setColor(color);
+
+        teams.add(team);
+
+        return team;
     }
 
-    protected void distributeAwards(Set<Award> awards, Team team) {
+    public void distributeAwards(Set<Award> awards, Team team) {
         awards.forEach(award -> {
             AtherysCore.getEconomyService().flatMap(economyService -> economyService.getOrCreateAccount(team.getId())).ifPresent(account -> {
                 award.getCurrency().forEach((c, amount) -> account.deposit(c, BigDecimal.valueOf(amount), Cause.of(EventContext.empty(), AtherysBattlegrounds.getInstance())));
@@ -31,24 +42,11 @@ public class TeamService {
         });
     }
 
-//    private static final TeamService instance = new TeamService();
-//
-//    @Override
-//    @Nonnull
-//    public Optional<Team> getById(@Nonnull String id) {
-//        for (Team team : getAll()) {
-//            if ( team.getId().equals(id) ) return Optional.of(team);
-//        }
-//        return Optional.empty();
-//    }
-//
-//    @Override
-//    @Nonnull
-//    public Collection<Team> getAll() {
-//        return AtherysBattlegrounds.getConfig().TEAMS;
-//    }
-//
-//    public static TeamService getInstance() {
-//        return instance;
-//    }
+    public Set<Team> getAllTeams() {
+        return teams;
+    }
+
+    public Optional<Team> getTeamFromId(String teamId) {
+        return teams.parallelStream().filter(team -> team.getId().equals(teamId)).findFirst();
+    }
 }

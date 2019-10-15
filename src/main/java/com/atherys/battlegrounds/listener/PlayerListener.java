@@ -14,6 +14,9 @@ public class PlayerListener {
     @Inject
     private BattlePointFacade battlePointFacade;
 
+    public PlayerListener() {
+    }
+
     @Listener
     public void onPlayerMovement(MoveEntityEvent event, @Root Player player) {
         battlePointFacade.onPlayerMovement(player, event.getFromTransform(), event.getToTransform());

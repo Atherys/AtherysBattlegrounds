@@ -13,34 +13,27 @@ public class Team {
 
     private TextColor color;
 
-    private Team() {}
+    public Team(String id) {
+        this.id = id;
+    }
 
-    @Nonnull
     public String getId() {
         return id;
     }
 
-    @Nonnull
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public TextColor getColor() {
         return color;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Team)) return false;
-        Team team = (Team) o;
-        return Objects.equals(id, team.id) &&
-                Objects.equals(name, team.name) &&
-                Objects.equals(color, team.color);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, color);
+    public void setColor(TextColor color) {
+        this.color = color;
     }
 }

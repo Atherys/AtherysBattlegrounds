@@ -7,6 +7,7 @@ import com.atherys.battlegrounds.model.RespawnPoint;
 import com.atherys.battlegrounds.model.Team;
 import com.atherys.battlegrounds.model.entity.TeamMember;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.entity.living.player.Player;
@@ -18,6 +19,7 @@ import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Singleton
 public class BattlePointService {
 
     @Inject
@@ -26,7 +28,10 @@ public class BattlePointService {
     @Inject
     private TeamService teamService;
 
-    private Set<BattlePoint> battlePoints;
+    private Set<BattlePoint> battlePoints = new HashSet<>();
+
+    public BattlePointService() {
+    }
 
     public BattlePoint createBattlePoint(
             String id,
@@ -103,14 +108,14 @@ public class BattlePointService {
             battlePoint.setControllingTeam(postTickControllingTeam.get());
 
             // distribute awards for capturing the point
-            teamService.distributeCaptureAwards(battlePoint, postTickControllingTeam.get());
+            teamService.distributeAwards(battlePoint.getCaptureAwards(), postTickControllingTeam.get());
 
             // trigger the capture event
             BattlePointEvent.Capture captureEvent = new BattlePointEvent.Capture(battlePoint, battlePoint.getControllingTeam());
             Sponge.getEventManager().post(captureEvent);
         } else {
             // distribute tick awards for having control of the point
-            teamService.distributeTickAwards(battlePoint, battlePoint.getControllingTeam());
+            teamService.distributeAwards(battlePoint.getTickAwards(), battlePoint.getControllingTeam());
 
             // trigger the tick event
             BattlePointEvent.Tick tickEvent = new BattlePointEvent.Tick(battlePoint);
