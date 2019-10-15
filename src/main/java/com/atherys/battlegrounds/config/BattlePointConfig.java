@@ -45,7 +45,7 @@ public class BattlePointConfig {
     public Duration respawnInterval = Duration.of(1, ChronoUnit.SECONDS);
 
     @Setting("respawn-duration")
-    public long respawnDuration = 30;
+    public Duration respawnDuration = Duration.of(30, ChronoUnit.SECONDS);
 
     @Setting("respawn-points")
     private Set<RespawnPointConfig> respawnPoints = new HashSet<>();
@@ -89,7 +89,7 @@ public class BattlePointConfig {
         return respawnInterval;
     }
 
-    public long getRespawnDuration() {
+    public Duration getRespawnDuration() {
         return respawnDuration;
     }
 
