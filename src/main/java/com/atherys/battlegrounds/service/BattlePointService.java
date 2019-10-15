@@ -118,11 +118,13 @@ public class BattlePointService {
     protected void incrementTeamProgress(BattlePoint battlePoint, Team team, float amount) {
         Float currentValue = battlePoint.getTeamProgress().getOrDefault(team, 0.0f);
 
-        if (currentValue + amount <= 0.0f || currentValue + amount >= 1.0f) {
-            return;
+        if (currentValue + amount <= 0.0f) {
+            battlePoint.getTeamProgress().put(team, 0.0f);
+        } else if (currentValue + amount >= 1.0f) {
+            battlePoint.getTeamProgress().put(team, 1.0f);
+        } else {
+            battlePoint.getTeamProgress().put(team, currentValue + amount);
         }
-
-        battlePoint.getTeamProgress().put(team, currentValue + amount);
     }
 
     protected Optional<Team> determineControllingTeam(BattlePoint battlePoint) {
