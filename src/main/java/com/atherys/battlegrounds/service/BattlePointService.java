@@ -116,11 +116,13 @@ public class BattlePointService {
     }
 
     protected void incrementTeamProgress(BattlePoint battlePoint, Team team, float amount) {
-        if (battlePoint.getTeamProgress().containsKey(team)) {
-            battlePoint.getTeamProgress().merge(team, amount, Float::sum);
-        } else {
-            battlePoint.getTeamProgress().put(team, amount);
+        Float currentValue = battlePoint.getTeamProgress().getOrDefault(team, 0.0f);
+
+        if (currentValue < 0.0f || currentValue >= 1.0f) {
+            return;
         }
+
+        battlePoint.getTeamProgress().put(team, currentValue + amount);
     }
 
     protected Optional<Team> determineControllingTeam(BattlePoint battlePoint) {
