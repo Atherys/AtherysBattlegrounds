@@ -1,7 +1,7 @@
 package com.atherys.battlegrounds.model;
 
 import org.spongepowered.api.boss.BossBar;
-import org.spongepowered.api.boss.BossBarColor;
+import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -17,7 +17,7 @@ public class BattlePoint {
 
     private String name;
 
-    private BossBar bossBar;
+    private ServerBossBar bossBar;
 
     private Location<World> location;
 
@@ -145,11 +145,11 @@ public class BattlePoint {
         this.controllingTeam = controllingTeam;
     }
 
-    public void setBossBar(BossBar bossBar) {
+    public void setBossBar(ServerBossBar bossBar) {
         this.bossBar = bossBar;
     }
 
-    public BossBar getBossBar() {
+    public ServerBossBar getBossBar() {
         return bossBar;
     }
 }

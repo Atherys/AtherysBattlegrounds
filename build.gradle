@@ -11,17 +11,4 @@ buildscript {
     }
 }
 
-
 apply plugin: 'com.atherys.gradle'
-
-repositories {
-    mavenCentral()
-    maven {
-        name 'sponge'
-        url 'https://repo.spongepowered.org/maven'
-    }
-    maven {
-        name 'jitpack'
-        url 'https://jitpack.io'
-    }
-}

@@ -8,8 +8,7 @@ import com.atherys.battlegrounds.model.Team;
 import com.atherys.battlegrounds.model.entity.TeamMember;
 import com.google.inject.Inject;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.boss.BossBar;
-import org.spongepowered.api.boss.BossBarColor;
+import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.world.Location;
@@ -27,10 +26,12 @@ public class BattlePointService {
     @Inject
     private TeamService teamService;
 
+    private Set<BattlePoint> battlePoints;
+
     public BattlePoint createBattlePoint(
             String id,
             String name,
-            BossBar bossBar,
+            ServerBossBar bossBar,
             Location<World> location,
             double innerRadius,
             double outerRadius,
@@ -54,6 +55,8 @@ public class BattlePointService {
         battlePoint.setRespawnPoints(respawnPoints);
         battlePoint.setCaptureAwards(captureAwards);
         battlePoint.setTickAwards(tickAwards);
+
+        battlePoints.add(battlePoint);
 
         return battlePoint;
     }
@@ -138,7 +141,7 @@ public class BattlePointService {
         return Optional.empty();
     }
 
-    protected boolean isPlayerWithinBattlePointInnerRadius(BattlePoint battlePoint, Player player) {
+    public boolean isPlayerWithinBattlePointInnerRadius(BattlePoint battlePoint, Player player) {
         if (!battlePoint.getLocation().getExtent().equals(player.getWorld())) {
             return false;
         }
@@ -148,4 +151,51 @@ public class BattlePointService {
         return distanceToCenterSquared <= Math.pow(battlePoint.getInnerRadius(), 2);
     }
 
+    public boolean isPlayerWithinBattlePointOuterRadius(BattlePoint battlePoint, Player player) {
+        return isLocationWithinBattlePointOuterRadius(battlePoint, player.getLocation());
+    }
+
+    public Set<BattlePoint> getAllBattlePoints() {
+        return battlePoints;
+    }
+
+    public Optional<BattlePoint> getBattlePointFromLocation(Location<World> location) {
+        Set<BattlePoint> overlappingBPs = battlePoints.parallelStream()
+                .filter(battlePoint -> isLocationWithinBattlePointOuterRadius(battlePoint, location))
+                .collect(Collectors.toSet());
+
+        // if there's only one battle point found to overlap those coordinates ( or none ), just return it
+        // otherwise, return the point with the smallest relative distance to the player
+        // For further reading: https://stackoverflow.com/questions/49892268/point-within-multiple-spheres
+        if (overlappingBPs.size() == 0 || overlappingBPs.size() == 1) {
+            return overlappingBPs.stream().findFirst();
+        } else {
+            double closestRelativeDistance = 1.0;
+            BattlePoint closestBP = null;
+
+            for (BattlePoint bp : overlappingBPs) {
+                double distanceSquared = bp.getLocation().getPosition().distanceSquared(location.getPosition());
+                double radiusSquared = Math.pow(bp.getOuterRadius(), 2);
+
+                double relativeDistance = distanceSquared / radiusSquared;
+
+                if (relativeDistance < closestRelativeDistance) {
+                    closestRelativeDistance = relativeDistance;
+                    closestBP = bp;
+                }
+            }
+
+            return Optional.ofNullable(closestBP);
+        }
+    }
+
+    private boolean isLocationWithinBattlePointOuterRadius(BattlePoint battlePoint, Location<World> location) {
+        if (!battlePoint.getLocation().getExtent().equals(location.getExtent())) {
+            return false;
+        }
+
+        double distanceToCenterSquared = battlePoint.getLocation().getPosition().distanceSquared(location.getPosition());
+
+        return distanceToCenterSquared <= Math.pow(battlePoint.getOuterRadius(), 2);
+    }
 }

@@ -4,7 +4,7 @@ import com.atherys.battlegrounds.model.Team;
 
 import javax.persistence.AttributeConverter;
 
-public class TeamTypeAdapter implements AttributeConverter<Team, String> {
+public class TeamConverter implements AttributeConverter<Team, String> {
     @Override
     public String convertToDatabaseColumn(Team attribute) {
         return attribute.getId();

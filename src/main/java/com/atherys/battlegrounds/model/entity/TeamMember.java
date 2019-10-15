@@ -1,7 +1,7 @@
 package com.atherys.battlegrounds.model.entity;
 
 import com.atherys.battlegrounds.model.Team;
-import com.atherys.battlegrounds.persistence.TeamTypeAdapter;
+import com.atherys.battlegrounds.persistence.TeamConverter;
 import com.atherys.core.db.SpongeIdentifiable;
 
 import javax.annotation.Nonnull;
@@ -16,7 +16,7 @@ public class TeamMember implements SpongeIdentifiable {
     @Id
     private UUID id;
 
-    @Convert(converter = TeamTypeAdapter.class)
+    @Convert(converter = TeamConverter.class)
     private Team team;
 
     public TeamMember(UUID player) {
