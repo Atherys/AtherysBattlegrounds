@@ -5,16 +5,13 @@ import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-@ConfigSerializable
 public class RespawnPoint {
 
-    @Setting("location")
     private Location<World> location;
 
-    @Setting("radius")
     private double radius;
 
-    private RespawnPoint() {}
+    public RespawnPoint() {}
 
     public RespawnPoint(Location<World> location, double radius) {
         this.location = location;
@@ -25,14 +22,22 @@ public class RespawnPoint {
         return location;
     }
 
+    public void setLocation(Location<World> location) {
+        this.location = location;
+    }
+
     public double getRadius() {
         return radius;
     }
 
-    public Location<World> getRandomPointWithin() {
-        double x = location.getX() + radius * Math.cos( Math.random() * 360.0 );
-        double z = location.getZ() + radius * Math.sin( Math.random() * 360.0 );
-        double y = location.getExtent().getHighestYAt( (int) x, (int) z );
-        return new Location<>( location.getExtent(), x, y, z );
+    public void setRadius(double radius) {
+        this.radius = radius;
     }
+
+//    public Location<World> getRandomPointWithin() {
+//        double x = location.getX() + radius * Math.cos( Math.random() * 360.0 );
+//        double z = location.getZ() + radius * Math.sin( Math.random() * 360.0 );
+//        double y = location.getExtent().getHighestYAt( (int) x, (int) z );
+//        return new Location<>( location.getExtent(), x, y, z );
+//    }
 }

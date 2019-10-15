@@ -1,24 +1,30 @@
-package com.atherys.battlegrounds.model;
+package com.atherys.battlegrounds.config;
 
+import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.spongepowered.api.text.format.TextColor;
 
-import javax.annotation.Nonnull;
-import java.util.Objects;
+@ConfigSerializable
+public class TeamConfig {
 
-public class Team {
-
+    @Setting("id")
     private String id;
 
+    @Setting("name")
     private String name;
 
+    @Setting("color")
     private TextColor color;
 
-    public Team(String id) {
-        this.id = id;
+    public TeamConfig() {
     }
 
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {

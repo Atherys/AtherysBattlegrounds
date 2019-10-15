@@ -3,46 +3,12 @@ group 'com.atherys'
 buildscript {
     repositories {
         jcenter()
+        maven { url = 'https://jitpack.io' }
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.2'
+        classpath 'com.github.Atherys-Horizons:AtherysGradle:1.0.1'
     }
 }
 
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'java'
-
-sourceCompatibility = 1.8
-
-sourceSets {
-    main {
-        resources {
-            srcDirs "src/main/"
-            exclude "java/**"
-        }
-    }
-}
-
-repositories {
-    mavenCentral()
-    maven {
-        name 'sponge'
-        url 'https://repo.spongepowered.org/maven'
-    }
-    maven {
-        name 'jitpack'
-        url 'https://jitpack.io'
-    }
-}
-
-dependencies {
-    shadow 'org.spongepowered:spongeapi:7.0.0-SNAPSHOT'
-    shadow 'com.github.Atherys-Horizons:AtherysCore:master-SNAPSHOT'
-}
-
-shadowJar {
-    relocate 'org.bson', 'com.atherys.libs.org.bson'
-    relocate 'com.mongodb', 'com.atherys.libs.com.mongodb'
-    relocate 'com.seisw', 'com.atherys.libs.com.seisw'
-    relocate 'math', 'com.atherys.libs.math'
-}
+apply plugin: 'com.atherys.gradle'
