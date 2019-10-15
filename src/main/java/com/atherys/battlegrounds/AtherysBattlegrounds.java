@@ -1,7 +1,9 @@
 package com.atherys.battlegrounds;
 
+import com.atherys.battlegrounds.facade.BattlePointFacade;
+import com.atherys.battlegrounds.facade.TeamFacade;
 import com.atherys.battlegrounds.persistence.TeamMemberRepository;
-import com.atherys.battlegrounds.service.BattlepointService;
+import com.atherys.battlegrounds.service.BattlePointService;
 import com.atherys.battlegrounds.service.RespawnService;
 import com.atherys.battlegrounds.service.TeamService;
 import com.google.inject.Inject;
@@ -41,7 +43,7 @@ public class AtherysBattlegrounds {
     @Inject
     private Injector spongeInjector;
 
-    private Injector battlepointInjector;
+    private Injector battlegroundsInjector;
 
     private Components components;
 
@@ -53,14 +55,17 @@ public class AtherysBattlegrounds {
         instance = this;
 
         components = new Components();
-        battlepointInjector = spongeInjector.createChildInjector();
-        battlepointInjector.injectMembers(components);
+        battlegroundsInjector = spongeInjector.createChildInjector();
+        battlegroundsInjector.injectMembers(components);
 
         init = true;
     }
 
     private void start() {
         components.teamMemberRepository.initCache();
+
+        components.battlePointFacade.init();
+        components.teamFacade.init();
     }
 
     private void stop() {
@@ -91,13 +96,19 @@ public class AtherysBattlegrounds {
         private TeamMemberRepository teamMemberRepository;
 
         @Inject
-        private BattlepointService battlepointService;
+        private BattlePointService battlePointService;
 
         @Inject
         private RespawnService respawnService;
 
         @Inject
         private TeamService teamService;
+
+        @Inject
+        private BattlePointFacade battlePointFacade;
+
+        @Inject
+        private TeamFacade teamFacade;
     }
 
 }

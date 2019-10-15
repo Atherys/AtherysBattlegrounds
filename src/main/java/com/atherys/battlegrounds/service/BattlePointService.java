@@ -1,6 +1,50 @@
 package com.atherys.battlegrounds.service;
 
-public class BattlepointService {// implements CatalogRegistryModule<BattlePoint> {
+import com.atherys.battlegrounds.config.RespawnPointConfig;
+import com.atherys.battlegrounds.model.BattlePoint;
+import com.atherys.battlegrounds.model.RespawnPoint;
+import org.spongepowered.api.boss.BossBarColor;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
+
+import java.time.Duration;
+import java.util.Set;
+
+public class BattlePointService {// implements CatalogRegistryModule<BattlePoint> {
+
+    public BattlePoint createBattlePoint(
+            String id,
+            String name,
+            BossBarColor color,
+            Location<World> location,
+            double innerRadius,
+            double outerRadius,
+            float perTickCaptureAmount,
+            Duration respawnInterval,
+            Duration respawnDuration,
+            Set<RespawnPoint> respawnPoints
+    ) {
+        BattlePoint battlePoint = new BattlePoint(id);
+        battlePoint.setName(name);
+        battlePoint.setColor(color);
+        battlePoint.setLocation(location);
+        battlePoint.setInnerRadius(innerRadius);
+        battlePoint.setOuterRadius(outerRadius);
+        battlePoint.setPerTickCaptureAmount(perTickCaptureAmount);
+        battlePoint.setRespawnInterval(respawnInterval);
+        battlePoint.setRespawnDuration(respawnDuration);
+        battlePoint.setRespawnPoints(respawnPoints);
+
+        return battlePoint;
+    }
+
+    public void tickBattlePoint(BattlePoint battlePoint) {
+        // TODO: Find all players current within the inner radius of the battlePoint
+        // TODO: If there are enough players ( a number larger than MINIMUM_PLAYERS_REQUIRED_TO_CAPTURE_POINT ) on the same team,
+        // TODO: then increase the capture amount for that team by the per-tick-capture-amount configured for this point.
+        // TODO: If the capture amount for the team is at 100%, then the team has captured the point
+        // TODO: With each tick, the currency rewards for controlling the point should also be handed out
+    }
 
 //    private static final BattlepointService instance = new BattlepointService();
 //

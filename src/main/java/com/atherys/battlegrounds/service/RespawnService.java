@@ -2,10 +2,14 @@ package com.atherys.battlegrounds.service;
 
 import com.atherys.battlegrounds.AtherysBattlegrounds;
 import com.atherys.battlegrounds.model.RespawnPoint;
+import com.flowpowered.math.vector.Vector3i;
+import com.google.inject.Singleton;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Identifiable;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -14,7 +18,15 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+@Singleton
 public class RespawnService {
+    public RespawnPoint createRespawnPoint(World world, Vector3i position, double radius) {
+        RespawnPoint respawnPoint = new RespawnPoint();
+        respawnPoint.setLocation(new Location<>(world, position));
+        respawnPoint.setRadius(radius);
+
+        return respawnPoint;
+    }
 
 //    private static final RespawnService instance = new RespawnService();
 //

@@ -2,6 +2,7 @@ package com.atherys.battlegrounds.config;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.text.format.TextColor;
 
 @ConfigSerializable
@@ -14,7 +15,7 @@ public class TeamConfig {
     private String name;
 
     @Setting("color")
-    private TextColor color;
+    private BossBarColor color;
 
     public TeamConfig() {
     }
@@ -35,11 +36,11 @@ public class TeamConfig {
         this.name = name;
     }
 
-    public TextColor getColor() {
+    public BossBarColor getColor() {
         return color;
     }
 
-    public void setColor(TextColor color) {
+    public void setColor(BossBarColor color) {
         this.color = color;
     }
 }

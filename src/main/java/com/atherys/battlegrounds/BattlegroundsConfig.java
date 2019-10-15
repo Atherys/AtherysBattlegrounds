@@ -35,6 +35,9 @@ public class BattlegroundsConfig extends PluginConfig {
     @Setting("tick-interval")
     public Duration TICK_INTERVAL = Duration.of(500, ChronoUnit.MILLIS);
 
+    @Setting("minimum-players-required-to-capture-point")
+    public int MINIMUM_PLAYERS_REQUIRED_TO_CAPTURE_POINT;
+
     protected BattlegroundsConfig() throws IOException {
         super("config/" + AtherysBattlegrounds.ID, "config.conf");
         init();

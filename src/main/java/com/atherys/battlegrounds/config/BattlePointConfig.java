@@ -6,6 +6,7 @@ import com.flowpowered.math.vector.Vector3i;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.spongepowered.api.boss.BossBarColor;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.time.Duration;
@@ -26,11 +27,8 @@ public class BattlePointConfig {
     @Setting("color")
     private BossBarColor color;
 
-    @Setting("world")
-    private World world;
-
-    @Setting("position")
-    private Vector3i position;
+    @Setting("location")
+    private Location<World> location;
 
     @Setting("inner-radius")
     private double innerRadius;
@@ -39,13 +37,13 @@ public class BattlePointConfig {
     private double outerRadius;
 
     @Setting("capture-amount-per-tick")
-    public float captureAmount = 0.01f;
+    private float perTickCaptureAmount = 0.01f;
 
     @Setting("respawn-interval")
-    public Duration respawnInterval = Duration.of(1, ChronoUnit.SECONDS);
+    private Duration respawnInterval = Duration.of(1, ChronoUnit.SECONDS);
 
     @Setting("respawn-duration")
-    public Duration respawnDuration = Duration.of(30, ChronoUnit.SECONDS);
+    private Duration respawnDuration = Duration.of(30, ChronoUnit.SECONDS);
 
     @Setting("respawn-points")
     private Set<RespawnPointConfig> respawnPoints = new HashSet<>();
@@ -65,12 +63,8 @@ public class BattlePointConfig {
         return color;
     }
 
-    public World getWorld() {
-        return world;
-    }
-
-    public Vector3i getPosition() {
-        return position;
+    public Location<World> getLocation() {
+        return location;
     }
 
     public double getInnerRadius() {
@@ -81,8 +75,8 @@ public class BattlePointConfig {
         return outerRadius;
     }
 
-    public float getCaptureAmount() {
-        return captureAmount;
+    public float getPerTickCaptureAmount() {
+        return perTickCaptureAmount;
     }
 
     public Duration getRespawnInterval() {

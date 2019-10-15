@@ -2,9 +2,11 @@ package com.atherys.battlegrounds.model;
 
 import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.boss.BossBarColor;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import javax.annotation.Nonnull;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -18,13 +20,17 @@ public class BattlePoint {
 
     private BossBarColor color;
 
-    private World world;
-
-    private Vector3d position;
+    private Location<World> location;
 
     private double innerRadius;
 
     private double outerRadius;
+
+    private float perTickCaptureAmount;
+
+    private Duration respawnInterval;
+
+    private Duration respawnDuration;
 
     private Set<RespawnPoint> respawnPoints = new HashSet<>();
 
@@ -48,12 +54,8 @@ public class BattlePoint {
         return color;
     }
 
-    public World getWorld() {
-        return world;
-    }
-
-    public Vector3d getPosition() {
-        return position;
+    public Location<World> getLocation() {
+        return location;
     }
 
     public double getInnerRadius() {
@@ -62,6 +64,18 @@ public class BattlePoint {
 
     public double getOuterRadius() {
         return outerRadius;
+    }
+
+    public float getPerTickCaptureAmount() {
+        return perTickCaptureAmount;
+    }
+
+    public Duration getRespawnInterval() {
+        return respawnInterval;
+    }
+
+    public Duration getRespawnDuration() {
+        return respawnDuration;
     }
 
     public Set<RespawnPoint> getRespawnPoints() {
@@ -80,12 +94,8 @@ public class BattlePoint {
         this.color = color;
     }
 
-    public void setWorld(World world) {
-        this.world = world;
-    }
-
-    public void setPosition(Vector3d position) {
-        this.position = position;
+    public void setLocation(Location<World> location) {
+        this.location = location;
     }
 
     public void setInnerRadius(double innerRadius) {
@@ -94,6 +104,18 @@ public class BattlePoint {
 
     public void setOuterRadius(double outerRadius) {
         this.outerRadius = outerRadius;
+    }
+
+    public void setPerTickCaptureAmount(float perTickCaptureAmount) {
+        this.perTickCaptureAmount = perTickCaptureAmount;
+    }
+
+    public void setRespawnInterval(Duration respawnInterval) {
+        this.respawnInterval = respawnInterval;
+    }
+
+    public void setRespawnDuration(Duration respawnDuration) {
+        this.respawnDuration = respawnDuration;
     }
 
     public void setRespawnPoints(Set<RespawnPoint> respawnPoints) {
