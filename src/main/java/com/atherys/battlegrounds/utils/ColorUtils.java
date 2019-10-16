@@ -23,4 +23,15 @@ public final class ColorUtils {
         return Sponge.getRegistry().getType(TextColor.class, color.getId()).orElse(TextColors.WHITE);
     }
 
+    public static BossBarColor textColorToBossBarColor(TextColor textColor) {
+        if (TextColors.LIGHT_PURPLE.equals(textColor)) {
+            return BossBarColors.PINK;
+        }
+
+        if (TextColors.DARK_PURPLE.equals(textColor)) {
+            return BossBarColors.PURPLE;
+        }
+
+        return Sponge.getRegistry().getType(BossBarColor.class, textColor.getId()).orElse(BossBarColors.WHITE);
+    }
 }

@@ -6,7 +6,6 @@ import com.atherys.battlegrounds.model.Award;
 import com.atherys.battlegrounds.model.BattlePoint;
 import com.atherys.battlegrounds.model.RespawnPoint;
 import com.atherys.battlegrounds.model.Team;
-import com.atherys.battlegrounds.model.entity.TeamMember;
 import com.atherys.battlegrounds.service.BattlePointService;
 import com.atherys.battlegrounds.service.RespawnService;
 import com.atherys.battlegrounds.service.TeamMemberService;
@@ -117,12 +116,11 @@ public class BattlePointFacade {
             }
         }
 
-        // if no such team could be found, display the controlling team, or 0 progress by default
         if (highestProgressTeam != null) {
-            battlePoint.getBossBar().setPercent(battlePoint.getTeamProgress().getOrDefault(highestProgressTeam, 0.0f));
-        } else {
-            battlePoint.getBossBar().setPercent(battlePoint.getTeamProgress().getOrDefault(battlePoint.getControllingTeam(), 0.0f));
+            battlePoint.getBossBar().setColor(ColorUtils.textColorToBossBarColor(highestProgressTeam.getColor()));
         }
+
+        battlePoint.getBossBar().setPercent(highestProgress);
     }
 
     public void onPlayerMovement(Player player, Transform<World> from, Transform<World> to) {
