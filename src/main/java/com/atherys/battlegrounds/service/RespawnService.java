@@ -33,7 +33,7 @@ public class RespawnService {
         // do maintenance on the map to ensure no players whose request ability has already elapsed are kept
         if (!playersWithAbilityToRequestRespawn.isEmpty()) {
             for (Map.Entry<UUID, Long> entry : playersWithAbilityToRequestRespawn.entrySet()) {
-                if (entry.getValue() >= currentTimestamp) {
+                if (entry.getValue() <= currentTimestamp) {
                     playersWithAbilityToRequestRespawn.remove(entry.getKey());
                 }
             }
@@ -49,6 +49,8 @@ public class RespawnService {
 
                 anyPlayerWithThisUUID.ifPresent((player) -> this.respawnPlayer(player, battlepoint));
             });
+
+            playersToRespawn.clear();
         }
     }
 
@@ -68,7 +70,7 @@ public class RespawnService {
     }
 
     public boolean hasPlayerRespawnCounterElapsed(Player player) {
-        return playersWithAbilityToRequestRespawn.containsKey(player.getUniqueId());
+        return !playersWithAbilityToRequestRespawn.containsKey(player.getUniqueId());
     }
 
     public void queuePlayerForRespawn(Player player, BattlePoint battlePoint) {
