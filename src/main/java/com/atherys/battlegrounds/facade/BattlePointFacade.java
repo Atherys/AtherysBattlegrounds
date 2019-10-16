@@ -5,8 +5,11 @@ import com.atherys.battlegrounds.BattlegroundsConfig;
 import com.atherys.battlegrounds.model.Award;
 import com.atherys.battlegrounds.model.BattlePoint;
 import com.atherys.battlegrounds.model.RespawnPoint;
+import com.atherys.battlegrounds.model.Team;
+import com.atherys.battlegrounds.model.entity.TeamMember;
 import com.atherys.battlegrounds.service.BattlePointService;
 import com.atherys.battlegrounds.service.RespawnService;
+import com.atherys.battlegrounds.service.TeamMemberService;
 import com.atherys.battlegrounds.utils.ColorUtils;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -21,6 +24,7 @@ import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.World;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +41,9 @@ public class BattlePointFacade {
 
     @Inject
     private RespawnService respawnService;
+
+    @Inject
+    private TeamMemberService teamMemberService;
 
     private Set<BattlePoint> battlePoints;
 
@@ -99,7 +106,23 @@ public class BattlePointFacade {
     }
 
     public void updateBattlePointBossBar(BattlePoint battlePoint) {
-        battlePoint.getBossBar().setPercent(battlePoint.getTeamProgress().getOrDefault(battlePoint.getControllingTeam(), 0.0f));
+        // find the highest progress team and display their progress on the boss bar
+        Team highestProgressTeam = null;
+        float highestProgress = 0.0f;
+
+        for (Map.Entry<Team, Float> entry : battlePoint.getTeamProgress().entrySet()) {
+            if (entry.getValue() > highestProgress) {
+                highestProgressTeam = entry.getKey();
+                highestProgress = entry.getValue();
+            }
+        }
+
+        // if no such team could be found, display the controlling team, or 0 progress by default
+        if (highestProgressTeam != null) {
+            battlePoint.getBossBar().setPercent(battlePoint.getTeamProgress().getOrDefault(highestProgressTeam, 0.0f));
+        } else {
+            battlePoint.getBossBar().setPercent(battlePoint.getTeamProgress().getOrDefault(battlePoint.getControllingTeam(), 0.0f));
+        }
     }
 
     public void onPlayerMovement(Player player, Transform<World> from, Transform<World> to) {
