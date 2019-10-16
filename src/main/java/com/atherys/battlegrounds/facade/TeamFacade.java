@@ -69,7 +69,7 @@ public class TeamFacade {
         Optional<Team> team = teamService.getTeamFromId(teamId);
 
         if (!team.isPresent()) {
-            throw msg.exception(Text.of("No such team exists!"));
+            throw msg.exception("No such team exists!");
         }
 
         teamMemberService.addTeamMemberToTeam(team.get(), teamMember);

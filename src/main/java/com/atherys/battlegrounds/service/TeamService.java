@@ -2,9 +2,7 @@ package com.atherys.battlegrounds.service;
 
 import com.atherys.battlegrounds.AtherysBattlegrounds;
 import com.atherys.battlegrounds.model.Award;
-import com.atherys.battlegrounds.model.BattlePoint;
 import com.atherys.battlegrounds.model.Team;
-import com.atherys.battlegrounds.model.entity.TeamMember;
 import com.atherys.core.AtherysCore;
 import com.google.inject.Singleton;
 import org.spongepowered.api.event.cause.Cause;

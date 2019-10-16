@@ -43,7 +43,7 @@ public class BattlePointService {
             float perTickCaptureAmount,
             Duration respawnInterval,
             Duration respawnDuration,
-            Set<RespawnPoint> respawnPoints,
+            List<RespawnPoint> respawnPoints,
             Set<Award> captureAwards,
             Set<Award> tickAwards
     ) {

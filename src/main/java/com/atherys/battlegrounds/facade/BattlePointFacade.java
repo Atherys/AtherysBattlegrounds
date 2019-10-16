@@ -5,13 +5,17 @@ import com.atherys.battlegrounds.BattlegroundsConfig;
 import com.atherys.battlegrounds.model.Award;
 import com.atherys.battlegrounds.model.BattlePoint;
 import com.atherys.battlegrounds.model.RespawnPoint;
+import com.atherys.battlegrounds.model.Team;
+import com.atherys.battlegrounds.model.entity.TeamMember;
 import com.atherys.battlegrounds.service.BattlePointService;
 import com.atherys.battlegrounds.service.RespawnService;
+import com.atherys.battlegrounds.service.TeamMemberService;
 import com.atherys.battlegrounds.utils.ColorUtils;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.boss.*;
+import org.spongepowered.api.boss.BossBarColor;
+import org.spongepowered.api.boss.BossBarOverlays;
+import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
@@ -19,7 +23,8 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.World;
 
-import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +42,9 @@ public class BattlePointFacade {
     @Inject
     private RespawnService respawnService;
 
+    @Inject
+    private TeamMemberService teamMemberService;
+
     private Set<BattlePoint> battlePoints;
 
     private Task battlepointTask;
@@ -48,13 +56,13 @@ public class BattlePointFacade {
         // create the battlepoints from the configuration
         config.BATTLE_POINTS.forEach(pointConfig -> {
             // parse the respawn point configs
-            Set<RespawnPoint> respawnPoints = pointConfig.getRespawnPoints().parallelStream()
+            List<RespawnPoint> respawnPoints = pointConfig.getRespawnPoints().parallelStream()
                     .map(respawnConfig -> respawnService.createRespawnPoint(
                             pointConfig.getLocation().getExtent(),
                             respawnConfig.getPosition(),
                             respawnConfig.getRadius()
                     ))
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
 
             // parse the capture awards config
             Set<Award> captureAwards = pointConfig.getOnCaptureAwards().parallelStream()
@@ -88,7 +96,7 @@ public class BattlePointFacade {
 
         // start the tick task
         battlepointTask = Task.builder()
-                .interval(config.TICK_INTERVAL.get(ChronoUnit.MILLIS), TimeUnit.MILLISECONDS)
+                .interval(config.TICK_INTERVAL.toMillis(), TimeUnit.MILLISECONDS)
                 .execute(this::tickAll)
                 .submit(AtherysBattlegrounds.getInstance());
     }
@@ -98,7 +106,23 @@ public class BattlePointFacade {
     }
 
     public void updateBattlePointBossBar(BattlePoint battlePoint) {
-        battlePoint.getBossBar().setPercent(battlePoint.getTeamProgress().getOrDefault(battlePoint.getControllingTeam(), 0.0f));
+        // find the highest progress team and display their progress on the boss bar
+        Team highestProgressTeam = null;
+        float highestProgress = 0.0f;
+
+        for (Map.Entry<Team, Float> entry : battlePoint.getTeamProgress().entrySet()) {
+            if (entry.getValue() > highestProgress) {
+                highestProgressTeam = entry.getKey();
+                highestProgress = entry.getValue();
+            }
+        }
+
+        // if no such team could be found, display the controlling team, or 0 progress by default
+        if (highestProgressTeam != null) {
+            battlePoint.getBossBar().setPercent(battlePoint.getTeamProgress().getOrDefault(highestProgressTeam, 0.0f));
+        } else {
+            battlePoint.getBossBar().setPercent(battlePoint.getTeamProgress().getOrDefault(battlePoint.getControllingTeam(), 0.0f));
+        }
     }
 
     public void onPlayerMovement(Player player, Transform<World> from, Transform<World> to) {

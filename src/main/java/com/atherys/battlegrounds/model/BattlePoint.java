@@ -1,15 +1,11 @@
 package com.atherys.battlegrounds.model;
 
-import org.spongepowered.api.boss.BossBar;
 import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class BattlePoint {
 
@@ -31,7 +27,7 @@ public class BattlePoint {
 
     private Duration respawnTimeout;
 
-    private Set<RespawnPoint> respawnPoints = new HashSet<>();
+    private List<RespawnPoint> respawnPoints = new ArrayList<>();
 
     private Set<Award> captureAwards = new HashSet<>();
 
@@ -105,11 +101,11 @@ public class BattlePoint {
         this.respawnTimeout = respawnTimeout;
     }
 
-    public Set<RespawnPoint> getRespawnPoints() {
+    public List<RespawnPoint> getRespawnPoints() {
         return respawnPoints;
     }
 
-    public void setRespawnPoints(Set<RespawnPoint> respawnPoints) {
+    public void setRespawnPoints(List<RespawnPoint> respawnPoints) {
         this.respawnPoints = respawnPoints;
     }
 
@@ -145,11 +141,11 @@ public class BattlePoint {
         this.controllingTeam = controllingTeam;
     }
 
-    public void setBossBar(ServerBossBar bossBar) {
-        this.bossBar = bossBar;
-    }
-
     public ServerBossBar getBossBar() {
         return bossBar;
+    }
+
+    public void setBossBar(ServerBossBar bossBar) {
+        this.bossBar = bossBar;
     }
 }

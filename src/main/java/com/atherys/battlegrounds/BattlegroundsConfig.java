@@ -33,7 +33,10 @@ public class BattlegroundsConfig extends PluginConfig {
     public Set<TeamConfig> TEAMS = new HashSet<>();
 
     @Setting("tick-interval")
-    public Duration TICK_INTERVAL = Duration.of(500, ChronoUnit.MILLIS);
+    public Duration TICK_INTERVAL = Duration.of(1, ChronoUnit.SECONDS);
+
+    @Setting("respawn-interval")
+    public Duration RESPAWN_INTERVAL = Duration.of(5, ChronoUnit.SECONDS);
 
     @Setting("minimum-players-required-to-capture-point")
     public int MINIMUM_PLAYERS_REQUIRED_TO_CAPTURE_POINT;
@@ -48,8 +51,10 @@ public class BattlegroundsConfig extends PluginConfig {
         ConfigurationOptions options = super.getOptions();
         TypeSerializerCollection serializers = TypeSerializers.getDefaultSerializers().newChild();
 
-        serializers.registerType(new TypeToken<Location<World>>() {}, new LocationTypeSerializer());
-        serializers.registerType(new TypeToken<Duration>() {}, new DurationTypeSerializer());
+        serializers.registerType(new TypeToken<Location<World>>() {
+        }, new LocationTypeSerializer());
+        serializers.registerType(new TypeToken<Duration>() {
+        }, new DurationTypeSerializer());
         options.setSerializers(serializers);
         return options;
     }

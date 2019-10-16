@@ -8,7 +8,9 @@ import org.spongepowered.api.world.World;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @ConfigSerializable
@@ -42,7 +44,7 @@ public class BattlePointConfig {
     private Duration respawnTimeout = Duration.of(30, ChronoUnit.SECONDS);
 
     @Setting("respawn-points")
-    private Set<RespawnPointConfig> respawnPoints = new HashSet<>();
+    private List<RespawnPointConfig> respawnPoints = new ArrayList<>();
 
     @Setting("on-capture-awards")
     private Set<AwardConfig> onCaptureAwards = new HashSet<>();
@@ -89,7 +91,7 @@ public class BattlePointConfig {
         return respawnTimeout;
     }
 
-    public Set<RespawnPointConfig> getRespawnPoints() {
+    public List<RespawnPointConfig> getRespawnPoints() {
         return respawnPoints;
     }
 

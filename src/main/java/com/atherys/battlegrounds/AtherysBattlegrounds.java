@@ -2,6 +2,7 @@ package com.atherys.battlegrounds;
 
 import com.atherys.battlegrounds.command.TeamCommand;
 import com.atherys.battlegrounds.facade.BattlePointFacade;
+import com.atherys.battlegrounds.facade.RespawnFacade;
 import com.atherys.battlegrounds.facade.TeamFacade;
 import com.atherys.battlegrounds.listener.BattlePointListener;
 import com.atherys.battlegrounds.listener.PlayerListener;
@@ -29,7 +30,7 @@ import static com.atherys.battlegrounds.AtherysBattlegrounds.*;
         description = DESCRIPTION,
         version = VERSION,
         dependencies = {
-                @Dependency( id = "atheryscore" )
+                @Dependency(id = "atheryscore")
         }
 )
 public class AtherysBattlegrounds {
@@ -74,6 +75,7 @@ public class AtherysBattlegrounds {
 
     private void start() {
         components.battlePointFacade.init();
+        components.respawnFacade.init();
         components.teamFacade.init();
 
         components.teamMemberRepository.initCache();
@@ -84,18 +86,18 @@ public class AtherysBattlegrounds {
     }
 
     @Listener
-    public void onInit( GameInitializationEvent event ) {
+    public void onInit(GameInitializationEvent event) {
         init();
     }
 
     @Listener
-    public void onStart( GameStartingServerEvent event ) {
-        if ( init ) start();
+    public void onStart(GameStartingServerEvent event) {
+        if (init) start();
     }
 
     @Listener
-    public void onStop( GameStoppingServerEvent event ) {
-        if ( init ) stop();
+    public void onStop(GameStoppingServerEvent event) {
+        if (init) stop();
     }
 
     public TeamFacade getTeamFacade() {
@@ -122,6 +124,9 @@ public class AtherysBattlegrounds {
 
         @Inject
         private TeamService teamService;
+
+        @Inject
+        private RespawnFacade respawnFacade;
 
         @Inject
         private BattlePointFacade battlePointFacade;
