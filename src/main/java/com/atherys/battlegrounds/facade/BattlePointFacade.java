@@ -88,7 +88,7 @@ public class BattlePointFacade {
 
         // start the tick task
         battlepointTask = Task.builder()
-                .interval(config.TICK_INTERVAL.get(ChronoUnit.MILLIS), TimeUnit.MILLISECONDS)
+                .interval(config.TICK_INTERVAL.toMillis(), TimeUnit.MILLISECONDS)
                 .execute(this::tickAll)
                 .submit(AtherysBattlegrounds.getInstance());
     }
