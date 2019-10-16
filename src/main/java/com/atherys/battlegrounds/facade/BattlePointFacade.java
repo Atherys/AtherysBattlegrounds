@@ -10,6 +10,7 @@ import com.atherys.battlegrounds.service.BattlePointService;
 import com.atherys.battlegrounds.service.RespawnService;
 import com.atherys.battlegrounds.service.TeamMemberService;
 import com.atherys.battlegrounds.utils.ColorUtils;
+import com.atherys.core.utils.MathUtils;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.spongepowered.api.boss.BossBarColor;
@@ -120,7 +121,7 @@ public class BattlePointFacade {
             battlePoint.getBossBar().setColor(ColorUtils.textColorToBossBarColor(highestProgressTeam.getColor()));
         }
 
-        battlePoint.getBossBar().setPercent(highestProgress);
+        battlePoint.getBossBar().setPercent(MathUtils.clamp(highestProgress, 0.0f, 1.0f));
     }
 
     public void onPlayerMovement(Player player, Transform<World> from, Transform<World> to) {
