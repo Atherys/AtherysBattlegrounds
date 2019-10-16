@@ -10,8 +10,9 @@ import com.atherys.battlegrounds.service.RespawnService;
 import com.atherys.battlegrounds.utils.ColorUtils;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.boss.*;
+import org.spongepowered.api.boss.BossBarColor;
+import org.spongepowered.api.boss.BossBarOverlays;
+import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
@@ -19,7 +20,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.World;
 
-import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -48,13 +49,13 @@ public class BattlePointFacade {
         // create the battlepoints from the configuration
         config.BATTLE_POINTS.forEach(pointConfig -> {
             // parse the respawn point configs
-            Set<RespawnPoint> respawnPoints = pointConfig.getRespawnPoints().parallelStream()
+            List<RespawnPoint> respawnPoints = pointConfig.getRespawnPoints().parallelStream()
                     .map(respawnConfig -> respawnService.createRespawnPoint(
                             pointConfig.getLocation().getExtent(),
                             respawnConfig.getPosition(),
                             respawnConfig.getRadius()
                     ))
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
 
             // parse the capture awards config
             Set<Award> captureAwards = pointConfig.getOnCaptureAwards().parallelStream()

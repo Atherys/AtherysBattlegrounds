@@ -7,7 +7,6 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 
 public class DurationTypeSerializer implements TypeSerializer<Duration> {
     @Override

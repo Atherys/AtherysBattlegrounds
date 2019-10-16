@@ -1,7 +1,5 @@
 package com.atherys.battlegrounds.model;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -11,7 +9,8 @@ public class RespawnPoint {
 
     private double radius;
 
-    public RespawnPoint() {}
+    public RespawnPoint() {
+    }
 
     public RespawnPoint(Location<World> location, double radius) {
         this.location = location;

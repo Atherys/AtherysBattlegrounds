@@ -1,25 +1,57 @@
 package com.atherys.battlegrounds.service;
 
-import com.atherys.battlegrounds.AtherysBattlegrounds;
+import com.atherys.battlegrounds.model.BattlePoint;
 import com.atherys.battlegrounds.model.RespawnPoint;
+import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Singleton;
+import org.apache.commons.lang3.RandomUtils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.util.Identifiable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import javax.annotation.Nonnull;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class RespawnService {
+
+    // this map represents players who are still able to request a respawn, but have not done so yet
+    // the value represents the timestamp before which they can request a respawn, and after which they will no longer be able to do so
+    private Map<UUID, Long> playersWithAbilityToRequestRespawn = new HashMap<>();
+
+    // this queue represents the players who have requested a respawn and are to be respawned with the next respawn tick
+    private Map<UUID, BattlePoint> playersToRespawn = new HashMap<>();
+
+    public void tickRespawns() {
+        long currentTimestamp = System.currentTimeMillis();
+
+        // do maintenance on the map to ensure no players whose request ability has already elapsed are kept
+        if (!playersWithAbilityToRequestRespawn.isEmpty()) {
+            for (Map.Entry<UUID, Long> entry : playersWithAbilityToRequestRespawn.entrySet()) {
+                if (entry.getValue() >= currentTimestamp) {
+                    playersWithAbilityToRequestRespawn.remove(entry.getKey());
+                }
+            }
+        }
+
+        // respawn players who have requested to do so
+        if (!playersToRespawn.isEmpty()) {
+            playersToRespawn.forEach((uuid, battlepoint) -> {
+                Optional<Player> anyPlayerWithThisUUID = Sponge.getServer()
+                        .getOnlinePlayers().stream()
+                        .filter(player -> player.getUniqueId().equals(uuid))
+                        .findAny();
+
+                anyPlayerWithThisUUID.ifPresent((player) -> this.respawnPlayer(player, battlepoint));
+            });
+        }
+    }
+
     public RespawnPoint createRespawnPoint(World world, Vector3i position, double radius) {
         RespawnPoint respawnPoint = new RespawnPoint();
         respawnPoint.setLocation(new Location<>(world, position));
@@ -28,139 +60,50 @@ public class RespawnService {
         return respawnPoint;
     }
 
-//    private static final RespawnService instance = new RespawnService();
-//
-//    public static class Respawn implements Identifiable {
-//
-//        private UUID player;
-//
-//        private RespawnPoint point;
-//
-//        private long timestamp;
-//
-//        private boolean ready;
-//
-//        public Respawn(UUID player, RespawnPoint point, long timestamp) {
-//            this.player = player;
-//            this.point = point;
-//            this.timestamp = timestamp;
-//        }
-//
-//        @Override
-//        @Nonnull
-//        public UUID getUniqueId() {
-//            return player;
-//        }
-//
-//        public RespawnPoint getPoint() {
-//            return point;
-//        }
-//
-//        public long getTimestamp() {
-//            return timestamp;
-//        }
-//
-//        public boolean isReady() {
-//            return ready;
-//        }
-//
-//        public void setReady(boolean state) {
-//            this.ready = state;
-//        }
-//
-//        @Override
-//        public boolean equals(Object o) {
-//            if (this == o) return true;
-//            if (!(o instanceof Respawn)) return false;
-//            Respawn respawn = (Respawn) o;
-//            return Objects.equals(player, respawn.player);
-//        }
-//
-//        @Override
-//        public int hashCode() {
-//            return Objects.hash(player);
-//        }
-//    }
-//
-//    private Map<UUID, Respawn> respawns = new HashMap<>();
-//
-//    private Task respawnTask;
-//
-//    private RespawnService() {
-//        respawnTask = Task.builder()
-//                .delay(1, TimeUnit.SECONDS)
-//                .interval(AtherysBattlegrounds.getConfig().RESPAWN_INTERVAL, TimeUnit.SECONDS)
-//                .execute(this::respawnTick)
-//                .submit(AtherysBattlegrounds.getInstance());
-//    }
-//
-//    /**
-//     * Queues a new respawn for the given player to the given point. If that player already has another
-//     * respawn queued, this will return false.
-//     *
-//     * @param player The players to be queued
-//     * @param point  the point to queue for
-//     * @return true if successful, false if player is already queued for respawn
-//     */
-//    public boolean queueRespawn(UUID player, RespawnPoint point) {
-//        Respawn respawn = new Respawn(player, point, System.currentTimeMillis());
-//
-//        if (respawns.containsKey(player)) return false;
-//
-//        respawns.put(player, respawn);
-//        return true;
-//    }
-//
-//    /**
-//     * If the given player has been queued for a respawn, this will set the respawn state to ready,
-//     * and when the appropriate time has passed, the player will be teleported to the respawn point.
-//     * <p>
-//     * If this method is not called, the player's respawn will expire, and they will not be teleported.
-//     *
-//     * @param player The player whose respawn to confirm
-//     * @return true if successful, false if the player has not been queued for a respawn
-//     */
-//    public boolean confirmRespawn(UUID player) {
-//        if (!respawns.containsKey(player)) return false;
-//
-//        respawns.get(player).setReady(true);
-//        return true;
-//    }
-//
-//    private void respawnPlayer(Player player) {
-//        Respawn respawn = respawns.get(player.getUniqueId());
-//        if (respawn == null) return;
-//
-//        long currentTimestamp = System.currentTimeMillis();
-//
-//        if (!respawn.isReady()) {
-//
-//            // if the respawn is not confirmed, and it's duration has run out, clear it
-//            if (currentTimestamp - respawn.getTimestamp() >= AtherysBattlegrounds.getConfig().RESPAWN_DURATION) {
-//                respawns.remove(player.getUniqueId());
-//            }
-//
-//            // return, as the respawn has not been confirmed
-//        } else {
-//
-//            // if the respawn is confirmed, and it's duration has not run out, return
-//            if (currentTimestamp - respawn.getTimestamp() < AtherysBattlegrounds.getConfig().RESPAWN_DURATION) {
-//                return;
-//            }
-//
-//            player.setLocation(respawn.getPoint().getRandomPointWithin());
-//        }
-//    }
-//
-//    private void respawnTick() {
-//        respawns.forEach((uuid, respawn) -> Sponge.getServer().getPlayer(uuid).ifPresent(this::respawnPlayer));
-//    }
-//
-//    public Task getRespawnTask() {
-//        return respawnTask;
-//    }
-//
-//    public static RespawnService getInstance() {
-//        return instance;
-//    }
+    public void beginRespawnTimeoutCounter(Player player, Duration respawnTimeout) {
+        playersWithAbilityToRequestRespawn.put(
+                player.getUniqueId(),
+                System.currentTimeMillis() + respawnTimeout.toMillis()
+        );
+    }
+
+    public boolean hasPlayerRespawnCounterElapsed(Player player) {
+        return playersWithAbilityToRequestRespawn.containsKey(player.getUniqueId());
+    }
+
+    public void queuePlayerForRespawn(Player player, BattlePoint battlePoint) {
+        playersToRespawn.put(player.getUniqueId(), battlePoint);
+    }
+
+    protected void respawnPlayer(Player player, BattlePoint battlePoint) {
+        // get random respawn point
+        RespawnPoint respawnPoint = battlePoint.getRespawnPoints().get(RandomUtils.nextInt(0, battlePoint.getRespawnPoints().size()));
+
+        // calculate a random point within its radius where to respawn the player
+        Location<World> respawnLocation = calculateSafeRespawnLocation(respawnPoint);
+
+        // teleport the player to the final respawn location
+        player.setLocation(respawnLocation);
+    }
+
+    protected Location<World> calculateSafeRespawnLocation(RespawnPoint respawnPoint) {
+        double a = Math.random() * 2 * Math.PI;
+        double r = respawnPoint.getRadius() * Math.sqrt(Math.random());
+
+        double x = respawnPoint.getLocation().getX() + r * Math.cos(a);
+        double z = respawnPoint.getLocation().getZ() + r * Math.sin(a);
+
+        Vector3d initialPosition = new Vector3d(
+                x,
+                respawnPoint.getLocation().getExtent().getHighestYAt((int) Math.round(x), (int) Math.round(z)),
+                z
+        );
+
+        Location<World> initialLocation = new Location<>(respawnPoint.getLocation().getExtent(), initialPosition);
+
+        return Sponge.getTeleportHelper()
+                .getSafeLocation(initialLocation, 3, 3)
+                .orElse(initialLocation);
+    }
+
 }

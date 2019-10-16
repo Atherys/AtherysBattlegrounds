@@ -19,7 +19,7 @@ public class LocationTypeSerializer implements TypeSerializer<Location<World>> {
         double z = value.getNode("z").getDouble();
 
         Optional<World> w = Sponge.getServer().getWorld(world);
-        if ( !w.isPresent() ) throw new ObjectMappingException("World '" + world + "' does not exist.");
+        if (!w.isPresent()) throw new ObjectMappingException("World '" + world + "' does not exist.");
 
         return new Location<>(w.get(), x, y, z);
     }

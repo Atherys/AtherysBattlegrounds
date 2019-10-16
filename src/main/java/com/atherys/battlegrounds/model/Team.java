@@ -2,9 +2,6 @@ package com.atherys.battlegrounds.model;
 
 import org.spongepowered.api.text.format.TextColor;
 
-import javax.annotation.Nonnull;
-import java.util.Objects;
-
 public class Team {
 
     private String id;
