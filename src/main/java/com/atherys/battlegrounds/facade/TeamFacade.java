@@ -64,15 +64,9 @@ public class TeamFacade {
         teamMemberService.removeTeamMemberFromTeam(team, teamMember);
     }
 
-    public void addPlayerToTeam(Player source, String teamId) throws CommandException {
+    public void addPlayerToTeam(Player source, Team team) throws CommandException {
         TeamMember teamMember = teamMemberService.getOrCreateTeamMember(source);
-        Optional<Team> team = teamService.getTeamFromId(teamId);
-
-        if (!team.isPresent()) {
-            throw msg.exception("No such team exists!");
-        }
-
-        teamMemberService.addTeamMemberToTeam(team.get(), teamMember);
+        teamMemberService.addTeamMemberToTeam(team, teamMember);
     }
 
     public Map<String, Team> getTeamChoices() {

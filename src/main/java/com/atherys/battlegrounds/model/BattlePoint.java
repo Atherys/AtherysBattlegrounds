@@ -148,4 +148,50 @@ public class BattlePoint {
     public void setBossBar(ServerBossBar bossBar) {
         this.bossBar = bossBar;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BattlePoint that = (BattlePoint) o;
+        return Double.compare(that.innerRadius, innerRadius) == 0 &&
+                Double.compare(that.outerRadius, outerRadius) == 0 &&
+                Float.compare(that.perTickCaptureAmount, perTickCaptureAmount) == 0 &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(bossBar, that.bossBar) &&
+                Objects.equals(location, that.location) &&
+                Objects.equals(respawnInterval, that.respawnInterval) &&
+                Objects.equals(respawnTimeout, that.respawnTimeout) &&
+                Objects.equals(respawnPoints, that.respawnPoints) &&
+                Objects.equals(captureAwards, that.captureAwards) &&
+                Objects.equals(tickAwards, that.tickAwards) &&
+                Objects.equals(teamProgress, that.teamProgress) &&
+                Objects.equals(controllingTeam, that.controllingTeam);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, bossBar, location, innerRadius, outerRadius, perTickCaptureAmount, respawnInterval, respawnTimeout, respawnPoints, captureAwards, tickAwards, teamProgress, controllingTeam);
+    }
+
+    @Override
+    public String toString() {
+        return "BattlePoint{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", bossBar=" + bossBar +
+                ", location=" + location +
+                ", innerRadius=" + innerRadius +
+                ", outerRadius=" + outerRadius +
+                ", perTickCaptureAmount=" + perTickCaptureAmount +
+                ", respawnInterval=" + respawnInterval +
+                ", respawnTimeout=" + respawnTimeout +
+                ", respawnPoints=" + respawnPoints +
+                ", captureAwards=" + captureAwards +
+                ", tickAwards=" + tickAwards +
+                ", teamProgress=" + teamProgress +
+                ", controllingTeam=" + controllingTeam +
+                '}';
+    }
 }

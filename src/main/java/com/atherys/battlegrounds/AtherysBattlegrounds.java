@@ -73,6 +73,9 @@ public class AtherysBattlegrounds {
         battlegroundsInjector = spongeInjector.createChildInjector();
         battlegroundsInjector.injectMembers(components);
 
+        // init the team facade now in order to populate team choices for the team command
+        components.teamFacade.init();
+
         try {
             AtherysCore.getCommandService().register(new TeamCommand(), this);
         } catch (CommandService.AnnotatedCommandException e) {
@@ -85,7 +88,6 @@ public class AtherysBattlegrounds {
     private void start() {
         components.battlePointFacade.init();
         components.respawnFacade.init();
-        components.teamFacade.init();
 
         components.teamMemberRepository.initCache();
     }

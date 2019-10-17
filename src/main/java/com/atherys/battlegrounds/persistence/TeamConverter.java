@@ -8,7 +8,7 @@ import javax.persistence.AttributeConverter;
 public class TeamConverter implements AttributeConverter<Team, String> {
     @Override
     public String convertToDatabaseColumn(Team attribute) {
-        return attribute.getId();
+        return attribute == null ? null : attribute.getId();
     }
 
     @Override

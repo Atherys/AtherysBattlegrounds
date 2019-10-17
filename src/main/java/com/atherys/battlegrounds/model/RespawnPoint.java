@@ -3,6 +3,8 @@ package com.atherys.battlegrounds.model;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.Objects;
+
 public class RespawnPoint {
 
     private Location<World> location;
@@ -33,10 +35,25 @@ public class RespawnPoint {
         this.radius = radius;
     }
 
-//    public Location<World> getRandomPointWithin() {
-//        double x = location.getX() + radius * Math.cos( Math.random() * 360.0 );
-//        double z = location.getZ() + radius * Math.sin( Math.random() * 360.0 );
-//        double y = location.getExtent().getHighestYAt( (int) x, (int) z );
-//        return new Location<>( location.getExtent(), x, y, z );
-//    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RespawnPoint that = (RespawnPoint) o;
+        return Double.compare(that.radius, radius) == 0 &&
+                Objects.equals(location, that.location);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(location, radius);
+    }
+
+    @Override
+    public String toString() {
+        return "RespawnPoint{" +
+                "location=" + location +
+                ", radius=" + radius +
+                '}';
+    }
 }
