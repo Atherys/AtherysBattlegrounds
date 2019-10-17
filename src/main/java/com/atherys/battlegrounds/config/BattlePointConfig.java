@@ -26,7 +26,58 @@ public class BattlePointConfig {
     private BossBarColor color;
 
     @Setting("location")
-    private Location<World> location;
+    private LocationConfig location;
+
+    @ConfigSerializable
+    public static class LocationConfig {
+
+        @Setting("world")
+        private String world;
+
+        @Setting("x")
+        private double x;
+
+        @Setting("y")
+        private double y;
+
+        @Setting("z")
+        private double z;
+
+        public LocationConfig() {
+        }
+
+        public String getWorld() {
+            return world;
+        }
+
+        public void setWorld(String world) {
+            this.world = world;
+        }
+
+        public double getX() {
+            return x;
+        }
+
+        public void setX(double x) {
+            this.x = x;
+        }
+
+        public double getY() {
+            return y;
+        }
+
+        public void setY(double y) {
+            this.y = y;
+        }
+
+        public double getZ() {
+            return z;
+        }
+
+        public void setZ(double z) {
+            this.z = z;
+        }
+    }
 
     @Setting("inner-radius")
     private double innerRadius;
@@ -67,7 +118,7 @@ public class BattlePointConfig {
         return color;
     }
 
-    public Location<World> getLocation() {
+    public LocationConfig getLocation() {
         return location;
     }
 

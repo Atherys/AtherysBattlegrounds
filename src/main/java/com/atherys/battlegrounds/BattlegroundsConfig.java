@@ -3,7 +3,6 @@ package com.atherys.battlegrounds;
 import com.atherys.battlegrounds.config.BattlePointConfig;
 import com.atherys.battlegrounds.config.TeamConfig;
 import com.atherys.battlegrounds.serialize.DurationTypeSerializer;
-import com.atherys.battlegrounds.serialize.LocationTypeSerializer;
 import com.atherys.core.utils.PluginConfig;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Singleton;
@@ -11,8 +10,6 @@ import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollection;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -49,12 +46,11 @@ public class BattlegroundsConfig extends PluginConfig {
     @Override
     protected ConfigurationOptions getOptions() {
         ConfigurationOptions options = super.getOptions();
+
         TypeSerializerCollection serializers = TypeSerializers.getDefaultSerializers().newChild();
 
-        serializers.registerType(new TypeToken<Location<World>>() {
-        }, new LocationTypeSerializer());
-        serializers.registerType(new TypeToken<Duration>() {
-        }, new DurationTypeSerializer());
+        serializers.registerType(TypeToken.of(Duration.class), new DurationTypeSerializer());
+
         options.setSerializers(serializers);
         return options;
     }

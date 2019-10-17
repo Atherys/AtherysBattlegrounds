@@ -8,6 +8,7 @@ import com.atherys.battlegrounds.listener.BattlePointListener;
 import com.atherys.battlegrounds.listener.PlayerListener;
 import com.atherys.battlegrounds.model.entity.TeamMember;
 import com.atherys.battlegrounds.persistence.TeamMemberRepository;
+import com.atherys.battlegrounds.serialize.DurationTypeSerializer;
 import com.atherys.battlegrounds.service.BattlePointService;
 import com.atherys.battlegrounds.service.RespawnService;
 import com.atherys.battlegrounds.service.TeamService;
@@ -15,15 +16,18 @@ import com.atherys.core.AtherysCore;
 import com.atherys.core.command.CommandService;
 import com.atherys.core.event.AtherysHibernateConfigurationEvent;
 import com.atherys.core.event.AtherysHibernateInitializedEvent;
+import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.slf4j.Logger;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
+
+import java.time.Duration;
 
 import static com.atherys.battlegrounds.AtherysBattlegrounds.*;
 
@@ -63,6 +67,8 @@ public class AtherysBattlegrounds {
     private void init() {
         instance = this;
 
+        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Duration.class), new DurationTypeSerializer());
+
         components = new Components();
         battlegroundsInjector = spongeInjector.createChildInjector();
         battlegroundsInjector.injectMembers(components);
@@ -76,14 +82,12 @@ public class AtherysBattlegrounds {
         init = true;
     }
 
-    private void dbInit() {
-        components.teamMemberRepository.initCache();
-    }
-
     private void start() {
         components.battlePointFacade.init();
         components.respawnFacade.init();
         components.teamFacade.init();
+
+        components.teamMemberRepository.initCache();
     }
 
     private void stop() {
@@ -97,11 +101,8 @@ public class AtherysBattlegrounds {
 
     @Listener
     public void onHibernateInit(AtherysHibernateInitializedEvent event) {
-        dbInit();
+        init();
     }
-
-    @Listener
-    public void onInit(GameInitializationEvent event) { init(); }
 
     @Listener
     public void onStart(GameStartingServerEvent event) {

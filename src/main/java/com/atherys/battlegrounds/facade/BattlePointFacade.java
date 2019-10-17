@@ -2,6 +2,7 @@ package com.atherys.battlegrounds.facade;
 
 import com.atherys.battlegrounds.AtherysBattlegrounds;
 import com.atherys.battlegrounds.BattlegroundsConfig;
+import com.atherys.battlegrounds.config.BattlePointConfig;
 import com.atherys.battlegrounds.model.Award;
 import com.atherys.battlegrounds.model.BattlePoint;
 import com.atherys.battlegrounds.model.RespawnPoint;
@@ -13,6 +14,8 @@ import com.atherys.battlegrounds.utils.ColorUtils;
 import com.atherys.core.utils.MathUtils;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.slf4j.Logger;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.boss.BossBarOverlays;
 import org.spongepowered.api.boss.ServerBossBar;
@@ -21,6 +24,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.List;
@@ -32,6 +36,9 @@ import java.util.stream.Collectors;
 
 @Singleton
 public class BattlePointFacade {
+
+    @Inject
+    private Logger logger;
 
     @Inject
     private BattlegroundsConfig config;
@@ -55,10 +62,27 @@ public class BattlePointFacade {
     public void init() {
         // create the battlepoints from the configuration
         config.BATTLE_POINTS.forEach(pointConfig -> {
+            // parse the configured location
+            BattlePointConfig.LocationConfig locationConfig = pointConfig.getLocation();
+
+            Optional<World> world = Sponge.getServer().getWorld(locationConfig.getWorld());
+
+            if (!world.isPresent()) {
+                logger.error("Configured location for battlepoint " + pointConfig.getId() + " contains an invalid world. Skipping.");
+                return;
+            }
+
+            Location<World> location = new Location<>(
+                    world.get(),
+                    locationConfig.getX(),
+                    locationConfig.getY(),
+                    locationConfig.getZ()
+            );
+
             // parse the respawn point configs
             List<RespawnPoint> respawnPoints = pointConfig.getRespawnPoints().parallelStream()
                     .map(respawnConfig -> respawnService.createRespawnPoint(
-                            pointConfig.getLocation().getExtent(),
+                            location.getExtent(),
                             respawnConfig.getPosition(),
                             respawnConfig.getRadius()
                     ))
@@ -82,7 +106,7 @@ public class BattlePointFacade {
                     pointConfig.getId(),
                     pointConfig.getName(),
                     battlePointBossBar,
-                    pointConfig.getLocation(),
+                    location,
                     pointConfig.getInnerRadius(),
                     pointConfig.getOuterRadius(),
                     pointConfig.getPerTickCaptureAmount(),
