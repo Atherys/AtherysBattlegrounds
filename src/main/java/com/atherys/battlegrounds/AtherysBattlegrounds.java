@@ -21,6 +21,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.slf4j.Logger;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
@@ -75,6 +76,9 @@ public class AtherysBattlegrounds {
 
         // init the team facade now in order to populate team choices for the team command
         components.teamFacade.init();
+
+        Sponge.getEventManager().registerListeners(this, components.battlePointListener);
+        Sponge.getEventManager().registerListeners(this, components.playerListener);
 
         try {
             AtherysCore.getCommandService().register(new TeamCommand(), this);

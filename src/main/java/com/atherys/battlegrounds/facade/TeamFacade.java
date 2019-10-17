@@ -10,11 +10,9 @@ import com.google.inject.Singleton;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Singleton
 public class TeamFacade {
@@ -50,7 +48,7 @@ public class TeamFacade {
             throw msg.exception(Text.of("You are not part of a team!"));
         }
 
-        msg.info(source, Text.of("You are currently part of \"", team.getColor(), team.getName(), TextColors.RESET, "\"."));
+        msg.info(source, Text.of("You are currently part of \"", team, "\"."));
     }
 
     public void removePlayerFromTeam(Player source) throws CommandException {
@@ -62,11 +60,16 @@ public class TeamFacade {
         }
 
         teamMemberService.removeTeamMemberFromTeam(team, teamMember);
+
+        msg.error(source, Text.of("You have left the team \"", team, "\""));
     }
 
     public void addPlayerToTeam(Player source, Team team) throws CommandException {
         TeamMember teamMember = teamMemberService.getOrCreateTeamMember(source);
+
         teamMemberService.addTeamMemberToTeam(team, teamMember);
+
+        msg.info(source, Text.of("You have joined the team \"", team, "\""));
     }
 
     public Map<String, Team> getTeamChoices() {

@@ -1,13 +1,17 @@
 package com.atherys.battlegrounds.model;
 
+import com.atherys.battlegrounds.utils.ColorUtils;
 import org.spongepowered.api.boss.ServerBossBar;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextRepresentable;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.time.Duration;
 import java.util.*;
 
-public class BattlePoint {
+public class BattlePoint implements TextRepresentable {
 
     private String id;
 
@@ -193,5 +197,10 @@ public class BattlePoint {
                 ", teamProgress=" + teamProgress +
                 ", controllingTeam=" + controllingTeam +
                 '}';
+    }
+
+    @Override
+    public Text toText() {
+        return Text.of(ColorUtils.bossBarColorToTextColor(bossBar.getColor()), name, TextColors.RESET);
     }
 }

@@ -38,6 +38,12 @@ public class BattlegroundsConfig extends PluginConfig {
     @Setting("minimum-players-required-to-capture-point")
     public int MINIMUM_PLAYERS_REQUIRED_TO_CAPTURE_POINT;
 
+    @Setting("title-fade-ticks")
+    public int TITLE_FADE_TICKS = 7;
+
+    @Setting("title-stay-ticks")
+    public int TITLE_STAY_TICKS = 10;
+
     protected BattlegroundsConfig() throws IOException {
         super("config/" + AtherysBattlegrounds.ID, "config.conf");
         init();

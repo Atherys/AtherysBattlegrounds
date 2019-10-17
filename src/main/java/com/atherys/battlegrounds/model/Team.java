@@ -1,10 +1,13 @@
 package com.atherys.battlegrounds.model;
 
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextRepresentable;
 import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Objects;
 
-public class Team {
+public class Team implements TextRepresentable {
 
     private String id;
 
@@ -58,5 +61,10 @@ public class Team {
                 ", name='" + name + '\'' +
                 ", color=" + color +
                 '}';
+    }
+
+    @Override
+    public Text toText() {
+        return Text.of(color, name, TextColors.RESET);
     }
 }

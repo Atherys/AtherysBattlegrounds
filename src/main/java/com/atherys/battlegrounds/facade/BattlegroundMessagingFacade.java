@@ -1,6 +1,7 @@
 package com.atherys.battlegrounds.facade;
 
 import com.google.inject.Singleton;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageReceiver;
@@ -25,6 +26,10 @@ public class BattlegroundMessagingFacade {
 
     public void error(MessageReceiver messageReceiver, Object... message) {
         messageReceiver.sendMessage(formatError(message));
+    }
+
+    public void broadcast(Object... message) {
+        Sponge.getServer().getBroadcastChannel().send(formatInfo(message));
     }
 
     public CommandException exception(Object... message) {

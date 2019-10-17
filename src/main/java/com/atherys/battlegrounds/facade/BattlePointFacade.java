@@ -12,6 +12,7 @@ import com.atherys.battlegrounds.service.RespawnService;
 import com.atherys.battlegrounds.service.TeamMemberService;
 import com.atherys.battlegrounds.utils.ColorUtils;
 import com.atherys.core.utils.MathUtils;
+import com.atherys.core.utils.Sound;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
@@ -19,6 +20,8 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.boss.BossBarOverlays;
 import org.spongepowered.api.boss.ServerBossBar;
+import org.spongepowered.api.effect.sound.SoundCategories;
+import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
@@ -51,6 +54,9 @@ public class BattlePointFacade {
 
     @Inject
     private TeamMemberService teamMemberService;
+
+    @Inject
+    private BattlegroundMessagingFacade msg;
 
     private Set<BattlePoint> battlePoints;
 
@@ -149,7 +155,7 @@ public class BattlePointFacade {
     }
 
     public void onPlayerMovement(Player player, Transform<World> from, Transform<World> to) {
-        if (from.getPosition().toInt().equals(to.getPosition().toInt())) {
+        if (from.getPosition().equals(to.getPosition())) {
             return;
         }
 
@@ -191,11 +197,11 @@ public class BattlePointFacade {
 
     private void showExitTitleToPlayer(Player player, BattlePoint battlePoint) {
         Title title = Title.builder()
-                .title(Text.of(ColorUtils.bossBarColorToTextColor(battlePoint.getBossBar().getColor()), battlePoint.getName()))
-                .subtitle(Text.of(ColorUtils.bossBarColorToTextColor(battlePoint.getBossBar().getColor()), "Entering Battleground..."))
-                .fadeIn(3)
-                .stay(5)
-                .fadeOut(3)
+                .title(Text.of(battlePoint))
+                .subtitle(Text.of(ColorUtils.bossBarColorToTextColor(battlePoint.getBossBar().getColor()), "Leaving Battleground..."))
+                .fadeIn(config.TITLE_FADE_TICKS)
+                .stay(config.TITLE_STAY_TICKS)
+                .fadeOut(config.TITLE_FADE_TICKS)
                 .build();
 
         player.sendTitle(title);
@@ -203,11 +209,11 @@ public class BattlePointFacade {
 
     private void showWelcomeTitleToPlayer(Player player, BattlePoint battlePoint) {
         Title title = Title.builder()
-                .title(Text.of(ColorUtils.bossBarColorToTextColor(battlePoint.getBossBar().getColor()), battlePoint.getName()))
-                .subtitle(Text.of(ColorUtils.bossBarColorToTextColor(battlePoint.getBossBar().getColor()), "Leaving Battleground..."))
-                .fadeIn(3)
-                .stay(5)
-                .fadeOut(3)
+                .title(Text.of(battlePoint))
+                .subtitle(Text.of(ColorUtils.bossBarColorToTextColor(battlePoint.getBossBar().getColor()), "Entering Battleground..."))
+                .fadeIn(config.TITLE_FADE_TICKS)
+                .stay(config.TITLE_STAY_TICKS)
+                .fadeOut(config.TITLE_FADE_TICKS)
                 .build();
 
         player.sendTitle(title);
@@ -225,4 +231,24 @@ public class BattlePointFacade {
                 .build();
     }
 
+    public void notifyCapturedBattlePoint(BattlePoint battlePoint, Team capturingTeam) {
+        msg.broadcast(Text.of("Team \"", capturingTeam, "\" has captured \"", battlePoint, "\""));
+
+        fetchPlayersWithinBattlePointOuterRadius(battlePoint).forEach(this::playBattlePointCaptureSound);
+    }
+
+    private Set<Player> fetchPlayersWithinBattlePointOuterRadius(BattlePoint battlePoint) {
+        return Sponge.getServer()
+                .getOnlinePlayers().parallelStream()
+                .filter(player -> battlePointService.isPlayerWithinBattlePointOuterRadius(battlePoint, player))
+                .collect(Collectors.toSet());
+    }
+
+    private void playBattlePointCaptureSound(Player player) {
+        Sound.playSound(
+                Sound.builder(SoundTypes.ENTITY_PLAYER_LEVELUP, 1.0).soundCategory(SoundCategories.AMBIENT).build(),
+                player,
+                player.getPosition()
+        );
+    }
 }

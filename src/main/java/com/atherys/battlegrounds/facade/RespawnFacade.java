@@ -65,6 +65,8 @@ public class RespawnFacade {
             return;
         }
 
+        msg.info(player, Text.of("Prepare to respawn at \"", battlePoint, "\"!"));
+
         respawnService.queuePlayerForRespawn(player, battlePoint);
     }
 }
