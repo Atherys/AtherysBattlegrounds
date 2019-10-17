@@ -76,12 +76,14 @@ public class AtherysBattlegrounds {
         init = true;
     }
 
+    private void dbInit() {
+        components.teamMemberRepository.initCache();
+    }
+
     private void start() {
         components.battlePointFacade.init();
         components.respawnFacade.init();
         components.teamFacade.init();
-
-        components.teamMemberRepository.initCache();
     }
 
     private void stop() {
@@ -94,9 +96,12 @@ public class AtherysBattlegrounds {
     }
 
     @Listener
-    public void onInit(AtherysHibernateInitializedEvent event) {
-        init();
+    public void onHibernateInit(AtherysHibernateInitializedEvent event) {
+        dbInit();
     }
+
+    @Listener
+    public void onInit(GameInitializationEvent event) { init(); }
 
     @Listener
     public void onStart(GameStartingServerEvent event) {
