@@ -6,12 +6,15 @@ import com.atherys.battlegrounds.facade.RespawnFacade;
 import com.atherys.battlegrounds.facade.TeamFacade;
 import com.atherys.battlegrounds.listener.BattlePointListener;
 import com.atherys.battlegrounds.listener.PlayerListener;
+import com.atherys.battlegrounds.model.entity.TeamMember;
 import com.atherys.battlegrounds.persistence.TeamMemberRepository;
 import com.atherys.battlegrounds.service.BattlePointService;
 import com.atherys.battlegrounds.service.RespawnService;
 import com.atherys.battlegrounds.service.TeamService;
 import com.atherys.core.AtherysCore;
 import com.atherys.core.command.CommandService;
+import com.atherys.core.event.AtherysHibernateConfigurationEvent;
+import com.atherys.core.event.AtherysHibernateInitializedEvent;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import org.slf4j.Logger;
@@ -86,7 +89,12 @@ public class AtherysBattlegrounds {
     }
 
     @Listener
-    public void onInit(GameInitializationEvent event) {
+    public void onHibernateRegistration(AtherysHibernateConfigurationEvent event) {
+        event.registerEntity(TeamMember.class);
+    }
+
+    @Listener
+    public void onInit(AtherysHibernateInitializedEvent event) {
         init();
     }
 
