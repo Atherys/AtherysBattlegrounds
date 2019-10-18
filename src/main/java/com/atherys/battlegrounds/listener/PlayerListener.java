@@ -9,6 +9,8 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.Getter;
+import org.spongepowered.api.event.filter.cause.Root;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 @Singleton
 public class PlayerListener {
@@ -32,4 +34,13 @@ public class PlayerListener {
         respawnFacade.offerRespawn(player);
     }
 
+    @Listener
+    public void onPlayerJoin(ClientConnectionEvent.Join event, @Root Player player) {
+        battlePointFacade.onPlayerJoin(player);
+    }
+
+    @Listener
+    public void onPlayerJoin(ClientConnectionEvent.Disconnect event, @Root Player player) {
+        battlePointFacade.onPlayerDisconnect(player);
+    }
 }

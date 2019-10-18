@@ -195,6 +195,25 @@ public class BattlePointFacade {
         }
     }
 
+    public void onPlayerJoin(Player player) {
+        Optional<BattlePoint> bp = battlePointService.getBattlePointFromLocation(player.getLocation());
+        bp.ifPresent(battlePoint -> {
+            showWelcomeTitleToPlayer(player, battlePoint);
+            battlePoint.getBossBar().addPlayer(player);
+        });
+    }
+
+    public void onPlayerDisconnect(Player player) {
+        Optional<BattlePoint> bp = battlePointService.getBattlePointFromLocation(player.getLocation());
+        bp.ifPresent(battlePoint -> battlePoint.getBossBar().removePlayer(player));
+    }
+
+    public void notifyCapturedBattlePoint(BattlePoint battlePoint, Team capturingTeam) {
+        msg.broadcast(Text.of("Team \"", capturingTeam, "\" has captured \"", battlePoint, "\""));
+
+        fetchPlayersWithinBattlePointOuterRadius(battlePoint).forEach(this::playBattlePointCaptureSound);
+    }
+
     private void showExitTitleToPlayer(Player player, BattlePoint battlePoint) {
         Title title = Title.builder()
                 .title(Text.of(battlePoint))
@@ -220,7 +239,7 @@ public class BattlePointFacade {
     }
 
 
-    protected ServerBossBar createBattlePointBossBar(String battlePointName, BossBarColor color) {
+    private ServerBossBar createBattlePointBossBar(String battlePointName, BossBarColor color) {
         return ServerBossBar.builder()
                 .name(Text.of(ColorUtils.bossBarColorToTextColor(color), battlePointName))
                 .color(color)
@@ -229,12 +248,6 @@ public class BattlePointFacade {
                 .createFog(false)
                 .darkenSky(false)
                 .build();
-    }
-
-    public void notifyCapturedBattlePoint(BattlePoint battlePoint, Team capturingTeam) {
-        msg.broadcast(Text.of("Team \"", capturingTeam, "\" has captured \"", battlePoint, "\""));
-
-        fetchPlayersWithinBattlePointOuterRadius(battlePoint).forEach(this::playBattlePointCaptureSound);
     }
 
     private Set<Player> fetchPlayersWithinBattlePointOuterRadius(BattlePoint battlePoint) {
