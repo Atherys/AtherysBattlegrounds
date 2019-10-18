@@ -8,6 +8,7 @@ import com.atherys.battlegrounds.service.RespawnService;
 import com.atherys.core.utils.Question;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
@@ -47,7 +48,7 @@ public class RespawnFacade {
         }
 
         // ask the player if they would like to respawn
-        Question.of(msg.formatInfo("You died at ", battlePoint.get().getName(), ". Would you like to respawn? You have ", battlePoint.get().getRespawnTimeout().toString(), " to decide."))
+        Question.of(msg.formatInfo("You died at ", battlePoint, ". Would you like to respawn? You have ", DurationFormatUtils.formatDurationISO(battlePoint.get().getRespawnTimeout().toMillis()), " to decide."))
                 .addAnswer(Question.Answer.of(Text.of("Yes"), (src) -> onPlayerAcceptRespawn(player, battlePoint.get())))
                 .addAnswer(Question.Answer.of(Text.of("No"), (src) -> {
                 }))
