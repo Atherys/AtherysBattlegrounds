@@ -203,4 +203,13 @@ public class BattlePointService {
 
         return distanceToCenterSquared <= Math.pow(battlePoint.getOuterRadius(), 2);
     }
+
+    public void clearBattlePoints() {
+        battlePoints.forEach(bp -> {
+            bp.getBossBar().removePlayers(bp.getBossBar().getPlayers());
+
+        });
+
+        battlePoints.clear();
+    }
 }

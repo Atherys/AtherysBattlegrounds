@@ -58,8 +58,6 @@ public class BattlePointFacade {
     @Inject
     private BattlegroundMessagingFacade msg;
 
-    private Set<BattlePoint> battlePoints;
-
     private Task battlepointTask;
 
     public BattlePointFacade() {
@@ -74,7 +72,7 @@ public class BattlePointFacade {
             Optional<World> world = Sponge.getServer().getWorld(locationConfig.getWorld());
 
             if (!world.isPresent()) {
-                logger.error("Configured location for battlepoint " + pointConfig.getId() + " contains an invalid world. Skipping.");
+                logger.error("Configured location for battlepoint " + pointConfig.getId() + " contains invalid world \"" + locationConfig.getWorld() + "\". Skipping.");
                 return;
             }
 
@@ -129,6 +127,13 @@ public class BattlePointFacade {
                 .interval(config.TICK_INTERVAL.toMillis(), TimeUnit.MILLISECONDS)
                 .execute(this::tickAll)
                 .submit(AtherysBattlegrounds.getInstance());
+    }
+
+    public void reload() {
+        battlePointService.clearBattlePoints();
+        battlepointTask.cancel();
+
+        init();
     }
 
     protected void tickAll() {

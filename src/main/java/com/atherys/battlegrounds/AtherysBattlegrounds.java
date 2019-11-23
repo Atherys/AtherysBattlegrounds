@@ -23,6 +23,7 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Dependency;
@@ -118,6 +119,11 @@ public class AtherysBattlegrounds {
     @Listener
     public void onStop(GameStoppingServerEvent event) {
         if (init) stop();
+    }
+
+    @Listener
+    public void onReload(GameReloadEvent event) {
+        components.battlePointFacade.reload();
     }
 
     public TeamFacade getTeamFacade() {
