@@ -124,6 +124,7 @@ public class AtherysBattlegrounds {
 
     @Listener
     public void onReload(GameReloadEvent event) {
+        components.config.load();
         components.battlePointFacade.reload();
     }
 
