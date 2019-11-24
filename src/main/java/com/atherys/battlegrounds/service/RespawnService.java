@@ -47,7 +47,9 @@ public class RespawnService {
                         .filter(player -> player.getUniqueId().equals(uuid))
                         .findAny();
 
-                anyPlayerWithThisUUID.ifPresent((player) -> this.respawnPlayer(player, battlepoint));
+                anyPlayerWithThisUUID.ifPresent((player) -> {
+                    this.respawnPlayer(player, battlepoint);
+                });
             });
 
             playersToRespawn.clear();
@@ -78,6 +80,12 @@ public class RespawnService {
     }
 
     protected void respawnPlayer(Player player, BattlePoint battlePoint) {
+
+        // if the battlepoint has no respawn points, return
+        if (battlePoint.getRespawnPoints() == null || battlePoint.getRespawnPoints().isEmpty()) {
+            return;
+        }
+
         // get random respawn point
         RespawnPoint respawnPoint = battlePoint.getRespawnPoints().get(RandomUtils.nextInt(0, battlePoint.getRespawnPoints().size()));
 

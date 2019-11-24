@@ -40,7 +40,7 @@ public class PlayerListener {
     }
 
     @Listener
-    public void onPlayerJoin(ClientConnectionEvent.Disconnect event, @Root Player player) {
+    public void onPlayerDisconnect(ClientConnectionEvent.Disconnect event, @Root Player player) {
         battlePointFacade.onPlayerDisconnect(player);
     }
 }
