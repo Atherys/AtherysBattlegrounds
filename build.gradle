@@ -9,7 +9,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.2'
-        classpath 'com.github.Atherys-Horizons:AtherysGradle:1.2.1'
+        classpath 'com.github.Atherys-Horizons:AtherysGradle:1.0.1'
     }
 }
 
