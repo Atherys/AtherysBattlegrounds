@@ -48,7 +48,7 @@ public class AtherysBattlegrounds {
     static final String ID = "atherysbattlegrounds";
     static final String NAME = "A'therys Battlegrounds";
     static final String DESCRIPTION = "A capture-and-hold mini-game intended to be played in the open-world for the A'therys Horizons server";
-    static final String VERSION = "%MAJOR_VERSION%.%MINOR_VERSION%.%PATCH%";
+    static final String VERSION = "%PLUGIN_VERSION%";
 
     private static AtherysBattlegrounds instance;
     private static boolean init;
