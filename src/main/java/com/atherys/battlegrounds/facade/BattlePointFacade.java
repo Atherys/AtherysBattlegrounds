@@ -7,10 +7,12 @@ import com.atherys.battlegrounds.model.Award;
 import com.atherys.battlegrounds.model.BattlePoint;
 import com.atherys.battlegrounds.model.RespawnPoint;
 import com.atherys.battlegrounds.model.Team;
+import com.atherys.battlegrounds.model.entity.TeamMember;
 import com.atherys.battlegrounds.service.BattlePointService;
 import com.atherys.battlegrounds.service.RespawnService;
 import com.atherys.battlegrounds.service.TeamMemberService;
 import com.atherys.battlegrounds.utils.ColorUtils;
+import com.atherys.core.AtherysCore;
 import com.atherys.core.utils.MathUtils;
 import com.atherys.core.utils.Sound;
 import com.google.inject.Inject;
@@ -20,16 +22,20 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.boss.BossBarOverlays;
 import org.spongepowered.api.boss.ServerBossBar;
+import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.service.economy.Currency;
+import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -268,5 +274,42 @@ public class BattlePointFacade {
                 player,
                 player.getPosition()
         );
+    }
+
+    public void offerReward(Player player, Player victimPlayer) {
+        Optional<EconomyService> economyService = AtherysCore.getEconomyService();
+
+        if (!economyService.isPresent()) {
+            logger.warn("No economy plugin could be found. Kills will not award reputation or currency.");
+            return;
+        }
+
+        EconomyService econ = economyService.get();
+        Optional<Currency> reputation = Sponge.getRegistry().getType(Currency.class, config.REPUTATION_CURRENCY);
+        Optional<Currency> killAwards = Sponge.getRegistry().getType(Currency.class, config.CURRENCY_AWARDED_PER_KILL);
+
+        if (!reputation.isPresent()) {
+            logger.error("The reputation currency configured could not be found. Kills will not award reputation or currency.");
+            return;
+        }
+
+        if (!killAwards.isPresent()) {
+            logger.error("The kill award currency configured could not be found. Kills will not award reputation or currency.");
+            return;
+        }
+
+        econ.getOrCreateAccount(player.getUniqueId()).ifPresent(attackerAccount -> econ.getOrCreateAccount(victimPlayer.getUniqueId()).ifPresent(victimAccount -> {
+            int killerReputation = attackerAccount.getBalance(reputation.get()).intValue();
+            int victimReputation = victimAccount.getBalance(reputation.get()).intValue();
+
+            // if the difference between the killer's reputation and the victim's reputation is larger than the configured cutoff,
+            // punish from the killer
+            // otherwise, award the killer
+            if ((killerReputation - victimReputation) > config.REPUTATION_DIFFERENCE_AWARD_CUTOFF) {
+
+            } else {
+
+            }
+        }));
     }
 }

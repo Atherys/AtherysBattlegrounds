@@ -107,14 +107,14 @@ public class BattlePointService {
         if (postTickControllingTeam.isPresent() && !postTickControllingTeam.get().equals(battlePoint.getControllingTeam())) {
             battlePoint.setControllingTeam(postTickControllingTeam.get());
 
-            // distribute awards for capturing the point
+            // distribute awards for capturing the point to the capturing team
             teamService.distributeAwards(battlePoint.getCaptureAwards(), postTickControllingTeam.get());
 
             // trigger the capture event
             BattlePointEvent.Capture captureEvent = new BattlePointEvent.Capture(battlePoint, battlePoint.getControllingTeam());
             Sponge.getEventManager().post(captureEvent);
         } else {
-            // distribute tick awards for having control of the point
+            // distribute tick awards for having control of the point to the capturing team
             teamService.distributeAwards(battlePoint.getTickAwards(), battlePoint.getControllingTeam());
 
             // trigger the tick event

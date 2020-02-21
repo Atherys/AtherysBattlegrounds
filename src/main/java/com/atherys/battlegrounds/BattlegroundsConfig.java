@@ -44,6 +44,30 @@ public class BattlegroundsConfig extends PluginConfig {
     @Setting("title-stay-ticks")
     public int TITLE_STAY_TICKS = 10;
 
+    @Setting("battlepoint-cooldown")
+    public Duration BATTLEPOINT_COOLDOWN = Duration.of(5, ChronoUnit.MINUTES);
+
+    @Setting("reputation-currency")
+    public String REPUTATION_CURRENCY = "atherys:reputation";
+
+    @Setting("reputation-difference-award-cutoff")
+    public int REPUTATION_DIFFERENCE_AWARD_CUTOFF = 50;
+
+    @Setting("reputation-awarded-per-kill")
+    public int REPUTATION_AWARDED_PER_KILL = 10;
+
+    @Setting("reputation-lost-per-death")
+    public int REPUTATION_LOST_PER_DEATH = 10;
+
+    @Setting("currency-awarded-per-kill")
+    public String CURRENCY_AWARDED_PER_KILL = "atherys:argent";
+
+    @Setting("amount-of-currency-awarded-per-kill")
+    public double AMOUNT_OF_CURRENCY_AWARDED_PER_KILL = 100;
+
+    @Setting("combat-duration")
+    public Duration COMBAT_DURATION = Duration.of(30, ChronoUnit.SECONDS);
+
     protected BattlegroundsConfig() throws IOException {
         super("config/" + AtherysBattlegrounds.ID, "config.conf");
         init();
