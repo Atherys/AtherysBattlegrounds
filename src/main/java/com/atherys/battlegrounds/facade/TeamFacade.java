@@ -2,9 +2,11 @@ package com.atherys.battlegrounds.facade;
 
 import com.atherys.battlegrounds.BattlegroundsConfig;
 import com.atherys.battlegrounds.model.Team;
+import com.atherys.battlegrounds.model.entity.PlayerRanking;
 import com.atherys.battlegrounds.model.entity.TeamMember;
 import com.atherys.battlegrounds.service.TeamMemberService;
 import com.atherys.battlegrounds.service.TeamService;
+import com.atherys.core.AtherysCore;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.spongepowered.api.command.CommandException;
@@ -13,6 +15,7 @@ import org.spongepowered.api.text.Text;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Singleton
 public class TeamFacade {
@@ -80,5 +83,41 @@ public class TeamFacade {
         });
 
         return choices;
+    }
+
+    public void rankPlayers(Player victim, Player attacker) {
+        TeamMember attackerTeamMember = teamMemberService.getOrCreateTeamMember(attacker);
+        TeamMember victimTeamMember = teamMemberService.getOrCreateTeamMember(victim);
+
+        // If both players are on the same team, no rankings will be changed
+        if (Objects.equals(attackerTeamMember.getTeam(), victimTeamMember.getTeam())) {
+            return;
+        }
+
+        PlayerRanking victimRanking = victimTeamMember.getRanking();
+
+        // If the attacker is higher position than their victim, switch the ranking positions
+        if (victimRanking.getPosition() <= attackerTeamMember.getRanking().getPosition()) {
+            teamMemberService.switchRankings(victimTeamMember, attackerTeamMember);
+
+            PlayerRanking attackerRanking = attackerTeamMember.getRanking();
+
+            msg.error(victim, "You have died to a player of lower rank. Your new ranking position is: ", victimRanking.getPosition());
+            msg.info(attacker, "You have killed a player of higher ranking. Your new ranking position is: ", attackerRanking.getPosition());
+        }
+    }
+
+    public void sendPlayerRanking(Player source) {
+        TeamMember teamMember = teamMemberService.getOrCreateTeamMember(source);
+
+        if (teamMember.getRanking() == null) {
+            teamMemberService.rankPlayerLast(teamMember);
+        }
+
+        msg.info(source, "Your current ranking position is ", teamMember.getRanking().getPosition(), ". Your rank is \"", teamMemberService.getTeamMemberRankName(teamMember),"\"");
+    }
+
+    public void sendPlayerRankList(Player source) {
+        msg.info(source, "Not yet implemented");
     }
 }

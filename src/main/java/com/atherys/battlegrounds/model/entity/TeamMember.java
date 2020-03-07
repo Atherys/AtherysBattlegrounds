@@ -3,11 +3,10 @@ package com.atherys.battlegrounds.model.entity;
 import com.atherys.battlegrounds.model.Team;
 import com.atherys.battlegrounds.persistence.TeamConverter;
 import com.atherys.core.db.SpongeIdentifiable;
+import org.hibernate.annotations.Fetch;
 
 import javax.annotation.Nonnull;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -19,6 +18,11 @@ public class TeamMember implements SpongeIdentifiable {
 
     @Convert(converter = TeamConverter.class)
     private Team team;
+
+    private String cachedName;
+
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private PlayerRanking ranking;
 
     protected TeamMember() {}
 
@@ -40,17 +44,35 @@ public class TeamMember implements SpongeIdentifiable {
         this.team = team;
     }
 
+    public String getCachedName() {
+        return cachedName;
+    }
+
+    public void setCachedName(String cachedName) {
+        this.cachedName = cachedName;
+    }
+
+    public PlayerRanking getRanking() {
+        return ranking;
+    }
+
+    public void setRanking(PlayerRanking ranking) {
+        this.ranking = ranking;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TeamMember that = (TeamMember) o;
-        return id.equals(that.id) &&
-                Objects.equals(team, that.team);
+        return Objects.equals(id, that.id) &&
+                Objects.equals(team, that.team) &&
+                Objects.equals(cachedName, that.cachedName) &&
+                Objects.equals(ranking, that.ranking);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, team);
+        return Objects.hash(id, team, cachedName, ranking);
     }
 }

@@ -1,12 +1,15 @@
 package com.atherys.battlegrounds;
 
+import com.atherys.battlegrounds.command.RankingCommand;
 import com.atherys.battlegrounds.command.TeamCommand;
 import com.atherys.battlegrounds.facade.BattlePointFacade;
 import com.atherys.battlegrounds.facade.RespawnFacade;
 import com.atherys.battlegrounds.facade.TeamFacade;
 import com.atherys.battlegrounds.listener.BattlePointListener;
 import com.atherys.battlegrounds.listener.PlayerListener;
+import com.atherys.battlegrounds.model.entity.PlayerRanking;
 import com.atherys.battlegrounds.model.entity.TeamMember;
+import com.atherys.battlegrounds.persistence.PlayerRankingRepository;
 import com.atherys.battlegrounds.persistence.TeamMemberRepository;
 import com.atherys.battlegrounds.serialize.DurationTypeSerializer;
 import com.atherys.battlegrounds.service.BattlePointService;
@@ -84,6 +87,7 @@ public class AtherysBattlegrounds {
 
         try {
             AtherysCore.getCommandService().register(new TeamCommand(), this);
+            AtherysCore.getCommandService().register(new RankingCommand(), this);
         } catch (CommandService.AnnotatedCommandException e) {
             e.printStackTrace();
         }
@@ -96,15 +100,18 @@ public class AtherysBattlegrounds {
         components.respawnFacade.init();
 
         components.teamMemberRepository.initCache();
+        components.playerRankingRepository.initCache();
     }
 
     private void stop() {
+        components.playerRankingRepository.flushCache();
         components.teamMemberRepository.flushCache();
     }
 
     @Listener
     public void onHibernateRegistration(AtherysHibernateConfigurationEvent event) {
         event.registerEntity(TeamMember.class);
+        event.registerEntity(PlayerRanking.class);
     }
 
     @Listener
@@ -143,6 +150,9 @@ public class AtherysBattlegrounds {
 
         @Inject
         private TeamMemberRepository teamMemberRepository;
+
+        @Inject
+        private PlayerRankingRepository playerRankingRepository;
 
         @Inject
         private BattlePointService battlePointService;

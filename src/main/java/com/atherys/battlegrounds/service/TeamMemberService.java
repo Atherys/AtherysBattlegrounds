@@ -2,7 +2,9 @@ package com.atherys.battlegrounds.service;
 
 import com.atherys.battlegrounds.BattlegroundsConfig;
 import com.atherys.battlegrounds.model.Team;
+import com.atherys.battlegrounds.model.entity.PlayerRanking;
 import com.atherys.battlegrounds.model.entity.TeamMember;
+import com.atherys.battlegrounds.persistence.PlayerRankingRepository;
 import com.atherys.battlegrounds.persistence.TeamMemberRepository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -20,6 +22,9 @@ public class TeamMemberService {
     private BattlegroundsConfig config;
 
     @Inject
+    private PlayerRankingRepository playerRankingRepository;
+
+    @Inject
     private TeamMemberRepository teamMemberRepository;
 
     public TeamMemberService() {
@@ -28,6 +33,12 @@ public class TeamMemberService {
     public TeamMember getOrCreateTeamMember(Player player) {
         return teamMemberRepository.findById(player.getUniqueId()).orElseGet(() -> {
             TeamMember teamMember = new TeamMember(player.getUniqueId());
+
+            PlayerRanking playerRanking = new PlayerRanking();
+            playerRankingRepository.saveOne(playerRanking);
+
+            teamMember.setRanking(playerRanking);
+
             teamMemberRepository.saveOne(teamMember);
             return teamMember;
         });
@@ -75,6 +86,26 @@ public class TeamMemberService {
 
     public void addTeamMemberToTeam(Team team, TeamMember teamMember) {
         teamMember.setTeam(team);
+        teamMemberRepository.saveOne(teamMember);
+    }
+
+    public void switchRankings(TeamMember victimTeamMember, TeamMember attackerTeamMember) {
+        PlayerRanking temp = victimTeamMember.getRanking();
+
+        victimTeamMember.setRanking(attackerTeamMember.getRanking());
+        attackerTeamMember.setRanking(temp);
+
+        teamMemberRepository.saveOne(victimTeamMember);
+        teamMemberRepository.saveOne(attackerTeamMember);
+    }
+
+    public String getTeamMemberRankName(TeamMember teamMember) {
+        return teamMemberRepository.fetchTeamMemberRankName(teamMember);
+    }
+
+    public void rankPlayerLast(TeamMember teamMember) {
+        teamMember.setRanking(new PlayerRanking());
+
         teamMemberRepository.saveOne(teamMember);
     }
 }

@@ -50,8 +50,7 @@ public class RespawnFacade {
         // ask the player if they would like to respawn
         Question.of(msg.formatInfo("You died at ", battlePoint.get(), ". Would you like to respawn? You have ", DurationFormatUtils.formatDurationISO(battlePoint.get().getRespawnTimeout().toMillis()), " to decide."))
                 .addAnswer(Question.Answer.of(Text.of("Yes"), (src) -> onPlayerAcceptRespawn(player, battlePoint.get())))
-                .addAnswer(Question.Answer.of(Text.of("No"), (src) -> {
-                }))
+                .addAnswer(Question.Answer.of(Text.of("No"), (src) -> {}))
                 .build()
                 .pollChat(player);
 
