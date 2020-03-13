@@ -8,7 +8,6 @@ import com.atherys.battlegrounds.listener.BattlePointListener;
 import com.atherys.battlegrounds.listener.PlayerListener;
 import com.atherys.battlegrounds.model.entity.TeamMember;
 import com.atherys.battlegrounds.persistence.TeamMemberRepository;
-import com.atherys.battlegrounds.serialize.DurationTypeSerializer;
 import com.atherys.battlegrounds.service.BattlePointService;
 import com.atherys.battlegrounds.service.RespawnService;
 import com.atherys.battlegrounds.service.TeamService;
@@ -25,7 +24,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
-import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
@@ -69,8 +67,6 @@ public class AtherysBattlegrounds {
 
     private void init() {
         instance = this;
-
-        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Duration.class), new DurationTypeSerializer());
 
         components = new Components();
         battlegroundsInjector = spongeInjector.createChildInjector();
