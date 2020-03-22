@@ -2,7 +2,6 @@ package com.atherys.battlegrounds;
 
 import com.atherys.battlegrounds.config.BattlePointConfig;
 import com.atherys.battlegrounds.config.TeamConfig;
-import com.atherys.battlegrounds.serialize.DurationTypeSerializer;
 import com.atherys.core.utils.PluginConfig;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Singleton;
@@ -47,17 +46,5 @@ public class BattlegroundsConfig extends PluginConfig {
     protected BattlegroundsConfig() throws IOException {
         super("config/" + AtherysBattlegrounds.ID, "config.conf");
         init();
-    }
-
-    @Override
-    protected ConfigurationOptions getOptions() {
-        ConfigurationOptions options = super.getOptions();
-
-        TypeSerializerCollection serializers = TypeSerializers.getDefaultSerializers().newChild();
-
-        serializers.registerType(TypeToken.of(Duration.class), new DurationTypeSerializer());
-
-        options.setSerializers(serializers);
-        return options;
     }
 }
