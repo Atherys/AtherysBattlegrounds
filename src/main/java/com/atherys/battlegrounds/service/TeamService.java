@@ -1,12 +1,11 @@
 package com.atherys.battlegrounds.service;
 
-import com.atherys.battlegrounds.AtherysBattlegrounds;
-import com.atherys.battlegrounds.model.Award;
+import com.atherys.battlegrounds.config.AwardConfig;
 import com.atherys.battlegrounds.model.Team;
-import com.atherys.core.AtherysCore;
+import com.atherys.core.economy.Economy;
 import com.google.inject.Singleton;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.EventContext;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.format.TextColor;
 
 import java.math.BigDecimal;
@@ -32,10 +31,18 @@ public class TeamService {
         return team;
     }
 
-    public void distributeAwards(Set<Award> awards, Team team) {
-        awards.forEach(award -> {
-            AtherysCore.getEconomyService().flatMap(economyService -> economyService.getOrCreateAccount(team.getId())).ifPresent(account -> {
-                award.getCurrency().forEach((c, amount) -> account.deposit(c, BigDecimal.valueOf(amount), Cause.of(EventContext.empty(), AtherysBattlegrounds.getInstance())));
+    public void distributeAward(AwardConfig award, Team team) {
+        Economy.getAccount(team.getId()).ifPresent(account -> {
+            award.getCurrency().forEach(((currency, amount) -> {
+                account.deposit(currency, BigDecimal.valueOf(amount), Sponge.getCauseStackManager().getCurrentCause());
+            }));
+        });
+    }
+
+    public void distributeAwardsToMembers(AwardConfig award, Set<Player> players) {
+        players.forEach(player -> {
+            award.getCurrency().forEach((currency, amount) -> {
+                Economy.addCurrency(player.getUniqueId(), currency, BigDecimal.valueOf(amount), Sponge.getCauseStackManager().getCurrentCause());
             });
         });
     }

@@ -1,21 +1,27 @@
 package com.atherys.battlegrounds.facade;
 
 import com.atherys.battlegrounds.BattlegroundsConfig;
+import com.atherys.battlegrounds.model.BattlePoint;
 import com.atherys.battlegrounds.model.Team;
 import com.atherys.battlegrounds.model.entity.PlayerRanking;
 import com.atherys.battlegrounds.model.entity.TeamMember;
+import com.atherys.battlegrounds.service.BattlePointService;
 import com.atherys.battlegrounds.service.TeamMemberService;
 import com.atherys.battlegrounds.service.TeamService;
 import com.atherys.core.AtherysCore;
+import com.atherys.core.economy.Economy;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageReceiver;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.spongepowered.api.text.format.TextColors.*;
 
 @Singleton
 public class TeamFacade {
@@ -28,6 +34,9 @@ public class TeamFacade {
 
     @Inject
     private TeamMemberService teamMemberService;
+
+    @Inject
+    private BattlePointService battlePointService;
 
     @Inject
     private BattlegroundMessagingFacade msg;
@@ -51,7 +60,23 @@ public class TeamFacade {
             throw msg.exception(Text.of("You are not part of a team!"));
         }
 
-        msg.info(source, Text.of("You are currently part of \"", team, "\"."));
+        List<Text> info = new ArrayList<>();
+
+        info.add(Text.of(DARK_GRAY, "[]====[ ", team.getColor(), team.getName(), DARK_GRAY, " ]====[]"));
+
+        Economy.getAccount(team.getId()).map(Account::getBalances).ifPresent(currencies -> currencies.forEach((currency, amount) -> {
+            if (config.TEAM_CURRENCIES.contains(currency)) {
+                info.add(Text.of(DARK_GREEN, currency.getPluralDisplayName(), ": ", GOLD, amount.toString()));
+            }
+        }));
+
+        String points = battlePointService.getControlledPoints(team).stream()
+                .map(BattlePoint::getName)
+                .collect(Collectors.joining(", "));
+
+        info.add(Text.of(DARK_GREEN, "Controlling: ", GOLD, points));
+
+        info.forEach(source::sendMessage);
     }
 
     public void removePlayerFromTeam(Player source) throws CommandException {

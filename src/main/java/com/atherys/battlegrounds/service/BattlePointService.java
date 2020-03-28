@@ -1,17 +1,17 @@
 package com.atherys.battlegrounds.service;
 
+import com.atherys.battlegrounds.config.AwardConfig;
 import com.atherys.battlegrounds.event.BattlePointEvent;
-import com.atherys.battlegrounds.model.Award;
 import com.atherys.battlegrounds.model.BattlePoint;
 import com.atherys.battlegrounds.model.RespawnPoint;
 import com.atherys.battlegrounds.model.Team;
 import com.atherys.battlegrounds.model.entity.TeamMember;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -44,8 +44,8 @@ public class BattlePointService {
             Duration respawnInterval,
             Duration respawnDuration,
             List<RespawnPoint> respawnPoints,
-            Set<Award> captureAwards,
-            Set<Award> tickAwards
+            AwardConfig captureAward,
+            AwardConfig tickAward
     ) {
         BattlePoint battlePoint = new BattlePoint(id);
 
@@ -58,32 +58,34 @@ public class BattlePointService {
         battlePoint.setRespawnInterval(respawnInterval);
         battlePoint.setRespawnTimeout(respawnDuration);
         battlePoint.setRespawnPoints(respawnPoints);
-        battlePoint.setCaptureAwards(captureAwards);
-        battlePoint.setTickAwards(tickAwards);
+        battlePoint.setCaptureAward(captureAward);
+        battlePoint.setTickAward(tickAward);
 
         battlePoints.add(battlePoint);
 
         return battlePoint;
     }
 
-    public Award createAward(Map<Currency, Double> currencyAwards) {
-        Award award = new Award();
-        award.setCurrency(currencyAwards);
-        return award;
-    }
-
     public void tickBattlePoint(BattlePoint battlePoint) {
+        Map<Team, Set<Player>> membersWithinInnerRadius = new HashMap<>();
 
-        // Find all online players currently within the inner radius of the battle point
-        Set<TeamMember> onlineTeamMembersWithinInnerRadius = Sponge.getServer()
-                .getOnlinePlayers().parallelStream()
-                .filter(player -> isPlayerWithinBattlePointInnerRadius(battlePoint, player))
-                .map(player -> teamMemberService.getOrCreateTeamMember(player))
-                .collect(Collectors.toSet());
+        for (Player player : Sponge.getServer().getOnlinePlayers()) {
+            if (isPlayerWithinBattlePointInnerRadius(battlePoint, player)) {
+                TeamMember member = teamMemberService.getOrCreateTeamMember(player);
+
+                if (member.getTeam() == null) continue;
+
+                if (membersWithinInnerRadius.containsKey(member.getTeam())) {
+                    membersWithinInnerRadius.get(member.getTeam()).add(player);
+                } else {
+                    membersWithinInnerRadius.put(member.getTeam(), Sets.newHashSet(player));
+                }
+            }
+        }
 
         // determine the capturing team, and if any, increment their progress by the configured amount
         // and decrement the progress of all other non-capturing teams
-        teamMemberService.determineCapturingTeam(onlineTeamMembersWithinInnerRadius).ifPresent(capturingTeam -> {
+        teamMemberService.determineCapturingTeam(membersWithinInnerRadius).ifPresent(capturingTeam -> {
 
             // increment the capturing team's progress
             incrementTeamProgress(battlePoint, capturingTeam, battlePoint.getPerTickCaptureAmount());
@@ -108,19 +110,22 @@ public class BattlePointService {
             battlePoint.setControllingTeam(postTickControllingTeam.get());
 
             // distribute awards for capturing the point
-            teamService.distributeAwards(battlePoint.getCaptureAwards(), postTickControllingTeam.get());
+            teamService.distributeAward(battlePoint.getCaptureAward(), postTickControllingTeam.get());
+            teamService.distributeAwardsToMembers(battlePoint.getCaptureAward(), membersWithinInnerRadius.get(postTickControllingTeam.get()));
 
             // trigger the capture event
             BattlePointEvent.Capture captureEvent = new BattlePointEvent.Capture(battlePoint, battlePoint.getControllingTeam());
             Sponge.getEventManager().post(captureEvent);
-        } else {
-            // distribute tick awards for having control of the point
-            teamService.distributeAwards(battlePoint.getTickAwards(), battlePoint.getControllingTeam());
 
-            // trigger the tick event
-            BattlePointEvent.Tick tickEvent = new BattlePointEvent.Tick(battlePoint);
-            Sponge.getEventManager().post(tickEvent);
+            return;
+        } else if (battlePoint.getControllingTeam() != null) {
+            // distribute tick awards for having control of the point
+            teamService.distributeAward(battlePoint.getTickAward(), battlePoint.getControllingTeam());
         }
+
+        // trigger the tick event
+        BattlePointEvent.Tick tickEvent = new BattlePointEvent.Tick(battlePoint);
+        Sponge.getEventManager().post(tickEvent);
     }
 
     protected void incrementTeamProgress(BattlePoint battlePoint, Team team, float amount) {
@@ -162,6 +167,12 @@ public class BattlePointService {
 
     public Set<BattlePoint> getAllBattlePoints() {
         return battlePoints;
+    }
+
+    public Set<BattlePoint> getControlledPoints(Team team) {
+        return battlePoints.stream()
+                .filter(battlePoint -> team.equals(battlePoint.getControllingTeam()))
+                .collect(Collectors.toSet());
     }
 
     public Optional<BattlePoint> getBattlePointFromLocation(Location<World> location) {

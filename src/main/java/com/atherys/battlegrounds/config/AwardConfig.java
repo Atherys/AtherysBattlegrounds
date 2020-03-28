@@ -11,7 +11,7 @@ import java.util.Map;
 public class AwardConfig {
 
     @Setting("currency")
-    private Map<org.spongepowered.api.service.economy.Currency, Double> currency = new HashMap<>();
+    private Map<Currency, Double> currency = new HashMap<>();
 
     public AwardConfig() {
     }

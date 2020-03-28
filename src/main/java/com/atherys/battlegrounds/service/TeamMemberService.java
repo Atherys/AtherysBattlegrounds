@@ -44,26 +44,11 @@ public class TeamMemberService {
         });
     }
 
-    protected Optional<Team> determineCapturingTeam(Set<TeamMember> onlineTeamMembersWithinInnerRadius) {
-        Map<Team, Integer> numberOfPlayersFromEachTeam = new HashMap<>();
-
-        onlineTeamMembersWithinInnerRadius.forEach(teamMember -> {
-            // if the player isn't part of a team, just return
-            if (teamMember.getTeam() == null) {
-                return;
-            }
-
-            if (numberOfPlayersFromEachTeam.containsKey(teamMember.getTeam())) {
-                numberOfPlayersFromEachTeam.merge(teamMember.getTeam(), 1, Integer::sum);
-            } else {
-                numberOfPlayersFromEachTeam.put(teamMember.getTeam(), 1);
-            }
-        });
-
+    protected Optional<Team> determineCapturingTeam(Map<Team, Set<Player>> onlineTeamMembersWithinInnerRadius) {
         Team capturingTeam = null;
 
-        for (Map.Entry<Team, Integer> entry : numberOfPlayersFromEachTeam.entrySet()) {
-            if (entry.getValue() >= config.MINIMUM_PLAYERS_REQUIRED_TO_CAPTURE_POINT) {
+        for (Map.Entry<Team, Set<Player>> entry : onlineTeamMembersWithinInnerRadius.entrySet()) {
+            if (entry.getValue().size() >= config.MINIMUM_PLAYERS_REQUIRED_TO_CAPTURE_POINT) {
 
                 // If a capturing team has already been found, and another also meets the criteria,
                 // then return that no team is currently capturing until there is only one single team that meets the criteria

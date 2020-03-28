@@ -98,10 +98,10 @@ public class BattlePointConfig {
     private List<RespawnPointConfig> respawnPoints = new ArrayList<>();
 
     @Setting("on-capture-awards")
-    private Set<AwardConfig> onCaptureAwards = new HashSet<>();
+    private AwardConfig onCaptureAward = new AwardConfig();
 
     @Setting("on-tick-awards")
-    private Set<AwardConfig> onTickAwards = new HashSet<>();
+    private AwardConfig onTickAward = new AwardConfig();
 
     public BattlePointConfig() {
     }
@@ -146,11 +146,11 @@ public class BattlePointConfig {
         return respawnPoints;
     }
 
-    public Set<AwardConfig> getOnCaptureAwards() {
-        return onCaptureAwards;
+    public AwardConfig getOnCaptureAward() {
+        return onCaptureAward;
     }
 
-    public Set<AwardConfig> getOnTickAwards() {
-        return onTickAwards;
+    public AwardConfig getOnTickAward() {
+        return onTickAward;
     }
 }

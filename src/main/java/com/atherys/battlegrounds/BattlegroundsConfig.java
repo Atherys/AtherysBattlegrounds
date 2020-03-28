@@ -10,6 +10,7 @@ import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollection;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
+import org.spongepowered.api.service.economy.Currency;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -28,6 +29,9 @@ public class BattlegroundsConfig extends PluginConfig {
 
     @Setting("teams")
     public Set<TeamConfig> TEAMS = new HashSet<>();
+
+    @Setting("team-currencies")
+    public Set<Currency> TEAM_CURRENCIES = new HashSet<>();
 
     @Setting("tick-interval")
     public Duration TICK_INTERVAL = Duration.of(1, ChronoUnit.SECONDS);

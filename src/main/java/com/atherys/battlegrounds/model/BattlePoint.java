@@ -1,5 +1,6 @@
 package com.atherys.battlegrounds.model;
 
+import com.atherys.battlegrounds.config.AwardConfig;
 import com.atherys.battlegrounds.utils.ColorUtils;
 import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.text.Text;
@@ -33,9 +34,9 @@ public class BattlePoint implements TextRepresentable {
 
     private List<RespawnPoint> respawnPoints = new ArrayList<>();
 
-    private Set<Award> captureAwards = new HashSet<>();
+    private AwardConfig captureAward;
 
-    private Set<Award> tickAwards = new HashSet<>();
+    private AwardConfig tickAward;
 
     private Map<Team, Float> teamProgress = new HashMap<>();
 
@@ -113,20 +114,20 @@ public class BattlePoint implements TextRepresentable {
         this.respawnPoints = respawnPoints;
     }
 
-    public Set<Award> getCaptureAwards() {
-        return captureAwards;
+    public AwardConfig getCaptureAward() {
+        return captureAward;
     }
 
-    public void setCaptureAwards(Set<Award> captureAwards) {
-        this.captureAwards = captureAwards;
+    public void setCaptureAward(AwardConfig captureAward) {
+        this.captureAward = captureAward;
     }
 
-    public Set<Award> getTickAwards() {
-        return tickAwards;
+    public AwardConfig getTickAward() {
+        return tickAward;
     }
 
-    public void setTickAwards(Set<Award> tickAwards) {
-        this.tickAwards = tickAwards;
+    public void setTickAward(AwardConfig tickAward) {
+        this.tickAward = tickAward;
     }
 
     public Map<Team, Float> getTeamProgress() {
@@ -158,25 +159,12 @@ public class BattlePoint implements TextRepresentable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BattlePoint that = (BattlePoint) o;
-        return Double.compare(that.innerRadius, innerRadius) == 0 &&
-                Double.compare(that.outerRadius, outerRadius) == 0 &&
-                Float.compare(that.perTickCaptureAmount, perTickCaptureAmount) == 0 &&
-                Objects.equals(id, that.id) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(bossBar, that.bossBar) &&
-                Objects.equals(location, that.location) &&
-                Objects.equals(respawnInterval, that.respawnInterval) &&
-                Objects.equals(respawnTimeout, that.respawnTimeout) &&
-                Objects.equals(respawnPoints, that.respawnPoints) &&
-                Objects.equals(captureAwards, that.captureAwards) &&
-                Objects.equals(tickAwards, that.tickAwards) &&
-                Objects.equals(teamProgress, that.teamProgress) &&
-                Objects.equals(controllingTeam, that.controllingTeam);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, bossBar, location, innerRadius, outerRadius, perTickCaptureAmount, respawnInterval, respawnTimeout, respawnPoints, captureAwards, tickAwards, teamProgress, controllingTeam);
+        return Objects.hash(id);
     }
 
     @Override
@@ -192,8 +180,8 @@ public class BattlePoint implements TextRepresentable {
                 ", respawnInterval=" + respawnInterval +
                 ", respawnTimeout=" + respawnTimeout +
                 ", respawnPoints=" + respawnPoints +
-                ", captureAwards=" + captureAwards +
-                ", tickAwards=" + tickAwards +
+                ", captureAward=" + captureAward +
+                ", tickAward=" + tickAward +
                 ", teamProgress=" + teamProgress +
                 ", controllingTeam=" + controllingTeam +
                 '}';

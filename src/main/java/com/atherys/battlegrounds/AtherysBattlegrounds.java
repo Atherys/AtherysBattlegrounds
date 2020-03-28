@@ -143,6 +143,10 @@ public class AtherysBattlegrounds {
         return components.teamService;
     }
 
+    public Logger getLogger() {
+        return logger;
+    }
+
     private static class Components {
 
         @Inject

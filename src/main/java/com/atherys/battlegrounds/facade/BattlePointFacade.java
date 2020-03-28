@@ -3,7 +3,6 @@ package com.atherys.battlegrounds.facade;
 import com.atherys.battlegrounds.AtherysBattlegrounds;
 import com.atherys.battlegrounds.BattlegroundsConfig;
 import com.atherys.battlegrounds.config.BattlePointConfig;
-import com.atherys.battlegrounds.model.Award;
 import com.atherys.battlegrounds.model.BattlePoint;
 import com.atherys.battlegrounds.model.RespawnPoint;
 import com.atherys.battlegrounds.model.Team;
@@ -84,23 +83,13 @@ public class BattlePointFacade {
             );
 
             // parse the respawn point configs
-            List<RespawnPoint> respawnPoints = pointConfig.getRespawnPoints().parallelStream()
+            List<RespawnPoint> respawnPoints = pointConfig.getRespawnPoints().stream()
                     .map(respawnConfig -> respawnService.createRespawnPoint(
                             location.getExtent(),
                             respawnConfig.getPosition(),
                             respawnConfig.getRadius()
                     ))
                     .collect(Collectors.toList());
-
-            // parse the capture awards config
-            Set<Award> captureAwards = pointConfig.getOnCaptureAwards().parallelStream()
-                    .map(awardConfig -> battlePointService.createAward(awardConfig.getCurrency()))
-                    .collect(Collectors.toSet());
-
-            // parse the tick awards config
-            Set<Award> tickAwards = pointConfig.getOnTickAwards().parallelStream()
-                    .map(awardConfig -> battlePointService.createAward(awardConfig.getCurrency()))
-                    .collect(Collectors.toSet());
 
             // create the boss bar for the battlepoint
             ServerBossBar battlePointBossBar = createBattlePointBossBar(pointConfig.getName(), pointConfig.getColor());
@@ -117,8 +106,8 @@ public class BattlePointFacade {
                     pointConfig.getRespawnInterval(),
                     pointConfig.getRespawnTimeout(),
                     respawnPoints,
-                    captureAwards,
-                    tickAwards
+                    pointConfig.getOnCaptureAward(),
+                    pointConfig.getOnTickAward()
             );
         });
 
@@ -151,6 +140,7 @@ public class BattlePointFacade {
                 highestProgress = entry.getValue();
             }
         }
+        AtherysBattlegrounds.getInstance().getLogger().info(highestProgressTeam == null ? "" : highestProgressTeam.toString());
 
         if (highestProgressTeam != null) {
             battlePoint.getBossBar().setColor(ColorUtils.textColorToBossBarColor(highestProgressTeam.getColor()));
