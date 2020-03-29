@@ -8,7 +8,10 @@ import com.atherys.battlegrounds.persistence.PlayerRankingRepository;
 import com.atherys.battlegrounds.persistence.TeamMemberRepository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.service.user.UserStorageService;
 
 import java.util.HashMap;
 import java.util.Map;

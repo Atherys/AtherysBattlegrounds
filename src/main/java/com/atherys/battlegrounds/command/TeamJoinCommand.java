@@ -34,7 +34,12 @@ public class TeamJoinCommand implements PlayerCommand, ParameterizedCommand {
     @Override
     public CommandElement[] getArguments() {
         return new CommandElement[]{
-                GenericArguments.choices(Text.of("team-id"), AtherysBattlegrounds.getInstance().getTeamFacade().getTeamChoices(), true, false)
+                GenericArguments.choices(
+                        Text.of("team"),
+                        AtherysBattlegrounds.getInstance().getTeamFacade().getTeamChoices(),
+                        true,
+                        false
+                )
         };
     }
 }

@@ -1,5 +1,6 @@
 package com.atherys.battlegrounds;
 
+import com.atherys.battlegrounds.config.AwardConfig;
 import com.atherys.battlegrounds.config.BattlePointConfig;
 import com.atherys.battlegrounds.config.TeamConfig;
 import com.atherys.battlegrounds.serialize.DurationTypeSerializer;
@@ -15,7 +16,9 @@ import org.spongepowered.api.service.economy.Currency;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Singleton
@@ -32,6 +35,9 @@ public class BattlegroundsConfig extends PluginConfig {
 
     @Setting("team-currencies")
     public Set<Currency> TEAM_CURRENCIES = new HashSet<>();
+
+    @Setting("award-for-kills")
+    public AwardConfig KILL_AWARD = new AwardConfig();
 
     @Setting("tick-interval")
     public Duration TICK_INTERVAL = Duration.of(1, ChronoUnit.SECONDS);

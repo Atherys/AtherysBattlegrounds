@@ -45,7 +45,8 @@ public class BattlePointService {
             Duration respawnDuration,
             List<RespawnPoint> respawnPoints,
             AwardConfig captureAward,
-            AwardConfig tickAward
+            AwardConfig tickAward,
+            AwardConfig killAward
     ) {
         BattlePoint battlePoint = new BattlePoint(id);
 
@@ -60,6 +61,7 @@ public class BattlePointService {
         battlePoint.setRespawnPoints(respawnPoints);
         battlePoint.setCaptureAward(captureAward);
         battlePoint.setTickAward(tickAward);
+        battlePoint.setKillAward(killAward);
 
         battlePoints.add(battlePoint);
 

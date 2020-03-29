@@ -1,6 +1,7 @@
 package com.atherys.battlegrounds.facade;
 
 import com.atherys.battlegrounds.BattlegroundsConfig;
+import com.atherys.battlegrounds.config.AwardConfig;
 import com.atherys.battlegrounds.model.BattlePoint;
 import com.atherys.battlegrounds.model.Team;
 import com.atherys.battlegrounds.model.entity.PlayerRanking;
@@ -14,9 +15,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.economy.account.Account;
+import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageReceiver;
+import org.spongepowered.api.util.Tristate;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -52,14 +56,7 @@ public class TeamFacade {
         ));
     }
 
-    public void showTeamInfo(Player source) throws CommandException {
-        TeamMember teamMember = teamMemberService.getOrCreateTeamMember(source);
-        Team team = teamMember.getTeam();
-
-        if (team == null) {
-            throw msg.exception(Text.of("You are not part of a team!"));
-        }
-
+    public void showTeamInfo(MessageReceiver receiver, Team team) {
         List<Text> info = new ArrayList<>();
 
         info.add(Text.of(DARK_GRAY, "[]====[ ", team.getColor(), team.getName(), DARK_GRAY, " ]====[]"));
@@ -76,7 +73,18 @@ public class TeamFacade {
 
         info.add(Text.of(DARK_GREEN, "Controlling: ", GOLD, points));
 
-        info.forEach(source::sendMessage);
+        info.forEach(receiver::sendMessage);
+    }
+
+    public void showTeamInfo(Player source) throws CommandException {
+        TeamMember teamMember = teamMemberService.getOrCreateTeamMember(source);
+        Team team = teamMember.getTeam();
+
+        if (team == null) {
+            throw msg.exception(Text.of("You are not part of a team!"));
+        }
+
+        showTeamInfo(source, team);
     }
 
     public void removePlayerFromTeam(Player source) throws CommandException {
@@ -87,17 +95,20 @@ public class TeamFacade {
             throw msg.exception(Text.of("You are not part of a team!"));
         }
 
+        source.getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT, "atherysbattlegrounds.teams." + team.getId(), Tristate.FALSE);
+
         teamMemberService.removeTeamMemberFromTeam(team, teamMember);
 
-        msg.error(source, Text.of("You have left the team \"", team, "\""));
+        msg.error(source, "You have left ", team, ".");
     }
 
-    public void addPlayerToTeam(Player source, Team team) throws CommandException {
+    public void addPlayerToTeam(Player source, Team team) {
         TeamMember teamMember = teamMemberService.getOrCreateTeamMember(source);
 
         teamMemberService.addTeamMemberToTeam(team, teamMember);
+        source.getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT, "atherysbattlegrounds.teams." + team.getId(), Tristate.TRUE);
 
-        msg.info(source, Text.of("You have joined the team \"", team, "\""));
+        msg.info(source, "You have joined the team ", team, ".");
     }
 
     public Map<String, Team> getTeamChoices() {
@@ -110,39 +121,15 @@ public class TeamFacade {
         return choices;
     }
 
-    public void rankPlayers(Player victim, Player attacker) {
-        TeamMember attackerTeamMember = teamMemberService.getOrCreateTeamMember(attacker);
-        TeamMember victimTeamMember = teamMemberService.getOrCreateTeamMember(victim);
+    public void grantPointsOnKill(Player victim, Player killer) {
+        TeamMember killerMember = teamMemberService.getOrCreateTeamMember(killer);
 
-        // If both players are on the same team, no rankings will be changed
-        if (Objects.equals(attackerTeamMember.getTeam(), victimTeamMember.getTeam())) {
-            return;
-        }
+        if (killerMember.getTeam() == null) return;
 
-        PlayerRanking victimRanking = victimTeamMember.getRanking();
+        if (killerMember.getTeam().equals(teamMemberService.getOrCreateTeamMember(victim).getTeam())) return;
 
-        // If the attacker is higher position than their victim, switch the ranking positions
-        if (victimRanking.getPosition() <= attackerTeamMember.getRanking().getPosition()) {
-            teamMemberService.switchRankings(victimTeamMember, attackerTeamMember);
+        AwardConfig award = battlePointService.getBattlePointFromLocation(victim.getLocation()).map(BattlePoint::getKillAward).orElse(config.KILL_AWARD);
 
-            PlayerRanking attackerRanking = attackerTeamMember.getRanking();
-
-            msg.error(victim, "You have died to a player of lower rank. Your new ranking position is: ", victimRanking.getPosition());
-            msg.info(attacker, "You have killed a player of higher ranking. Your new ranking position is: ", attackerRanking.getPosition());
-        }
-    }
-
-    public void sendPlayerRanking(Player source) {
-        TeamMember teamMember = teamMemberService.getOrCreateTeamMember(source);
-
-        if (teamMember.getRanking() == null) {
-            teamMemberService.rankPlayerLast(teamMember);
-        }
-
-        msg.info(source, "Your current ranking position is ", teamMember.getRanking().getPosition(), ". Your rank is \"", teamMemberService.getTeamMemberRankName(teamMember),"\"");
-    }
-
-    public void sendPlayerRankList(Player source) {
-        msg.info(source, "Not yet implemented");
+        teamService.distributeAwardsToMembers(award, Collections.singleton(killer));
     }
 }

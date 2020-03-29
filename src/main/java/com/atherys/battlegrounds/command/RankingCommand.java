@@ -1,6 +1,5 @@
 package com.atherys.battlegrounds.command;
 
-import com.atherys.battlegrounds.AtherysBattlegrounds;
 import com.atherys.core.command.PlayerCommand;
 import com.atherys.core.command.annotation.Aliases;
 import com.atherys.core.command.annotation.Children;
@@ -13,13 +12,12 @@ import javax.annotation.Nonnull;
 
 @Aliases("ranking")
 @Children({
-        GetRankListCommand.class
 })
 public class RankingCommand implements PlayerCommand {
     @Nonnull
     @Override
     public CommandResult execute(@Nonnull Player source, @Nonnull CommandContext args) throws CommandException {
-        AtherysBattlegrounds.getInstance().getTeamFacade().sendPlayerRanking(source);
+        //AtherysBattlegrounds.getInstance().getTeamFacade().sendPlayerRanking(source);
 
         return CommandResult.success();
     }

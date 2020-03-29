@@ -107,7 +107,8 @@ public class BattlePointFacade {
                     pointConfig.getRespawnTimeout(),
                     respawnPoints,
                     pointConfig.getOnCaptureAward(),
-                    pointConfig.getOnTickAward()
+                    pointConfig.getOnTickAward(),
+                    pointConfig.getOnKillAward()
             );
         });
 
@@ -140,7 +141,6 @@ public class BattlePointFacade {
                 highestProgress = entry.getValue();
             }
         }
-        AtherysBattlegrounds.getInstance().getLogger().info(highestProgressTeam == null ? "" : highestProgressTeam.toString());
 
         if (highestProgressTeam != null) {
             battlePoint.getBossBar().setColor(ColorUtils.textColorToBossBarColor(highestProgressTeam.getColor()));
@@ -204,7 +204,7 @@ public class BattlePointFacade {
     }
 
     public void notifyCapturedBattlePoint(BattlePoint battlePoint, Team capturingTeam) {
-        msg.broadcast(Text.of("Team \"", capturingTeam, "\" has captured \"", battlePoint, "\""));
+        msg.broadcast(capturingTeam, " has captured ", battlePoint, ".");
 
         fetchPlayersWithinBattlePointOuterRadius(battlePoint).forEach(this::playBattlePointCaptureSound);
     }

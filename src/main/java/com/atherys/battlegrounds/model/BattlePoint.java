@@ -38,6 +38,8 @@ public class BattlePoint implements TextRepresentable {
 
     private AwardConfig tickAward;
 
+    private AwardConfig killAward;
+
     private Map<Team, Float> teamProgress = new HashMap<>();
 
     private Team controllingTeam;
@@ -128,6 +130,14 @@ public class BattlePoint implements TextRepresentable {
 
     public void setTickAward(AwardConfig tickAward) {
         this.tickAward = tickAward;
+    }
+
+    public AwardConfig getKillAward() {
+        return killAward;
+    }
+
+    public void setKillAward(AwardConfig killAward) {
+        this.killAward = killAward;
     }
 
     public Map<Team, Float> getTeamProgress() {

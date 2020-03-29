@@ -103,6 +103,9 @@ public class BattlePointConfig {
     @Setting("on-tick-awards")
     private AwardConfig onTickAward = new AwardConfig();
 
+    @Setting("on-kill-awards")
+    private AwardConfig onKillAward = new AwardConfig();
+
     public BattlePointConfig() {
     }
 
@@ -152,5 +155,9 @@ public class BattlePointConfig {
 
     public AwardConfig getOnTickAward() {
         return onTickAward;
+    }
+
+    public AwardConfig getOnKillAward() {
+        return onKillAward;
     }
 }
