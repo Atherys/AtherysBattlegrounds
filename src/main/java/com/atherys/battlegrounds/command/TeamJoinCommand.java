@@ -26,7 +26,7 @@ public class TeamJoinCommand implements PlayerCommand, ParameterizedCommand {
     public CommandResult execute(@Nonnull Player source, @Nonnull CommandContext args) throws CommandException {
         AtherysBattlegrounds.getInstance().getTeamFacade().addPlayerToTeam(
                 source,
-                args.<Team>getOne("team-id").orElse(null)
+                args.<Team>getOne("team").orElse(null)
         );
         return CommandResult.success();
     }

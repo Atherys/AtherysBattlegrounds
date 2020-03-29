@@ -178,7 +178,7 @@ public class BattlePointService {
     }
 
     public Optional<BattlePoint> getBattlePointFromLocation(Location<World> location) {
-        Set<BattlePoint> overlappingBPs = battlePoints.parallelStream()
+        Set<BattlePoint> overlappingBPs = battlePoints.stream()
                 .filter(battlePoint -> isLocationWithinBattlePointOuterRadius(battlePoint, location))
                 .collect(Collectors.toSet());
 

@@ -37,8 +37,12 @@ public class PlayerListener {
 
     @Listener
     public void onPlayerDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Player victim, @Root EntityDamageSource source) {
-        respawnFacade.offerRespawn(victim);
         EntityUtils.playerAttackedEntity(source).ifPresent(attacker -> teamFacade.grantPointsOnKill(victim, attacker));
+    }
+
+    @Listener
+    public void onPlayerDeathAny(DestructEntityEvent event, @Getter("getTargetEntity") Player victim) {
+        respawnFacade.offerRespawn(victim);
     }
 
     @Listener
