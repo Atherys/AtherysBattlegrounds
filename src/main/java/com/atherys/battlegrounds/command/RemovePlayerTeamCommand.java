@@ -15,7 +15,7 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
-@Aliases("add")
+@Aliases("remove")
 @Permission("atherysbattlegrounds.team.remove")
 @Description("Removes a player from their team.")
 public class RemovePlayerTeamCommand implements ParameterizedCommand {

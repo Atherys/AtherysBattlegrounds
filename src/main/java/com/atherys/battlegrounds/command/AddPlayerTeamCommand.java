@@ -23,7 +23,7 @@ public class AddPlayerTeamCommand implements ParameterizedCommand {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         AtherysBattlegrounds.getInstance().getTeamFacade().addPlayerToTeam(
                 args.<Player>getOne("player").get(),
-                args.<Team>getOne("team-id").get()
+                args.<Team>getOne("team").get()
         );
         return CommandResult.success();
     }
@@ -32,7 +32,12 @@ public class AddPlayerTeamCommand implements ParameterizedCommand {
     public CommandElement[] getArguments() {
         return new CommandElement[] {
                 GenericArguments.player(Text.of("player")),
-                GenericArguments.choices(Text.of("team-id"), AtherysBattlegrounds.getInstance().getTeamFacade().getTeamChoices(), true, false)
+                GenericArguments.choices(
+                        Text.of("team"),
+                        AtherysBattlegrounds.getInstance().getTeamFacade().getTeamChoices(),
+                        true,
+                        false
+                )
         };
     }
 
