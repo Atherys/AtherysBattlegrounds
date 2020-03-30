@@ -19,7 +19,7 @@ public class TeamLeaveCommand implements PlayerCommand {
     @Nonnull
     @Override
     public CommandResult execute(@Nonnull Player source, @Nonnull CommandContext args) throws CommandException {
-        AtherysBattlegrounds.getInstance().getTeamFacade().removePlayerFromTeam(source);
+        AtherysBattlegrounds.getInstance().getTeamFacade().leaveTeam(source);
         return CommandResult.success();
     }
 }

@@ -87,7 +87,17 @@ public class TeamFacade {
         showTeamInfo(source, team);
     }
 
-    public void removePlayerFromTeam(Player source) throws CommandException {
+    public void removePlayerFromTeam(Player player) {
+        TeamMember teamMember = teamMemberService.getOrCreateTeamMember(player);
+        Team team = teamMember.getTeam();
+
+        if (team == null) return;
+
+        setTeamPermission(player, team, false);
+        teamMemberService.removeTeamMemberFromTeam(teamMember);
+    }
+
+    public void leaveTeam(Player source) throws CommandException {
         TeamMember teamMember = teamMemberService.getOrCreateTeamMember(source);
         Team team = teamMember.getTeam();
 
@@ -95,9 +105,8 @@ public class TeamFacade {
             throw msg.exception(Text.of("You are not part of a team!"));
         }
 
-        source.getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT, "atherysbattlegrounds.teams." + team.getId(), Tristate.FALSE);
-
-        teamMemberService.removeTeamMemberFromTeam(team, teamMember);
+        setTeamPermission(source, team, false);
+        teamMemberService.removeTeamMemberFromTeam(teamMember);
 
         msg.error(source, "You have left ", team, ".");
     }
@@ -105,10 +114,22 @@ public class TeamFacade {
     public void addPlayerToTeam(Player source, Team team) {
         TeamMember teamMember = teamMemberService.getOrCreateTeamMember(source);
 
+        if (teamMember.getTeam() != null) {
+            setTeamPermission(source, teamMember.getTeam(), false);
+        }
+
         teamMemberService.addTeamMemberToTeam(team, teamMember);
-        source.getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT, "atherysbattlegrounds.teams." + team.getId(), Tristate.TRUE);
+        setTeamPermission(source, team, true);
 
         msg.info(source, "You have joined the team ", team, ".");
+    }
+
+    private void setTeamPermission(Player player, Team team, boolean value) {
+        player.getSubjectData().setPermission(
+                SubjectData.GLOBAL_CONTEXT,
+                "atherysbattlegrounds.team." + team.getId(),
+                value ? Tristate.TRUE : Tristate.FALSE
+        );
     }
 
     public Map<String, Team> getTeamChoices() {

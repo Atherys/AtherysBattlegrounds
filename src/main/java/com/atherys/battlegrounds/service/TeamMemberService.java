@@ -67,7 +67,7 @@ public class TeamMemberService {
         return Optional.ofNullable(capturingTeam);
     }
 
-    public void removeTeamMemberFromTeam(Team team, TeamMember teamMember) {
+    public void removeTeamMemberFromTeam(TeamMember teamMember) {
         teamMember.setTeam(null);
         teamMemberRepository.saveOne(teamMember);
     }
