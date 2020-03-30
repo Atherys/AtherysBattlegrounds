@@ -48,6 +48,7 @@ public class PlayerListener {
     @Listener
     public void onPlayerJoin(ClientConnectionEvent.Join event, @Root Player player) {
         battlePointFacade.onPlayerJoin(player);
+        teamFacade.onPlayerJoin(player);
     }
 
     @Listener

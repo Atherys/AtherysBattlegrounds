@@ -1,9 +1,8 @@
 package com.atherys.battlegrounds.model.entity;
 
-import com.atherys.battlegrounds.model.Team;
+import com.atherys.battlegrounds.model.BattleTeam;
 import com.atherys.battlegrounds.persistence.TeamConverter;
 import com.atherys.core.db.SpongeIdentifiable;
-import org.hibernate.annotations.Fetch;
 
 import javax.annotation.Nonnull;
 import javax.persistence.*;
@@ -17,7 +16,7 @@ public class TeamMember implements SpongeIdentifiable {
     private UUID id;
 
     @Convert(converter = TeamConverter.class)
-    private Team team;
+    private BattleTeam team;
 
     private String cachedName;
 
@@ -36,11 +35,11 @@ public class TeamMember implements SpongeIdentifiable {
         return id;
     }
 
-    public Team getTeam() {
+    public BattleTeam getTeam() {
         return team;
     }
 
-    public void setTeam(Team team) {
+    public void setTeam(BattleTeam team) {
         this.team = team;
     }
 

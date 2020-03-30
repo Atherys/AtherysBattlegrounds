@@ -40,9 +40,9 @@ public class BattlePoint implements TextRepresentable {
 
     private AwardConfig killAward;
 
-    private Map<Team, Float> teamProgress = new HashMap<>();
+    private Map<BattleTeam, Float> teamProgress = new HashMap<>();
 
-    private Team controllingTeam;
+    private BattleTeam controllingTeam;
 
     public BattlePoint(String id) {
         this.id = id;
@@ -140,19 +140,19 @@ public class BattlePoint implements TextRepresentable {
         this.killAward = killAward;
     }
 
-    public Map<Team, Float> getTeamProgress() {
+    public Map<BattleTeam, Float> getTeamProgress() {
         return teamProgress;
     }
 
-    public void setTeamProgress(Map<Team, Float> teamProgress) {
+    public void setTeamProgress(Map<BattleTeam, Float> teamProgress) {
         this.teamProgress = teamProgress;
     }
 
-    public Team getControllingTeam() {
+    public BattleTeam getControllingTeam() {
         return controllingTeam;
     }
 
-    public void setControllingTeam(Team controllingTeam) {
+    public void setControllingTeam(BattleTeam controllingTeam) {
         this.controllingTeam = controllingTeam;
     }
 

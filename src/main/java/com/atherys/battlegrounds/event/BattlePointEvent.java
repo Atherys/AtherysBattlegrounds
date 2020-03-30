@@ -1,7 +1,7 @@
 package com.atherys.battlegrounds.event;
 
 import com.atherys.battlegrounds.model.BattlePoint;
-import com.atherys.battlegrounds.model.Team;
+import com.atherys.battlegrounds.model.BattleTeam;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.cause.Cause;
@@ -40,15 +40,15 @@ public abstract class BattlePointEvent implements Event {
      */
     public static class Capture extends Tick {
 
-        private Team team;
+        private BattleTeam team;
 
-        public Capture(BattlePoint battlepoint, Team team) {
+        public Capture(BattlePoint battlepoint, BattleTeam team) {
             super(battlepoint);
             this.team = team;
             this.cause = Cause.of(Sponge.getCauseStackManager().getCurrentContext(), battlepoint, team);
         }
 
-        public Team getTeam() {
+        public BattleTeam getTeam() {
             return team;
         }
     }

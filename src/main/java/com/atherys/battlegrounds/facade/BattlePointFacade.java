@@ -5,7 +5,7 @@ import com.atherys.battlegrounds.BattlegroundsConfig;
 import com.atherys.battlegrounds.config.BattlePointConfig;
 import com.atherys.battlegrounds.model.BattlePoint;
 import com.atherys.battlegrounds.model.RespawnPoint;
-import com.atherys.battlegrounds.model.Team;
+import com.atherys.battlegrounds.model.BattleTeam;
 import com.atherys.battlegrounds.service.BattlePointService;
 import com.atherys.battlegrounds.service.RespawnService;
 import com.atherys.battlegrounds.service.TeamMemberService;
@@ -24,6 +24,8 @@ import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.scoreboard.Team;
+import org.spongepowered.api.scoreboard.TeamMember;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.Location;
@@ -132,10 +134,10 @@ public class BattlePointFacade {
 
     public void updateBattlePointBossBar(BattlePoint battlePoint) {
         // find the highest progress team and display their progress on the boss bar
-        Team highestProgressTeam = null;
+        BattleTeam highestProgressTeam = null;
         float highestProgress = 0.0f;
 
-        for (Map.Entry<Team, Float> entry : battlePoint.getTeamProgress().entrySet()) {
+        for (Map.Entry<BattleTeam, Float> entry : battlePoint.getTeamProgress().entrySet()) {
             if (entry.getValue() > highestProgress) {
                 highestProgressTeam = entry.getKey();
                 highestProgress = entry.getValue();
@@ -203,7 +205,7 @@ public class BattlePointFacade {
         bp.ifPresent(battlePoint -> battlePoint.getBossBar().removePlayer(player));
     }
 
-    public void notifyCapturedBattlePoint(BattlePoint battlePoint, Team capturingTeam) {
+    public void notifyCapturedBattlePoint(BattlePoint battlePoint, BattleTeam capturingTeam) {
         msg.broadcast(capturingTeam, " has captured ", battlePoint, ".");
 
         fetchPlayersWithinBattlePointOuterRadius(battlePoint).forEach(this::playBattlePointCaptureSound);

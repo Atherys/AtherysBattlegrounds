@@ -1,7 +1,7 @@
 package com.atherys.battlegrounds.command;
 
 import com.atherys.battlegrounds.AtherysBattlegrounds;
-import com.atherys.battlegrounds.model.Team;
+import com.atherys.battlegrounds.model.BattleTeam;
 import com.atherys.core.command.ParameterizedCommand;
 import com.atherys.core.command.PlayerCommand;
 import com.atherys.core.command.annotation.Aliases;
@@ -26,7 +26,7 @@ public class TeamJoinCommand implements PlayerCommand, ParameterizedCommand {
     public CommandResult execute(@Nonnull Player source, @Nonnull CommandContext args) throws CommandException {
         AtherysBattlegrounds.getInstance().getTeamFacade().addPlayerToTeam(
                 source,
-                args.<Team>getOne("team").orElse(null)
+                args.<BattleTeam>getOne("team").orElse(null)
         );
         return CommandResult.success();
     }

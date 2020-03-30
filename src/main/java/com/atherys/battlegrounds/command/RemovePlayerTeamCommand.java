@@ -1,7 +1,6 @@
 package com.atherys.battlegrounds.command;
 
 import com.atherys.battlegrounds.AtherysBattlegrounds;
-import com.atherys.battlegrounds.model.Team;
 import com.atherys.core.command.ParameterizedCommand;
 import com.atherys.core.command.annotation.Aliases;
 import com.atherys.core.command.annotation.Description;

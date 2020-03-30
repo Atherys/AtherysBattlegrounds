@@ -4,7 +4,7 @@ import com.atherys.battlegrounds.config.AwardConfig;
 import com.atherys.battlegrounds.event.BattlePointEvent;
 import com.atherys.battlegrounds.model.BattlePoint;
 import com.atherys.battlegrounds.model.RespawnPoint;
-import com.atherys.battlegrounds.model.Team;
+import com.atherys.battlegrounds.model.BattleTeam;
 import com.atherys.battlegrounds.model.entity.TeamMember;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -69,7 +69,7 @@ public class BattlePointService {
     }
 
     public void tickBattlePoint(BattlePoint battlePoint) {
-        Map<Team, Set<Player>> membersWithinInnerRadius = new HashMap<>();
+        Map<BattleTeam, Set<Player>> membersWithinInnerRadius = new HashMap<>();
 
         for (Player player : Sponge.getServer().getOnlinePlayers()) {
             if (isPlayerWithinBattlePointInnerRadius(battlePoint, player)) {
@@ -104,7 +104,7 @@ public class BattlePointService {
         });
 
         // determine the controlling team after having modified the progress values for the battlepoint
-        Optional<Team> postTickControllingTeam = determineControllingTeam(battlePoint);
+        Optional<BattleTeam> postTickControllingTeam = determineControllingTeam(battlePoint);
 
         // if the point's current controlling team the controlling team after the last progress tick are different,
         // then a change of ownership has occurred. Distribute capture awards to the new controlling team
@@ -130,7 +130,7 @@ public class BattlePointService {
         Sponge.getEventManager().post(tickEvent);
     }
 
-    protected void incrementTeamProgress(BattlePoint battlePoint, Team team, float amount) {
+    protected void incrementTeamProgress(BattlePoint battlePoint, BattleTeam team, float amount) {
         Float currentValue = battlePoint.getTeamProgress().getOrDefault(team, 0.0f);
 
         if (currentValue + amount <= 0.0f) {
@@ -142,9 +142,9 @@ public class BattlePointService {
         }
     }
 
-    protected Optional<Team> determineControllingTeam(BattlePoint battlePoint) {
+    protected Optional<BattleTeam> determineControllingTeam(BattlePoint battlePoint) {
         // Find the first team with 100% progress towards capturing the point
-        for (Map.Entry<Team, Float> entry : battlePoint.getTeamProgress().entrySet()) {
+        for (Map.Entry<BattleTeam, Float> entry : battlePoint.getTeamProgress().entrySet()) {
             if (entry.getValue() != null && entry.getValue() == 1.0f) {
                 return Optional.of(entry.getKey());
             }
@@ -171,7 +171,7 @@ public class BattlePointService {
         return battlePoints;
     }
 
-    public Set<BattlePoint> getControlledPoints(Team team) {
+    public Set<BattlePoint> getControlledPoints(BattleTeam team) {
         return battlePoints.stream()
                 .filter(battlePoint -> team.equals(battlePoint.getControllingTeam()))
                 .collect(Collectors.toSet());

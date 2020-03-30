@@ -1,19 +1,15 @@
 package com.atherys.battlegrounds.service;
 
 import com.atherys.battlegrounds.BattlegroundsConfig;
-import com.atherys.battlegrounds.model.Team;
+import com.atherys.battlegrounds.model.BattleTeam;
 import com.atherys.battlegrounds.model.entity.PlayerRanking;
 import com.atherys.battlegrounds.model.entity.TeamMember;
 import com.atherys.battlegrounds.persistence.PlayerRankingRepository;
 import com.atherys.battlegrounds.persistence.TeamMemberRepository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.api.service.user.UserStorageService;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -47,10 +43,10 @@ public class TeamMemberService {
         });
     }
 
-    protected Optional<Team> determineCapturingTeam(Map<Team, Set<Player>> onlineTeamMembersWithinInnerRadius) {
-        Team capturingTeam = null;
+    protected Optional<BattleTeam> determineCapturingTeam(Map<BattleTeam, Set<Player>> onlineTeamMembersWithinInnerRadius) {
+        BattleTeam capturingTeam = null;
 
-        for (Map.Entry<Team, Set<Player>> entry : onlineTeamMembersWithinInnerRadius.entrySet()) {
+        for (Map.Entry<BattleTeam, Set<Player>> entry : onlineTeamMembersWithinInnerRadius.entrySet()) {
             if (entry.getValue().size() >= config.MINIMUM_PLAYERS_REQUIRED_TO_CAPTURE_POINT) {
 
                 // If a capturing team has already been found, and another also meets the criteria,
@@ -72,7 +68,7 @@ public class TeamMemberService {
         teamMemberRepository.saveOne(teamMember);
     }
 
-    public void addTeamMemberToTeam(Team team, TeamMember teamMember) {
+    public void addTeamMemberToTeam(BattleTeam team, TeamMember teamMember) {
         teamMember.setTeam(team);
         teamMemberRepository.saveOne(teamMember);
     }

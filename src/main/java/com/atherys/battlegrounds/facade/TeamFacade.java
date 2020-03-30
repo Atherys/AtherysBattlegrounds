@@ -3,19 +3,17 @@ package com.atherys.battlegrounds.facade;
 import com.atherys.battlegrounds.BattlegroundsConfig;
 import com.atherys.battlegrounds.config.AwardConfig;
 import com.atherys.battlegrounds.model.BattlePoint;
-import com.atherys.battlegrounds.model.Team;
-import com.atherys.battlegrounds.model.entity.PlayerRanking;
+import com.atherys.battlegrounds.model.BattleTeam;
 import com.atherys.battlegrounds.model.entity.TeamMember;
 import com.atherys.battlegrounds.service.BattlePointService;
 import com.atherys.battlegrounds.service.TeamMemberService;
 import com.atherys.battlegrounds.service.TeamService;
-import com.atherys.core.AtherysCore;
 import com.atherys.core.economy.Economy;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.scoreboard.Team;
 import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.text.Text;
@@ -49,14 +47,22 @@ public class TeamFacade {
     }
 
     public void init() {
-        config.TEAMS.forEach(teamConfig -> teamService.createTeam(
-                teamConfig.getId(),
-                teamConfig.getName(),
-                teamConfig.getColor()
-        ));
+        List<Team> scoreboardTeams = config.TEAMS.stream()
+                .map(teamConfig -> teamService.createTeam(teamConfig.getId(), teamConfig.getName(), teamConfig.getColor()).getScoreboardTeam())
+                .collect(Collectors.toList());
+
+        teamService.setScoreboard(scoreboardTeams);
     }
 
-    public void showTeamInfo(MessageReceiver receiver, Team team) {
+    public void onPlayerJoin(Player source) {
+        TeamMember teamMember = teamMemberService.getOrCreateTeamMember(source);
+        if (teamMember.getTeam() != null) {
+            teamMember.getTeam().getScoreboardTeam().addMember(source.getTeamRepresentation());
+        }
+        teamService.addPlayerToScoreboard(source);
+    }
+
+    public void showTeamInfo(MessageReceiver receiver, BattleTeam team) {
         List<Text> info = new ArrayList<>();
 
         info.add(Text.of(DARK_GRAY, "[]====[ ", team.getColor(), team.getName(), DARK_GRAY, " ]====[]"));
@@ -78,7 +84,7 @@ public class TeamFacade {
 
     public void showTeamInfo(Player source) throws CommandException {
         TeamMember teamMember = teamMemberService.getOrCreateTeamMember(source);
-        Team team = teamMember.getTeam();
+        BattleTeam team = teamMember.getTeam();
 
         if (team == null) {
             throw msg.exception(Text.of("You are not part of a team!"));
@@ -89,29 +95,37 @@ public class TeamFacade {
 
     public void removePlayerFromTeam(Player player) {
         TeamMember teamMember = teamMemberService.getOrCreateTeamMember(player);
-        Team team = teamMember.getTeam();
+        BattleTeam team = teamMember.getTeam();
 
         if (team == null) return;
 
+        team.getScoreboardTeam().removeMember(player.getTeamRepresentation());
         setTeamPermission(player, team, false);
         teamMemberService.removeTeamMemberFromTeam(teamMember);
     }
 
     public void leaveTeam(Player source) throws CommandException {
         TeamMember teamMember = teamMemberService.getOrCreateTeamMember(source);
-        Team team = teamMember.getTeam();
+        BattleTeam team = teamMember.getTeam();
 
         if (team == null) {
             throw msg.exception(Text.of("You are not part of a team!"));
         }
 
+        team.getScoreboardTeam().removeMember(source.getTeamRepresentation());
         setTeamPermission(source, team, false);
         teamMemberService.removeTeamMemberFromTeam(teamMember);
 
         msg.error(source, "You have left ", team, ".");
     }
 
-    public void addPlayerToTeam(Player source, Team team) {
+    private void removePlayer(Player player, TeamMember teamMember, BattleTeam team) {
+        team.getScoreboardTeam().removeMember(player.getTeamRepresentation());
+        setTeamPermission(player, team, false);
+        teamMemberService.removeTeamMemberFromTeam(teamMember);
+    }
+
+    public void addPlayerToTeam(Player source, BattleTeam team) {
         TeamMember teamMember = teamMemberService.getOrCreateTeamMember(source);
 
         if (teamMember.getTeam() != null) {
@@ -119,12 +133,14 @@ public class TeamFacade {
         }
 
         teamMemberService.addTeamMemberToTeam(team, teamMember);
+        team.getScoreboardTeam().addMember(source.getTeamRepresentation());
+        teamService.addPlayerToScoreboard(source);
         setTeamPermission(source, team, true);
 
         msg.info(source, "You have joined the team ", team, ".");
     }
 
-    private void setTeamPermission(Player player, Team team, boolean value) {
+    private void setTeamPermission(Player player, BattleTeam team, boolean value) {
         player.getSubjectData().setPermission(
                 SubjectData.GLOBAL_CONTEXT,
                 "atherysbattlegrounds.team." + team.getId(),
@@ -132,8 +148,8 @@ public class TeamFacade {
         );
     }
 
-    public Map<String, Team> getTeamChoices() {
-        Map<String, Team> choices = new HashMap<>();
+    public Map<String, BattleTeam> getTeamChoices() {
+        Map<String, BattleTeam> choices = new HashMap<>();
 
         teamService.getAllTeams().forEach(team -> {
             choices.put(team.getId(), team);
