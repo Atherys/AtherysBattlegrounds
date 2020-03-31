@@ -12,6 +12,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -43,16 +44,14 @@ public class RespawnFacade {
     public void offerRespawn(Player player) {
         Optional<BattlePoint> battlePoint = battlePointService.getBattlePointFromLocation(player.getLocation());
 
-        AtherysBattlegrounds.getInstance().getLogger().info("Battle point is present: " + battlePoint.isPresent());
-
         if (!battlePoint.isPresent()) {
             return;
         }
 
         // ask the player if they would like to respawn
         Question.of(msg.formatInfo("You died at ", battlePoint.get(), ". Would you like to respawn? You have ", DurationFormatUtils.formatDurationWords(battlePoint.get().getRespawnTimeout().toMillis(), true, true), " to decide."))
-                .addAnswer(Question.Answer.of(Text.of("Yes"), (src) -> onPlayerAcceptRespawn(player, battlePoint.get())))
-                .addAnswer(Question.Answer.of(Text.of("No"), (src) -> {}))
+                .addAnswer(Question.Answer.of(Text.of(TextColors.DARK_GREEN, "Yes"), (src) -> onPlayerAcceptRespawn(player, battlePoint.get())))
+                .addAnswer(Question.Answer.of(Text.of(TextColors.RED, "No"), (src) -> {}))
                 .build()
                 .pollChat(player);
 

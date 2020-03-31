@@ -8,14 +8,16 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.scoreboard.Team;
+import org.spongepowered.api.scoreboard.critieria.Criteria;
+import org.spongepowered.api.scoreboard.critieria.Criterion;
+import org.spongepowered.api.scoreboard.displayslot.DisplaySlots;
+import org.spongepowered.api.scoreboard.objective.Objective;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Singleton
 public class TeamService {
@@ -30,7 +32,16 @@ public class TeamService {
     public void setScoreboard(List<Team> scoreboardTeams) {
         this.scoreboard = Scoreboard.builder()
                 .teams(scoreboardTeams)
+                .objectives(Collections.singletonList(
+                        Objective.builder()
+                                .criterion(Criteria.HEALTH)
+                                .name("health")
+                                .displayName(Text.of(TextColors.RED, "❤"))
+                                .build()
+                ))
                 .build();
+
+        scoreboard.updateDisplaySlot(this.scoreboard.getObjective("health").get(), DisplaySlots.BELOW_NAME);
     }
 
     public void addPlayerToScoreboard(Player source) {
