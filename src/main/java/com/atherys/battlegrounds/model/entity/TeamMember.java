@@ -20,8 +20,9 @@ public class TeamMember implements SpongeIdentifiable {
 
     private String cachedName;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private PlayerRanking ranking;
+    private int milestone = -1;
+
+    private int milestonesAwarded = -1;
 
     protected TeamMember() {}
 
@@ -51,12 +52,20 @@ public class TeamMember implements SpongeIdentifiable {
         this.cachedName = cachedName;
     }
 
-    public PlayerRanking getRanking() {
-        return ranking;
+    public int getMilestone() {
+        return milestone;
     }
 
-    public void setRanking(PlayerRanking ranking) {
-        this.ranking = ranking;
+    public void setMilestone(int milestone) {
+        this.milestone = milestone;
+    }
+
+    public int getMilestonesAwarded() {
+        return milestonesAwarded;
+    }
+
+    public void setMilestonesAwarded(int milestonesAwarded) {
+        this.milestonesAwarded = milestonesAwarded;
     }
 
     @Override
@@ -64,14 +73,11 @@ public class TeamMember implements SpongeIdentifiable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TeamMember that = (TeamMember) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(team, that.team) &&
-                Objects.equals(cachedName, that.cachedName) &&
-                Objects.equals(ranking, that.ranking);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, team, cachedName, ranking);
+        return Objects.hash(id, team, cachedName);
     }
 }

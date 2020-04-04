@@ -78,6 +78,10 @@ public class TeamService {
             award.getCurrency().forEach((currency, amount) -> {
                 Economy.addCurrency(player.getUniqueId(), currency, BigDecimal.valueOf(amount), Sponge.getCauseStackManager().getCurrentCause());
             });
+
+            award.getCommands().forEach(command -> {
+                Sponge.getCommandManager().process(Sponge.getServer().getConsole(), command.replace("{player}", player.getName()));
+            });
         });
     }
 

@@ -1,6 +1,7 @@
 package com.atherys.battlegrounds.listener;
 
 import com.atherys.battlegrounds.facade.BattlePointFacade;
+import com.atherys.battlegrounds.facade.MilestoneFacade;
 import com.atherys.battlegrounds.facade.RespawnFacade;
 import com.atherys.battlegrounds.facade.TeamFacade;
 import com.atherys.core.utils.EntityUtils;
@@ -9,6 +10,7 @@ import com.google.inject.Singleton;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.economy.EconomyTransactionEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.Getter;
@@ -26,6 +28,9 @@ public class PlayerListener {
 
     @Inject
     private RespawnFacade respawnFacade;
+
+    @Inject
+    private MilestoneFacade milestoneFacade;
 
     public PlayerListener() {
     }
@@ -49,10 +54,16 @@ public class PlayerListener {
     public void onPlayerJoin(ClientConnectionEvent.Join event, @Root Player player) {
         battlePointFacade.onPlayerJoin(player);
         teamFacade.onPlayerJoin(player);
+        milestoneFacade.checkMilestones(player);
     }
 
     @Listener
     public void onPlayerDisconnect(ClientConnectionEvent.Disconnect event, @Root Player player) {
         battlePointFacade.onPlayerDisconnect(player);
+    }
+
+    @Listener
+    public void onTransaction(EconomyTransactionEvent event) {
+        milestoneFacade.onTransaction(event.getTransactionResult());
     }
 }

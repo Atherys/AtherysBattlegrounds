@@ -2,13 +2,12 @@ package com.atherys.battlegrounds.service;
 
 import com.atherys.battlegrounds.BattlegroundsConfig;
 import com.atherys.battlegrounds.model.BattleTeam;
-import com.atherys.battlegrounds.model.entity.PlayerRanking;
 import com.atherys.battlegrounds.model.entity.TeamMember;
-import com.atherys.battlegrounds.persistence.PlayerRankingRepository;
 import com.atherys.battlegrounds.persistence.TeamMemberRepository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 
 import java.util.Map;
 import java.util.Optional;
@@ -21,22 +20,14 @@ public class TeamMemberService {
     private BattlegroundsConfig config;
 
     @Inject
-    private PlayerRankingRepository playerRankingRepository;
-
-    @Inject
     private TeamMemberRepository teamMemberRepository;
 
     public TeamMemberService() {
     }
 
-    public TeamMember getOrCreateTeamMember(Player player) {
-        return teamMemberRepository.findById(player.getUniqueId()).orElseGet(() -> {
-            TeamMember teamMember = new TeamMember(player.getUniqueId());
-
-            PlayerRanking playerRanking = new PlayerRanking();
-            playerRankingRepository.saveOne(playerRanking);
-
-            teamMember.setRanking(playerRanking);
+    public TeamMember getOrCreateTeamMember(User user) {
+        return teamMemberRepository.findById(user.getUniqueId()).orElseGet(() -> {
+            TeamMember teamMember = new TeamMember(user.getUniqueId());
 
             teamMemberRepository.saveOne(teamMember);
             return teamMember;
@@ -73,23 +64,13 @@ public class TeamMemberService {
         teamMemberRepository.saveOne(teamMember);
     }
 
-    public void switchRankings(TeamMember victimTeamMember, TeamMember attackerTeamMember) {
-        PlayerRanking temp = victimTeamMember.getRanking();
-
-        victimTeamMember.setRanking(attackerTeamMember.getRanking());
-        attackerTeamMember.setRanking(temp);
-
-        teamMemberRepository.saveOne(victimTeamMember);
-        teamMemberRepository.saveOne(attackerTeamMember);
+    public void setMilestone(TeamMember teamMember, int milestone) {
+        teamMember.setMilestone(milestone);
+        teamMemberRepository.saveOne(teamMember);
     }
 
-    public String getTeamMemberRankName(TeamMember teamMember) {
-        return teamMemberRepository.fetchTeamMemberRankName(teamMember);
-    }
-
-    public void rankPlayerLast(TeamMember teamMember) {
-        teamMember.setRanking(new PlayerRanking());
-
+    public void setAwardedMilestones(TeamMember teamMember, int milestones) {
+        teamMember.setMilestonesAwarded(milestones);
         teamMemberRepository.saveOne(teamMember);
     }
 }

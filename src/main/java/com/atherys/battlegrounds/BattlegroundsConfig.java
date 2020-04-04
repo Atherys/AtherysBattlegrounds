@@ -2,6 +2,7 @@ package com.atherys.battlegrounds;
 
 import com.atherys.battlegrounds.config.AwardConfig;
 import com.atherys.battlegrounds.config.BattlePointConfig;
+import com.atherys.battlegrounds.config.MilestoneConfig;
 import com.atherys.battlegrounds.config.TeamConfig;
 import com.atherys.battlegrounds.serialize.DurationTypeSerializer;
 import com.atherys.core.utils.PluginConfig;
@@ -16,19 +17,22 @@ import org.spongepowered.api.service.economy.Currency;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Singleton
 public class BattlegroundsConfig extends PluginConfig {
 
-    @Setting("is-default")
-    public boolean IS_DEFAULT = true;
-
     @Setting("battle-points")
     public Set<BattlePointConfig> BATTLE_POINTS = new HashSet<>();
+
+    @Setting("milestones-title")
+    public String MILESTONES_TITLE = "Rewards";
+
+    @Setting("milestones")
+    public List<MilestoneConfig> MILESTONES = new ArrayList<>();
+
+    @Setting("milestone-currency")
+    public Currency MILESTONE_CURRENCY;
 
     @Setting("teams")
     public Set<TeamConfig> TEAMS = new HashSet<>();

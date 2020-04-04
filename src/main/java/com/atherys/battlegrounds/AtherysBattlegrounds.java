@@ -1,15 +1,14 @@
 package com.atherys.battlegrounds;
 
-import com.atherys.battlegrounds.command.RankingCommand;
+import com.atherys.battlegrounds.command.ListMilestonesCommand;
 import com.atherys.battlegrounds.command.TeamCommand;
 import com.atherys.battlegrounds.facade.BattlePointFacade;
+import com.atherys.battlegrounds.facade.MilestoneFacade;
 import com.atherys.battlegrounds.facade.RespawnFacade;
 import com.atherys.battlegrounds.facade.TeamFacade;
 import com.atherys.battlegrounds.listener.BattlePointListener;
 import com.atherys.battlegrounds.listener.PlayerListener;
-import com.atherys.battlegrounds.model.entity.PlayerRanking;
 import com.atherys.battlegrounds.model.entity.TeamMember;
-import com.atherys.battlegrounds.persistence.PlayerRankingRepository;
 import com.atherys.battlegrounds.persistence.TeamMemberRepository;
 import com.atherys.battlegrounds.serialize.DurationTypeSerializer;
 import com.atherys.battlegrounds.service.BattlePointService;
@@ -28,7 +27,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
-import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
@@ -87,7 +85,7 @@ public class AtherysBattlegrounds {
 
         try {
             AtherysCore.getCommandService().register(new TeamCommand(), this);
-            AtherysCore.getCommandService().register(new RankingCommand(), this);
+            AtherysCore.getCommandService().register(new ListMilestonesCommand(), this);
         } catch (CommandService.AnnotatedCommandException e) {
             e.printStackTrace();
         }
@@ -100,18 +98,15 @@ public class AtherysBattlegrounds {
         components.respawnFacade.init();
 
         components.teamMemberRepository.initCache();
-        components.playerRankingRepository.initCache();
     }
 
     private void stop() {
-        components.playerRankingRepository.flushCache();
         components.teamMemberRepository.flushCache();
     }
 
     @Listener
     public void onHibernateRegistration(AtherysHibernateConfigurationEvent event) {
         event.registerEntity(TeamMember.class);
-        event.registerEntity(PlayerRanking.class);
     }
 
     @Listener
@@ -143,6 +138,10 @@ public class AtherysBattlegrounds {
         return components.teamService;
     }
 
+    public MilestoneFacade getMilestoneFacade() {
+        return components.milestoneFacade;
+    }
+
     public Logger getLogger() {
         return logger;
     }
@@ -154,9 +153,6 @@ public class AtherysBattlegrounds {
 
         @Inject
         private TeamMemberRepository teamMemberRepository;
-
-        @Inject
-        private PlayerRankingRepository playerRankingRepository;
 
         @Inject
         private BattlePointService battlePointService;
@@ -175,6 +171,9 @@ public class AtherysBattlegrounds {
 
         @Inject
         private TeamFacade teamFacade;
+
+        @Inject
+        private MilestoneFacade milestoneFacade;
 
         @Inject
         private PlayerListener playerListener;
