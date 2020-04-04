@@ -8,7 +8,7 @@ A capture-and-hold mini-game intended to be played in the open-world for the A't
 | Aliases                | Permission                        | Description                                        |
 |------------------------|-----------------------------------|----------------------------------------------------|
 | `/team`                | `atherysbattlegrounds.team.base`  | Shows info on own current team                     |
-| `/team info`           | `atherysbattlegrounds.team.info`  | Shows info on own current team ( same as `/team` ) |
+| `/team info`           | `atherysbattlegrounds.team.info`  | Shows info on a team                               |
 | `/team join <team-id>` | `atherysbattlegrounds.team.join`  | Join the provided team                             |
 | `/team leave`          | `atherysbattlegrounds.team.leave` | Leave current team                                 |
 
