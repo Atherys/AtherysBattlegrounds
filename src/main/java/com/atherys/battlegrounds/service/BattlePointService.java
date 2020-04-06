@@ -41,6 +41,8 @@ public class BattlePointService {
             double innerRadius,
             double outerRadius,
             float perTickCaptureAmount,
+            float perMemberTickCaptureAmount,
+            float maxPerTickCaptureAmount,
             Duration respawnInterval,
             Duration respawnDuration,
             List<RespawnPoint> respawnPoints,
@@ -56,6 +58,8 @@ public class BattlePointService {
         battlePoint.setInnerRadius(innerRadius);
         battlePoint.setOuterRadius(outerRadius);
         battlePoint.setPerTickCaptureAmount(perTickCaptureAmount);
+        battlePoint.setPerMemberTickCaptureAmount(perMemberTickCaptureAmount);
+        battlePoint.setMaxPerTickCaptureAmount(maxPerTickCaptureAmount);
         battlePoint.setRespawnInterval(respawnInterval);
         battlePoint.setRespawnTimeout(respawnDuration);
         battlePoint.setRespawnPoints(respawnPoints);
@@ -69,7 +73,7 @@ public class BattlePointService {
     }
 
     public void tickBattlePoint(BattlePoint battlePoint) {
-        Map<BattleTeam, Set<Player>> membersWithinInnerRadius = new HashMap<>();
+        Map<BattleTeam, Set<Player>> membersWithinInner = new HashMap<>();
 
         for (Player player : Sponge.getServer().getOnlinePlayers()) {
             if (isPlayerWithinBattlePointInnerRadius(battlePoint, player)) {
@@ -77,20 +81,23 @@ public class BattlePointService {
 
                 if (member.getTeam() == null) continue;
 
-                if (membersWithinInnerRadius.containsKey(member.getTeam())) {
-                    membersWithinInnerRadius.get(member.getTeam()).add(player);
+                if (membersWithinInner.containsKey(member.getTeam())) {
+                    membersWithinInner.get(member.getTeam()).add(player);
                 } else {
-                    membersWithinInnerRadius.put(member.getTeam(), Sets.newHashSet(player));
+                    membersWithinInner.put(member.getTeam(), Sets.newHashSet(player));
                 }
             }
         }
 
         // determine the capturing team, and if any, increment their progress by the configured amount
         // and decrement the progress of all other non-capturing teams
-        teamMemberService.determineCapturingTeam(membersWithinInnerRadius).ifPresent(capturingTeam -> {
+        teamMemberService.determineCapturingTeam(membersWithinInner).ifPresent(capturingTeam -> {
 
             // increment the capturing team's progress
-            incrementTeamProgress(battlePoint, capturingTeam, battlePoint.getPerTickCaptureAmount());
+            float amount = battlePoint.getPerTickCaptureAmount() + membersWithinInner.get(capturingTeam).size() * battlePoint.getPerMemberTickCaptureAmount();
+            amount = Math.max(amount, battlePoint.getMaxPerTickCaptureAmount());
+
+            incrementTeamProgress(battlePoint, capturingTeam, amount);
 
             // the other teams get their progress decremented by the same amount
             battlePoint.getTeamProgress().keySet().forEach(otherTeam -> {
@@ -113,7 +120,7 @@ public class BattlePointService {
 
             // distribute awards for capturing the point
             teamService.distributeAward(battlePoint.getCaptureAward(), postTickControllingTeam.get());
-            teamService.distributeAwardsToMembers(battlePoint.getCaptureAward(), membersWithinInnerRadius.get(postTickControllingTeam.get()));
+            teamService.distributeAwardsToMembers(battlePoint.getCaptureAward(), membersWithinInner.get(postTickControllingTeam.get()));
 
             // trigger the capture event
             BattlePointEvent.Capture captureEvent = new BattlePointEvent.Capture(battlePoint, battlePoint.getControllingTeam());

@@ -28,6 +28,10 @@ public class BattlePoint implements TextRepresentable {
 
     private float perTickCaptureAmount;
 
+    private float perMemberTickCaptureAmount;
+
+    private float maxPerTickCaptureAmount;
+
     private Duration respawnInterval;
 
     private Duration respawnTimeout;
@@ -90,6 +94,22 @@ public class BattlePoint implements TextRepresentable {
 
     public void setPerTickCaptureAmount(float perTickCaptureAmount) {
         this.perTickCaptureAmount = perTickCaptureAmount;
+    }
+
+    public float getPerMemberTickCaptureAmount() {
+        return perMemberTickCaptureAmount;
+    }
+
+    public void setPerMemberTickCaptureAmount(float perMemberTickCaptureAmount) {
+        this.perMemberTickCaptureAmount = perMemberTickCaptureAmount;
+    }
+
+    public float getMaxPerTickCaptureAmount() {
+        return maxPerTickCaptureAmount;
+    }
+
+    public void setMaxPerTickCaptureAmount(float maxPerTickCaptureAmount) {
+        this.maxPerTickCaptureAmount = maxPerTickCaptureAmount;
     }
 
     public Duration getRespawnInterval() {

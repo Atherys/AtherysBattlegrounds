@@ -24,8 +24,6 @@ import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.scoreboard.Team;
-import org.spongepowered.api.scoreboard.TeamMember;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.Location;
@@ -105,6 +103,8 @@ public class BattlePointFacade {
                     pointConfig.getInnerRadius(),
                     pointConfig.getOuterRadius(),
                     pointConfig.getPerTickCaptureAmount(),
+                    pointConfig.getPerMemberTickCaptureAmount(),
+                    pointConfig.getMaxPerTickCaptureAmount(),
                     pointConfig.getRespawnInterval(),
                     pointConfig.getRespawnTimeout(),
                     respawnPoints,

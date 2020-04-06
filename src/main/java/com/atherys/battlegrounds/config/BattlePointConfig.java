@@ -3,15 +3,11 @@ package com.atherys.battlegrounds.config;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.spongepowered.api.boss.BossBarColor;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @ConfigSerializable
 public class BattlePointConfig {
@@ -88,6 +84,12 @@ public class BattlePointConfig {
     @Setting("capture-amount-per-tick")
     private float perTickCaptureAmount = 0.01f;
 
+    @Setting("max-capture-amount-per-tick")
+    private float maxPerTickCaptureAmount = 0.01f;
+
+    @Setting("capture-amount-per-member-per-tick")
+    private float perMemberTickCaptureAmount = 0.01f;
+
     @Setting("respawn-interval")
     private Duration respawnInterval = Duration.of(1, ChronoUnit.SECONDS);
 
@@ -135,6 +137,14 @@ public class BattlePointConfig {
 
     public float getPerTickCaptureAmount() {
         return perTickCaptureAmount;
+    }
+
+    public float getMaxPerTickCaptureAmount() {
+        return maxPerTickCaptureAmount;
+    }
+
+    public float getPerMemberTickCaptureAmount() {
+        return perMemberTickCaptureAmount;
     }
 
     public Duration getRespawnInterval() {

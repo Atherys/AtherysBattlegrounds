@@ -95,7 +95,7 @@ public class MilestoneFacade {
         Text.Builder milestones = Text.builder().append(Text.of(DARK_GRAY, "[]====[ ", GOLD, config.MILESTONES_TITLE, DARK_GRAY, " ]====[]", Text.NEW_LINE));
 
         for (MilestoneConfig milestoneConfig : config.MILESTONES) {
-            if (member.getMilestonesAwarded() < member.getMilestone()) {
+            if (i <= member.getMilestonesAwarded() && member.getMilestonesAwarded() < member.getMilestone()) {
                 milestones.append(Text.of(Text.builder()
                         .onHover(TextActions.showText(Text.of(DARK_GRAY, "Click to receive awards!")))
                         .onClick(TextActions.executeCallback(src -> awardMilestones(source)))
