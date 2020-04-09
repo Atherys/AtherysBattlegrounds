@@ -2,6 +2,7 @@ package com.atherys.battlegrounds.model;
 
 import com.atherys.battlegrounds.config.AwardConfig;
 import com.atherys.battlegrounds.utils.ColorUtils;
+import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextRepresentable;
@@ -21,6 +22,8 @@ public class BattlePoint implements TextRepresentable {
     private ServerBossBar bossBar;
 
     private Location<World> location;
+
+    private Vector3i beaconLocation;
 
     private double innerRadius;
 
@@ -70,6 +73,14 @@ public class BattlePoint implements TextRepresentable {
 
     public void setLocation(Location<World> location) {
         this.location = location;
+    }
+
+    public Vector3i getBeaconLocation() {
+        return beaconLocation;
+    }
+
+    public void setBeaconLocation(Vector3i beaconLocation) {
+        this.beaconLocation = beaconLocation;
     }
 
     public double getInnerRadius() {

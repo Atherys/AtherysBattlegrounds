@@ -24,6 +24,9 @@ public class BattlePointConfig {
     @Setting("location")
     private LocationConfig location;
 
+    @Setting("beacon-location")
+    private LocationConfig beaconLocation;
+
     @ConfigSerializable
     public static class LocationConfig {
 
@@ -125,6 +128,14 @@ public class BattlePointConfig {
 
     public LocationConfig getLocation() {
         return location;
+    }
+
+    public LocationConfig getBeaconLocation() {
+        return beaconLocation;
+    }
+
+    public void setBeaconLocation(LocationConfig beaconLocation) {
+        this.beaconLocation = beaconLocation;
     }
 
     public double getInnerRadius() {

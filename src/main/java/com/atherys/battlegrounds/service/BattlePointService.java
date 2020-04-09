@@ -6,11 +6,16 @@ import com.atherys.battlegrounds.model.BattlePoint;
 import com.atherys.battlegrounds.model.RespawnPoint;
 import com.atherys.battlegrounds.model.BattleTeam;
 import com.atherys.battlegrounds.model.entity.TeamMember;
+import com.atherys.battlegrounds.utils.ColorUtils;
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.boss.ServerBossBar;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -38,6 +43,7 @@ public class BattlePointService {
             String name,
             ServerBossBar bossBar,
             Location<World> location,
+            Vector3i beaconLocation,
             double innerRadius,
             double outerRadius,
             float perTickCaptureAmount,
@@ -55,6 +61,7 @@ public class BattlePointService {
         battlePoint.setName(name);
         battlePoint.setBossBar(bossBar);
         battlePoint.setLocation(location);
+        battlePoint.setBeaconLocation(beaconLocation);
         battlePoint.setInnerRadius(innerRadius);
         battlePoint.setOuterRadius(outerRadius);
         battlePoint.setPerTickCaptureAmount(perTickCaptureAmount);

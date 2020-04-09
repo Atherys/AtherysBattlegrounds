@@ -12,13 +12,19 @@ import com.atherys.battlegrounds.service.TeamMemberService;
 import com.atherys.battlegrounds.utils.ColorUtils;
 import com.atherys.core.utils.MathUtils;
 import com.atherys.core.utils.Sound;
+import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.boss.BossBarOverlays;
 import org.spongepowered.api.boss.ServerBossBar;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.DyeColor;
+import org.spongepowered.api.data.type.DyeColors;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.Transform;
@@ -29,10 +35,7 @@ import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -59,6 +62,17 @@ public class BattlePointFacade {
 
     private Task battlepointTask;
 
+    private static final List<Vector3i> offsets = Arrays.asList(
+            Vector3i.UNIT_X,
+            Vector3i.UNIT_Z,
+            Vector3i.from(1, 0, -1),
+            Vector3i.from(-1, 0, 1),
+            Vector3i.from(-1, 0, -1),
+            Vector3i.from(-1, 0, 0),
+            Vector3i.from(0, 0, -1),
+            Vector3i.from(1, 0, 1)
+    );
+
     public BattlePointFacade() {
     }
 
@@ -82,6 +96,10 @@ public class BattlePointFacade {
                     locationConfig.getZ()
             );
 
+            BattlePointConfig.LocationConfig beaconLocationConfig = pointConfig.getBeaconLocation();
+
+            Vector3i beaconLocation = new Vector3i(beaconLocationConfig.getX(), beaconLocationConfig.getY(), beaconLocationConfig.getZ());
+
             // parse the respawn point configs
             List<RespawnPoint> respawnPoints = pointConfig.getRespawnPoints().stream()
                     .map(respawnConfig -> respawnService.createRespawnPoint(
@@ -95,11 +113,12 @@ public class BattlePointFacade {
             ServerBossBar battlePointBossBar = createBattlePointBossBar(pointConfig.getName(), pointConfig.getColor());
 
             // create the battlepoint
-            battlePointService.createBattlePoint(
+            BattlePoint battlePoint = battlePointService.createBattlePoint(
                     pointConfig.getId(),
                     pointConfig.getName(),
                     battlePointBossBar,
                     location,
+                    beaconLocation,
                     pointConfig.getInnerRadius(),
                     pointConfig.getOuterRadius(),
                     pointConfig.getPerTickCaptureAmount(),
@@ -112,6 +131,8 @@ public class BattlePointFacade {
                     pointConfig.getOnTickAward(),
                     pointConfig.getOnKillAward()
             );
+
+            placeBeacon(battlePoint);
         });
 
         // start the tick task
@@ -207,8 +228,30 @@ public class BattlePointFacade {
 
     public void notifyCapturedBattlePoint(BattlePoint battlePoint, BattleTeam capturingTeam) {
         msg.broadcast(capturingTeam, " has captured ", battlePoint, ".");
-
+        setBeaconColor(battlePoint, ColorUtils.textColorToDyeColor(battlePoint.getControllingTeam().getColor()));
         fetchPlayersWithinBattlePointOuterRadius(battlePoint).forEach(this::playBattlePointCaptureSound);
+    }
+
+    private void setBeaconColor(BattlePoint battlePoint, DyeColor color) {
+        BlockState state = BlockState.builder()
+                .blockType(BlockTypes.STAINED_GLASS)
+                .add(Keys.DYE_COLOR, color)
+                .build();
+
+        battlePoint.getLocation().getExtent().setBlock(battlePoint.getBeaconLocation().add(0, 1, 0), state);
+    }
+
+    private void placeBeacon(BattlePoint battlePoint) {
+        World world = battlePoint.getLocation().getExtent();
+
+        world.setBlockType(battlePoint.getBeaconLocation(), BlockTypes.BEACON);
+        Vector3i below = battlePoint.getBeaconLocation().sub(0, 1, 0);
+        world.setBlockType(below, BlockTypes.IRON_BLOCK);
+        offsets.forEach(offset -> {
+            world.setBlockType(below.add(offset), BlockTypes.IRON_BLOCK);
+        });
+
+        setBeaconColor(battlePoint, DyeColors.WHITE);
     }
 
     private void showExitTitleToPlayer(Player player, BattlePoint battlePoint) {
