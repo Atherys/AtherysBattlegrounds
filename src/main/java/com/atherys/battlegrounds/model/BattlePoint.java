@@ -6,11 +6,13 @@ import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextRepresentable;
+import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 
 public class BattlePoint implements TextRepresentable {
@@ -38,6 +40,10 @@ public class BattlePoint implements TextRepresentable {
     private Duration respawnInterval;
 
     private Duration respawnTimeout;
+
+    private Duration captureCooldown;
+
+    private Instant lastCapture;
 
     private List<RespawnPoint> respawnPoints = new ArrayList<>();
 
@@ -139,6 +145,22 @@ public class BattlePoint implements TextRepresentable {
         this.respawnTimeout = respawnTimeout;
     }
 
+    public Duration getCaptureCooldown() {
+        return captureCooldown;
+    }
+
+    public void setCaptureCooldown(Duration captureCooldown) {
+        this.captureCooldown = captureCooldown;
+    }
+
+    public Instant getLastCapture() {
+        return lastCapture;
+    }
+
+    public void setLastCapture(Instant lastCapture) {
+        this.lastCapture = lastCapture;
+    }
+
     public List<RespawnPoint> getRespawnPoints() {
         return respawnPoints;
     }
@@ -195,6 +217,10 @@ public class BattlePoint implements TextRepresentable {
         this.bossBar = bossBar;
     }
 
+    public TextColor getColor() {
+        return bossBar.getName().getColor();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -230,6 +256,6 @@ public class BattlePoint implements TextRepresentable {
 
     @Override
     public Text toText() {
-        return Text.of(ColorUtils.bossBarColorToTextColor(bossBar.getColor()), name, TextColors.RESET);
+        return Text.of(getColor(), name, TextColors.RESET);
     }
 }

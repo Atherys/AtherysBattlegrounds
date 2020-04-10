@@ -49,6 +49,9 @@ public class BattlegroundsConfig extends PluginConfig {
     @Setting("respawn-interval")
     public Duration RESPAWN_INTERVAL = Duration.of(5, ChronoUnit.SECONDS);
 
+    @Setting("warning-time")
+    public Duration WARNING_TIME = Duration.of(5, ChronoUnit.MINUTES);
+
     @Setting("minimum-players-required-to-capture-point")
     public int MINIMUM_PLAYERS_REQUIRED_TO_CAPTURE_POINT;
 

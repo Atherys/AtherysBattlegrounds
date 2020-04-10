@@ -1,5 +1,7 @@
 package com.atherys.battlegrounds.service;
 
+import com.atherys.battlegrounds.AtherysBattlegrounds;
+import com.atherys.battlegrounds.BattlegroundsConfig;
 import com.atherys.battlegrounds.config.AwardConfig;
 import com.atherys.battlegrounds.event.BattlePointEvent;
 import com.atherys.battlegrounds.model.BattlePoint;
@@ -17,11 +19,15 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -32,6 +38,9 @@ public class BattlePointService {
 
     @Inject
     private TeamService teamService;
+
+    @Inject
+    private BattlegroundsConfig config;
 
     private Set<BattlePoint> battlePoints = new HashSet<>();
 
@@ -51,6 +60,7 @@ public class BattlePointService {
             float maxPerTickCaptureAmount,
             Duration respawnInterval,
             Duration respawnDuration,
+            Duration captureCooldown,
             List<RespawnPoint> respawnPoints,
             AwardConfig captureAward,
             AwardConfig tickAward,
@@ -69,6 +79,7 @@ public class BattlePointService {
         battlePoint.setMaxPerTickCaptureAmount(maxPerTickCaptureAmount);
         battlePoint.setRespawnInterval(respawnInterval);
         battlePoint.setRespawnTimeout(respawnDuration);
+        battlePoint.setCaptureCooldown(captureCooldown);
         battlePoint.setRespawnPoints(respawnPoints);
         battlePoint.setCaptureAward(captureAward);
         battlePoint.setTickAward(tickAward);
@@ -80,6 +91,33 @@ public class BattlePointService {
     }
 
     public void tickBattlePoint(BattlePoint battlePoint) {
+        BattlePointEvent.Tick.Pre preEvent = new BattlePointEvent.Tick.Pre(battlePoint);
+        Sponge.getEventManager().post(preEvent);
+        if (preEvent.isCancelled()) return;
+
+        if (battlePoint.getControllingTeam() != null) {
+            // distribute tick awards for having control of the point
+            teamService.distributeAward(battlePoint.getTickAward(), battlePoint.getControllingTeam());
+        }
+
+        if (battlePoint.getLastCapture() != null) {
+            Duration sinceCapture = Duration.between(battlePoint.getLastCapture(), Instant.now());
+
+            // If the cooldown is up
+            if (sinceCapture.compareTo(battlePoint.getCaptureCooldown()) >= 0) {
+                Sponge.getEventManager().post(new BattlePointEvent.Capturable(battlePoint));
+                battlePoint.setLastCapture(null);
+
+            // If the warning time is up
+            } else if (sinceCapture.compareTo(config.WARNING_TIME) >= 0) {
+                Sponge.getEventManager().post(new BattlePointEvent.Warning(battlePoint));
+                return;
+            } else {
+                return;
+            }
+        }
+
+        // Collect members from each team in the inner radius
         Map<BattleTeam, Set<Player>> membersWithinInner = new HashMap<>();
 
         for (Player player : Sponge.getServer().getOnlinePlayers()) {
@@ -123,25 +161,26 @@ public class BattlePointService {
         // if the point's current controlling team the controlling team after the last progress tick are different,
         // then a change of ownership has occurred. Distribute capture awards to the new controlling team
         if (postTickControllingTeam.isPresent() && !postTickControllingTeam.get().equals(battlePoint.getControllingTeam())) {
-            battlePoint.setControllingTeam(postTickControllingTeam.get());
-
-            // distribute awards for capturing the point
-            teamService.distributeAward(battlePoint.getCaptureAward(), postTickControllingTeam.get());
-            teamService.distributeAwardsToMembers(battlePoint.getCaptureAward(), membersWithinInner.get(postTickControllingTeam.get()));
-
-            // trigger the capture event
-            BattlePointEvent.Capture captureEvent = new BattlePointEvent.Capture(battlePoint, battlePoint.getControllingTeam());
-            Sponge.getEventManager().post(captureEvent);
-
+            captureBattlePoint(battlePoint, postTickControllingTeam.get(), membersWithinInner.get(postTickControllingTeam.get()));
             return;
-        } else if (battlePoint.getControllingTeam() != null) {
-            // distribute tick awards for having control of the point
-            teamService.distributeAward(battlePoint.getTickAward(), battlePoint.getControllingTeam());
         }
 
         // trigger the tick event
-        BattlePointEvent.Tick tickEvent = new BattlePointEvent.Tick(battlePoint);
+        BattlePointEvent.Tick tickEvent = new BattlePointEvent.Tick.Post(battlePoint);
         Sponge.getEventManager().post(tickEvent);
+    }
+
+    private void captureBattlePoint(BattlePoint battlePoint, BattleTeam battleTeam, Set<Player> membersWithinInner) {
+        battlePoint.setControllingTeam(battleTeam);
+        battlePoint.setLastCapture(Instant.now());
+
+        // distribute awards for capturing the point
+        teamService.distributeAward(battlePoint.getCaptureAward(), battleTeam);
+        teamService.distributeAwardsToMembers(battlePoint.getCaptureAward(), membersWithinInner);
+
+        // trigger the capture event
+        BattlePointEvent.Capture captureEvent = new BattlePointEvent.Capture(battlePoint, battlePoint.getControllingTeam());
+        Sponge.getEventManager().post(captureEvent);
     }
 
     protected void incrementTeamProgress(BattlePoint battlePoint, BattleTeam team, float amount) {

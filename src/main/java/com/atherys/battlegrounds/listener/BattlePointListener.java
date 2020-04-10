@@ -19,7 +19,7 @@ public class BattlePointListener {
     }
 
     @Listener
-    public void onBattlePointTick(BattlePointEvent.Tick event, @First BattlePoint battlePoint) {
+    public void onBattlePointTick(BattlePointEvent.Tick.Post event, @First BattlePoint battlePoint) {
         battlePointFacade.updateBattlePointBossBar(battlePoint);
     }
 
@@ -28,4 +28,13 @@ public class BattlePointListener {
         battlePointFacade.notifyCapturedBattlePoint(battlePoint, team);
     }
 
+    @Listener
+    public void onBattlePointWarning(BattlePointEvent.Warning event, @First BattlePoint battlePoint) {
+        battlePointFacade.warnCapturableBattlePoint(battlePoint);
+    }
+
+    @Listener
+    public void onBattlePointCapturable(BattlePointEvent.Capturable event, @First BattlePoint battlePoint) {
+        battlePointFacade.notifyCapturableBattlePoint(battlePoint);
+    }
 }

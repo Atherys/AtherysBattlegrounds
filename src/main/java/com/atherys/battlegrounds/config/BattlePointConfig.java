@@ -3,6 +3,7 @@ package com.atherys.battlegrounds.config;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.spongepowered.api.boss.BossBarColor;
+import org.spongepowered.api.text.format.TextColor;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -19,7 +20,7 @@ public class BattlePointConfig {
     private String name;
 
     @Setting("color")
-    private BossBarColor color;
+    private TextColor color;
 
     @Setting("location")
     private LocationConfig location;
@@ -99,6 +100,9 @@ public class BattlePointConfig {
     @Setting("respawn-timeout")
     private Duration respawnTimeout = Duration.of(30, ChronoUnit.SECONDS);
 
+    @Setting("capture-cooldown")
+    private Duration captureCooldown = Duration.of(5, ChronoUnit.MINUTES);
+
     @Setting("respawn-points")
     private List<RespawnPointConfig> respawnPoints = new ArrayList<>();
 
@@ -122,7 +126,7 @@ public class BattlePointConfig {
         return name;
     }
 
-    public BossBarColor getColor() {
+    public TextColor getColor() {
         return color;
     }
 
@@ -132,10 +136,6 @@ public class BattlePointConfig {
 
     public LocationConfig getBeaconLocation() {
         return beaconLocation;
-    }
-
-    public void setBeaconLocation(LocationConfig beaconLocation) {
-        this.beaconLocation = beaconLocation;
     }
 
     public double getInnerRadius() {
@@ -164,6 +164,10 @@ public class BattlePointConfig {
 
     public Duration getRespawnTimeout() {
         return respawnTimeout;
+    }
+
+    public Duration getCaptureCooldown() {
+        return captureCooldown;
     }
 
     public List<RespawnPointConfig> getRespawnPoints() {

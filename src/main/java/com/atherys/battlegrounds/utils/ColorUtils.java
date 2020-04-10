@@ -12,17 +12,6 @@ public final class ColorUtils {
     private ColorUtils() {
     }
 
-    public static TextColor bossBarColorToTextColor(BossBarColor color) {
-        if (BossBarColors.PINK == color) return TextColors.LIGHT_PURPLE;
-        if (BossBarColors.PURPLE == color) return TextColors.DARK_PURPLE;
-        if (BossBarColors.GREEN == color) return TextColors.GREEN;
-        if (BossBarColors.BLUE == color) return TextColors.BLUE;
-        if (BossBarColors.RED == color) return TextColors.RED;
-        if (BossBarColors.YELLOW == color) return TextColors.YELLOW;
-
-        return TextColors.WHITE;
-    }
-
     public static BossBarColor textColorToBossBarColor(TextColor textColor) {
         if (TextColors.LIGHT_PURPLE == textColor) return BossBarColors.PINK;
         if (TextColors.DARK_PURPLE == textColor) return BossBarColors.PURPLE;

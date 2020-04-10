@@ -15,11 +15,13 @@ import com.atherys.core.utils.Sound;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.boss.BossBarColor;
+import org.spongepowered.api.boss.BossBarColors;
 import org.spongepowered.api.boss.BossBarOverlays;
 import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.data.key.Keys;
@@ -31,6 +33,7 @@ import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -61,6 +64,8 @@ public class BattlePointFacade {
     private BattlegroundMessagingFacade msg;
 
     private Task battlepointTask;
+
+    private String timeLeft;
 
     private static final List<Vector3i> offsets = Arrays.asList(
             Vector3i.UNIT_X,
@@ -126,6 +131,7 @@ public class BattlePointFacade {
                     pointConfig.getMaxPerTickCaptureAmount(),
                     pointConfig.getRespawnInterval(),
                     pointConfig.getRespawnTimeout(),
+                    pointConfig.getCaptureCooldown(),
                     respawnPoints,
                     pointConfig.getOnCaptureAward(),
                     pointConfig.getOnTickAward(),
@@ -140,6 +146,8 @@ public class BattlePointFacade {
                 .interval(config.TICK_INTERVAL.toMillis(), TimeUnit.MILLISECONDS)
                 .execute(this::tickAll)
                 .submit(AtherysBattlegrounds.getInstance());
+
+        timeLeft = DurationFormatUtils.formatDuration(config.WARNING_TIME.toMillis(), "m") + " minutes";
     }
 
     public void reload() {
@@ -232,6 +240,14 @@ public class BattlePointFacade {
         fetchPlayersWithinBattlePointOuterRadius(battlePoint).forEach(this::playBattlePointCaptureSound);
     }
 
+    public void notifyCapturableBattlePoint(BattlePoint battlePoint) {
+        msg.broadcast(battlePoint, " is now capturable!");
+    }
+
+    public void warnCapturableBattlePoint(BattlePoint battlePoint) {
+        msg.broadcast(battlePoint, " will be capturable in ", timeLeft, " minutes.");
+    }
+
     private void setBeaconColor(BattlePoint battlePoint, DyeColor color) {
         BlockState state = BlockState.builder()
                 .blockType(BlockTypes.STAINED_GLASS)
@@ -257,7 +273,7 @@ public class BattlePointFacade {
     private void showExitTitleToPlayer(Player player, BattlePoint battlePoint) {
         Title title = Title.builder()
                 .title(Text.of(battlePoint))
-                .subtitle(Text.of(ColorUtils.bossBarColorToTextColor(battlePoint.getBossBar().getColor()), "Leaving Battleground..."))
+                .subtitle(Text.of(battlePoint.getColor(), "Leaving Battleground..."))
                 .fadeIn(config.TITLE_FADE_TICKS)
                 .stay(config.TITLE_STAY_TICKS)
                 .fadeOut(config.TITLE_FADE_TICKS)
@@ -269,7 +285,7 @@ public class BattlePointFacade {
     private void showWelcomeTitleToPlayer(Player player, BattlePoint battlePoint) {
         Title title = Title.builder()
                 .title(Text.of(battlePoint))
-                .subtitle(Text.of(ColorUtils.bossBarColorToTextColor(battlePoint.getBossBar().getColor()), "Entering Battleground..."))
+                .subtitle(Text.of(battlePoint.getColor(), "Entering Battleground..."))
                 .fadeIn(config.TITLE_FADE_TICKS)
                 .stay(config.TITLE_STAY_TICKS)
                 .fadeOut(config.TITLE_FADE_TICKS)
@@ -279,10 +295,10 @@ public class BattlePointFacade {
     }
 
 
-    private ServerBossBar createBattlePointBossBar(String battlePointName, BossBarColor color) {
+    private ServerBossBar createBattlePointBossBar(String battlePointName, TextColor color) {
         return ServerBossBar.builder()
-                .name(Text.of(ColorUtils.bossBarColorToTextColor(color), battlePointName))
-                .color(color)
+                .name(Text.of(color, battlePointName))
+                .color(BossBarColors.WHITE)
                 .overlay(BossBarOverlays.PROGRESS)
                 .playEndBossMusic(false)
                 .createFog(false)
