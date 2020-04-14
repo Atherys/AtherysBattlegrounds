@@ -1,7 +1,9 @@
 package com.atherys.battlegrounds;
 
+import com.atherys.battlegrounds.command.ListMilestonesCommand;
 import com.atherys.battlegrounds.command.TeamCommand;
 import com.atherys.battlegrounds.facade.BattlePointFacade;
+import com.atherys.battlegrounds.facade.MilestoneFacade;
 import com.atherys.battlegrounds.facade.RespawnFacade;
 import com.atherys.battlegrounds.facade.TeamFacade;
 import com.atherys.battlegrounds.listener.BattlePointListener;
@@ -80,6 +82,7 @@ public class AtherysBattlegrounds {
 
         try {
             AtherysCore.getCommandService().register(new TeamCommand(), this);
+            AtherysCore.getCommandService().register(new ListMilestonesCommand(), this);
         } catch (CommandService.AnnotatedCommandException e) {
             e.printStackTrace();
         }
@@ -132,6 +135,14 @@ public class AtherysBattlegrounds {
         return components.teamService;
     }
 
+    public MilestoneFacade getMilestoneFacade() {
+        return components.milestoneFacade;
+    }
+
+    public Logger getLogger() {
+        return logger;
+    }
+
     private static class Components {
 
         @Inject
@@ -157,6 +168,9 @@ public class AtherysBattlegrounds {
 
         @Inject
         private TeamFacade teamFacade;
+
+        @Inject
+        private MilestoneFacade milestoneFacade;
 
         @Inject
         private PlayerListener playerListener;

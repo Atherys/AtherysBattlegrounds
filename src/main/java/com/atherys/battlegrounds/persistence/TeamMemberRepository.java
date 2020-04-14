@@ -11,4 +11,8 @@ public class TeamMemberRepository extends CachedHibernateRepository<TeamMember, 
     public TeamMemberRepository() {
         super(TeamMember.class);
     }
+
+    public String fetchTeamMemberRankName(TeamMember teamMember) {
+        return "Not Yet Implemented";
+    }
 }

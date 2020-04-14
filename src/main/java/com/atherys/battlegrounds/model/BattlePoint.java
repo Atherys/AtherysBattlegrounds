@@ -1,14 +1,18 @@
 package com.atherys.battlegrounds.model;
 
+import com.atherys.battlegrounds.config.AwardConfig;
 import com.atherys.battlegrounds.utils.ColorUtils;
+import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextRepresentable;
+import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 
 public class BattlePoint implements TextRepresentable {
@@ -21,25 +25,37 @@ public class BattlePoint implements TextRepresentable {
 
     private Location<World> location;
 
+    private Vector3i beaconLocation;
+
     private double innerRadius;
 
     private double outerRadius;
 
     private float perTickCaptureAmount;
 
+    private float perMemberTickCaptureAmount;
+
+    private float maxPerTickCaptureAmount;
+
     private Duration respawnInterval;
 
     private Duration respawnTimeout;
 
+    private Duration captureCooldown;
+
+    private Instant lastCapture;
+
     private List<RespawnPoint> respawnPoints = new ArrayList<>();
 
-    private Set<Award> captureAwards = new HashSet<>();
+    private AwardConfig captureAward;
 
-    private Set<Award> tickAwards = new HashSet<>();
+    private AwardConfig tickAward;
 
-    private Map<Team, Float> teamProgress = new HashMap<>();
+    private AwardConfig killAward;
 
-    private Team controllingTeam;
+    private Map<BattleTeam, Float> teamProgress = new HashMap<>();
+
+    private BattleTeam controllingTeam;
 
     public BattlePoint(String id) {
         this.id = id;
@@ -63,6 +79,14 @@ public class BattlePoint implements TextRepresentable {
 
     public void setLocation(Location<World> location) {
         this.location = location;
+    }
+
+    public Vector3i getBeaconLocation() {
+        return beaconLocation;
+    }
+
+    public void setBeaconLocation(Vector3i beaconLocation) {
+        this.beaconLocation = beaconLocation;
     }
 
     public double getInnerRadius() {
@@ -89,6 +113,22 @@ public class BattlePoint implements TextRepresentable {
         this.perTickCaptureAmount = perTickCaptureAmount;
     }
 
+    public float getPerMemberTickCaptureAmount() {
+        return perMemberTickCaptureAmount;
+    }
+
+    public void setPerMemberTickCaptureAmount(float perMemberTickCaptureAmount) {
+        this.perMemberTickCaptureAmount = perMemberTickCaptureAmount;
+    }
+
+    public float getMaxPerTickCaptureAmount() {
+        return maxPerTickCaptureAmount;
+    }
+
+    public void setMaxPerTickCaptureAmount(float maxPerTickCaptureAmount) {
+        this.maxPerTickCaptureAmount = maxPerTickCaptureAmount;
+    }
+
     public Duration getRespawnInterval() {
         return respawnInterval;
     }
@@ -105,6 +145,22 @@ public class BattlePoint implements TextRepresentable {
         this.respawnTimeout = respawnTimeout;
     }
 
+    public Duration getCaptureCooldown() {
+        return captureCooldown;
+    }
+
+    public void setCaptureCooldown(Duration captureCooldown) {
+        this.captureCooldown = captureCooldown;
+    }
+
+    public Instant getLastCapture() {
+        return lastCapture;
+    }
+
+    public void setLastCapture(Instant lastCapture) {
+        this.lastCapture = lastCapture;
+    }
+
     public List<RespawnPoint> getRespawnPoints() {
         return respawnPoints;
     }
@@ -113,35 +169,43 @@ public class BattlePoint implements TextRepresentable {
         this.respawnPoints = respawnPoints;
     }
 
-    public Set<Award> getCaptureAwards() {
-        return captureAwards;
+    public AwardConfig getCaptureAward() {
+        return captureAward;
     }
 
-    public void setCaptureAwards(Set<Award> captureAwards) {
-        this.captureAwards = captureAwards;
+    public void setCaptureAward(AwardConfig captureAward) {
+        this.captureAward = captureAward;
     }
 
-    public Set<Award> getTickAwards() {
-        return tickAwards;
+    public AwardConfig getTickAward() {
+        return tickAward;
     }
 
-    public void setTickAwards(Set<Award> tickAwards) {
-        this.tickAwards = tickAwards;
+    public void setTickAward(AwardConfig tickAward) {
+        this.tickAward = tickAward;
     }
 
-    public Map<Team, Float> getTeamProgress() {
+    public AwardConfig getKillAward() {
+        return killAward;
+    }
+
+    public void setKillAward(AwardConfig killAward) {
+        this.killAward = killAward;
+    }
+
+    public Map<BattleTeam, Float> getTeamProgress() {
         return teamProgress;
     }
 
-    public void setTeamProgress(Map<Team, Float> teamProgress) {
+    public void setTeamProgress(Map<BattleTeam, Float> teamProgress) {
         this.teamProgress = teamProgress;
     }
 
-    public Team getControllingTeam() {
+    public BattleTeam getControllingTeam() {
         return controllingTeam;
     }
 
-    public void setControllingTeam(Team controllingTeam) {
+    public void setControllingTeam(BattleTeam controllingTeam) {
         this.controllingTeam = controllingTeam;
     }
 
@@ -153,30 +217,21 @@ public class BattlePoint implements TextRepresentable {
         this.bossBar = bossBar;
     }
 
+    public TextColor getColor() {
+        return bossBar.getName().getColor();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BattlePoint that = (BattlePoint) o;
-        return Double.compare(that.innerRadius, innerRadius) == 0 &&
-                Double.compare(that.outerRadius, outerRadius) == 0 &&
-                Float.compare(that.perTickCaptureAmount, perTickCaptureAmount) == 0 &&
-                Objects.equals(id, that.id) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(bossBar, that.bossBar) &&
-                Objects.equals(location, that.location) &&
-                Objects.equals(respawnInterval, that.respawnInterval) &&
-                Objects.equals(respawnTimeout, that.respawnTimeout) &&
-                Objects.equals(respawnPoints, that.respawnPoints) &&
-                Objects.equals(captureAwards, that.captureAwards) &&
-                Objects.equals(tickAwards, that.tickAwards) &&
-                Objects.equals(teamProgress, that.teamProgress) &&
-                Objects.equals(controllingTeam, that.controllingTeam);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, bossBar, location, innerRadius, outerRadius, perTickCaptureAmount, respawnInterval, respawnTimeout, respawnPoints, captureAwards, tickAwards, teamProgress, controllingTeam);
+        return Objects.hash(id);
     }
 
     @Override
@@ -192,8 +247,8 @@ public class BattlePoint implements TextRepresentable {
                 ", respawnInterval=" + respawnInterval +
                 ", respawnTimeout=" + respawnTimeout +
                 ", respawnPoints=" + respawnPoints +
-                ", captureAwards=" + captureAwards +
-                ", tickAwards=" + tickAwards +
+                ", captureAward=" + captureAward +
+                ", tickAward=" + tickAward +
                 ", teamProgress=" + teamProgress +
                 ", controllingTeam=" + controllingTeam +
                 '}';
@@ -201,6 +256,6 @@ public class BattlePoint implements TextRepresentable {
 
     @Override
     public Text toText() {
-        return Text.of(ColorUtils.bossBarColorToTextColor(bossBar.getColor()), name, TextColors.RESET);
+        return Text.of(getColor(), name, TextColors.RESET);
     }
 }

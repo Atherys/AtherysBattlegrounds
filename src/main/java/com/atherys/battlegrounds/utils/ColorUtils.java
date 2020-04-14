@@ -1,8 +1,9 @@
 package com.atherys.battlegrounds.utils;
 
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.boss.BossBarColors;
+import org.spongepowered.api.data.type.DyeColor;
+import org.spongepowered.api.data.type.DyeColors;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -11,27 +12,31 @@ public final class ColorUtils {
     private ColorUtils() {
     }
 
-    public static TextColor bossBarColorToTextColor(BossBarColor color) {
-        if (BossBarColors.PINK.equals(color)) {
-            return TextColors.LIGHT_PURPLE;
-        }
+    public static BossBarColor textColorToBossBarColor(TextColor textColor) {
+        if (TextColors.LIGHT_PURPLE == textColor) return BossBarColors.PINK;
+        if (TextColors.DARK_PURPLE == textColor) return BossBarColors.PURPLE;
+        if (TextColors.GREEN == textColor) return BossBarColors.GREEN;
+        if (TextColors.BLUE == textColor) return BossBarColors.BLUE;
+        if (TextColors.RED == textColor) return BossBarColors.RED;
+        if (TextColors.YELLOW == textColor) return BossBarColors.YELLOW;
 
-        if (BossBarColors.PURPLE.equals(color)) {
-            return TextColors.DARK_PURPLE;
-        }
-
-        return Sponge.getRegistry().getType(TextColor.class, color.getId()).orElse(TextColors.WHITE);
+        return BossBarColors.WHITE;
     }
 
-    public static BossBarColor textColorToBossBarColor(TextColor textColor) {
-        if (TextColors.LIGHT_PURPLE.equals(textColor)) {
-            return BossBarColors.PINK;
-        }
+    public static DyeColor textColorToDyeColor(TextColor textColor) {
+        if (TextColors.LIGHT_PURPLE == textColor) return DyeColors.PINK;
+        if (TextColors.DARK_PURPLE == textColor) return DyeColors.PURPLE;
+        if (TextColors.GREEN == textColor) return DyeColors.LIME;
+        if (TextColors.DARK_GREEN == textColor) return DyeColors.GREEN;
+        if (TextColors.BLUE == textColor) return DyeColors.LIGHT_BLUE;
+        if (TextColors.DARK_BLUE == textColor) return DyeColors.BLUE;
+        if (TextColors.AQUA == textColor) return DyeColors.LIGHT_BLUE;
+        if (TextColors.DARK_AQUA == textColor) return DyeColors.BLUE;
+        if (TextColors.GOLD == textColor) return DyeColors.ORANGE;
+        if (TextColors.YELLOW == textColor) return DyeColors.YELLOW;
+        if (TextColors.BLACK == textColor) return DyeColors.BLACK;
+        if (TextColors.RED == textColor) return DyeColors.RED;
 
-        if (TextColors.DARK_PURPLE.equals(textColor)) {
-            return BossBarColors.PURPLE;
-        }
-
-        return Sponge.getRegistry().getType(BossBarColor.class, textColor.getId()).orElse(BossBarColors.WHITE);
+        return DyeColors.WHITE;
     }
 }

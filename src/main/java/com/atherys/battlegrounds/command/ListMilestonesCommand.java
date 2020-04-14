@@ -13,21 +13,15 @@ import org.spongepowered.api.entity.living.player.Player;
 
 import javax.annotation.Nonnull;
 
-@Aliases("team")
-@Children({
-        TeamJoinCommand.class,
-        TeamLeaveCommand.class,
-        TeamInfoCommand.class,
-        AddPlayerTeamCommand.class,
-        RemovePlayerTeamCommand.class
-})
-@Permission("atherysbattlegrounds.team.base")
-@Description("Displays information for your current team.")
-public class TeamCommand implements PlayerCommand {
+@Aliases("awards")
+@Permission("atherysbattlegrounds.awards")
+@Description("Lists all milestones.")
+@Children(ReceiveMilestonesCommand.class)
+public class ListMilestonesCommand implements PlayerCommand {
     @Nonnull
     @Override
     public CommandResult execute(@Nonnull Player source, @Nonnull CommandContext args) throws CommandException {
-        AtherysBattlegrounds.getInstance().getTeamFacade().showTeamInfo(source);
+        AtherysBattlegrounds.getInstance().getMilestoneFacade().displayMilestones(source);
         return CommandResult.success();
     }
 }

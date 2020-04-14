@@ -3,37 +3,42 @@ package com.atherys.battlegrounds.facade;
 import com.atherys.battlegrounds.AtherysBattlegrounds;
 import com.atherys.battlegrounds.BattlegroundsConfig;
 import com.atherys.battlegrounds.config.BattlePointConfig;
-import com.atherys.battlegrounds.model.Award;
 import com.atherys.battlegrounds.model.BattlePoint;
 import com.atherys.battlegrounds.model.RespawnPoint;
-import com.atherys.battlegrounds.model.Team;
+import com.atherys.battlegrounds.model.BattleTeam;
 import com.atherys.battlegrounds.service.BattlePointService;
 import com.atherys.battlegrounds.service.RespawnService;
 import com.atherys.battlegrounds.service.TeamMemberService;
 import com.atherys.battlegrounds.utils.ColorUtils;
 import com.atherys.core.utils.MathUtils;
 import com.atherys.core.utils.Sound;
+import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.boss.BossBarColor;
+import org.spongepowered.api.boss.BossBarColors;
 import org.spongepowered.api.boss.BossBarOverlays;
 import org.spongepowered.api.boss.ServerBossBar;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.DyeColor;
+import org.spongepowered.api.data.type.DyeColors;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -60,6 +65,19 @@ public class BattlePointFacade {
 
     private Task battlepointTask;
 
+    private String timeLeft;
+
+    private static final List<Vector3i> offsets = Arrays.asList(
+            Vector3i.UNIT_X,
+            Vector3i.UNIT_Z,
+            Vector3i.from(1, 0, -1),
+            Vector3i.from(-1, 0, 1),
+            Vector3i.from(-1, 0, -1),
+            Vector3i.from(-1, 0, 0),
+            Vector3i.from(0, 0, -1),
+            Vector3i.from(1, 0, 1)
+    );
+
     public BattlePointFacade() {
     }
 
@@ -83,8 +101,12 @@ public class BattlePointFacade {
                     locationConfig.getZ()
             );
 
+            BattlePointConfig.LocationConfig beaconLocationConfig = pointConfig.getBeaconLocation();
+
+            Vector3i beaconLocation = new Vector3i(beaconLocationConfig.getX(), beaconLocationConfig.getY(), beaconLocationConfig.getZ());
+
             // parse the respawn point configs
-            List<RespawnPoint> respawnPoints = pointConfig.getRespawnPoints().parallelStream()
+            List<RespawnPoint> respawnPoints = pointConfig.getRespawnPoints().stream()
                     .map(respawnConfig -> respawnService.createRespawnPoint(
                             location.getExtent(),
                             respawnConfig.getPosition(),
@@ -92,34 +114,31 @@ public class BattlePointFacade {
                     ))
                     .collect(Collectors.toList());
 
-            // parse the capture awards config
-            Set<Award> captureAwards = pointConfig.getOnCaptureAwards().parallelStream()
-                    .map(awardConfig -> battlePointService.createAward(awardConfig.getCurrency()))
-                    .collect(Collectors.toSet());
-
-            // parse the tick awards config
-            Set<Award> tickAwards = pointConfig.getOnTickAwards().parallelStream()
-                    .map(awardConfig -> battlePointService.createAward(awardConfig.getCurrency()))
-                    .collect(Collectors.toSet());
-
             // create the boss bar for the battlepoint
             ServerBossBar battlePointBossBar = createBattlePointBossBar(pointConfig.getName(), pointConfig.getColor());
 
             // create the battlepoint
-            battlePointService.createBattlePoint(
+            BattlePoint battlePoint = battlePointService.createBattlePoint(
                     pointConfig.getId(),
                     pointConfig.getName(),
                     battlePointBossBar,
                     location,
+                    beaconLocation,
                     pointConfig.getInnerRadius(),
                     pointConfig.getOuterRadius(),
                     pointConfig.getPerTickCaptureAmount(),
+                    pointConfig.getPerMemberTickCaptureAmount(),
+                    pointConfig.getMaxPerTickCaptureAmount(),
                     pointConfig.getRespawnInterval(),
                     pointConfig.getRespawnTimeout(),
+                    pointConfig.getCaptureCooldown(),
                     respawnPoints,
-                    captureAwards,
-                    tickAwards
+                    pointConfig.getOnCaptureAward(),
+                    pointConfig.getOnTickAward(),
+                    pointConfig.getOnKillAward()
             );
+
+            placeBeacon(battlePoint);
         });
 
         // start the tick task
@@ -127,6 +146,8 @@ public class BattlePointFacade {
                 .interval(config.TICK_INTERVAL.toMillis(), TimeUnit.MILLISECONDS)
                 .execute(this::tickAll)
                 .submit(AtherysBattlegrounds.getInstance());
+
+        timeLeft = DurationFormatUtils.formatDuration(config.WARNING_TIME.toMillis(), "m") + " minutes";
     }
 
     public void reload() {
@@ -142,10 +163,10 @@ public class BattlePointFacade {
 
     public void updateBattlePointBossBar(BattlePoint battlePoint) {
         // find the highest progress team and display their progress on the boss bar
-        Team highestProgressTeam = null;
+        BattleTeam highestProgressTeam = null;
         float highestProgress = 0.0f;
 
-        for (Map.Entry<Team, Float> entry : battlePoint.getTeamProgress().entrySet()) {
+        for (Map.Entry<BattleTeam, Float> entry : battlePoint.getTeamProgress().entrySet()) {
             if (entry.getValue() > highestProgress) {
                 highestProgressTeam = entry.getKey();
                 highestProgress = entry.getValue();
@@ -213,16 +234,46 @@ public class BattlePointFacade {
         bp.ifPresent(battlePoint -> battlePoint.getBossBar().removePlayer(player));
     }
 
-    public void notifyCapturedBattlePoint(BattlePoint battlePoint, Team capturingTeam) {
-        msg.broadcast(Text.of("Team \"", capturingTeam, "\" has captured \"", battlePoint, "\""));
-
+    public void notifyCapturedBattlePoint(BattlePoint battlePoint, BattleTeam capturingTeam) {
+        msg.broadcast(capturingTeam, " has captured ", battlePoint, ".");
+        setBeaconColor(battlePoint, ColorUtils.textColorToDyeColor(battlePoint.getControllingTeam().getColor()));
         fetchPlayersWithinBattlePointOuterRadius(battlePoint).forEach(this::playBattlePointCaptureSound);
+    }
+
+    public void notifyCapturableBattlePoint(BattlePoint battlePoint) {
+        msg.broadcast(battlePoint, " is now capturable!");
+    }
+
+    public void warnCapturableBattlePoint(BattlePoint battlePoint) {
+        msg.broadcast(battlePoint, " will be capturable in ", timeLeft, " minutes.");
+    }
+
+    private void setBeaconColor(BattlePoint battlePoint, DyeColor color) {
+        BlockState state = BlockState.builder()
+                .blockType(BlockTypes.STAINED_GLASS)
+                .add(Keys.DYE_COLOR, color)
+                .build();
+
+        battlePoint.getLocation().getExtent().setBlock(battlePoint.getBeaconLocation().add(0, 1, 0), state);
+    }
+
+    private void placeBeacon(BattlePoint battlePoint) {
+        World world = battlePoint.getLocation().getExtent();
+
+        world.setBlockType(battlePoint.getBeaconLocation(), BlockTypes.BEACON);
+        Vector3i below = battlePoint.getBeaconLocation().sub(0, 1, 0);
+        world.setBlockType(below, BlockTypes.IRON_BLOCK);
+        offsets.forEach(offset -> {
+            world.setBlockType(below.add(offset), BlockTypes.IRON_BLOCK);
+        });
+
+        setBeaconColor(battlePoint, DyeColors.WHITE);
     }
 
     private void showExitTitleToPlayer(Player player, BattlePoint battlePoint) {
         Title title = Title.builder()
                 .title(Text.of(battlePoint))
-                .subtitle(Text.of(ColorUtils.bossBarColorToTextColor(battlePoint.getBossBar().getColor()), "Leaving Battleground..."))
+                .subtitle(Text.of(battlePoint.getColor(), "Leaving Battleground..."))
                 .fadeIn(config.TITLE_FADE_TICKS)
                 .stay(config.TITLE_STAY_TICKS)
                 .fadeOut(config.TITLE_FADE_TICKS)
@@ -234,7 +285,7 @@ public class BattlePointFacade {
     private void showWelcomeTitleToPlayer(Player player, BattlePoint battlePoint) {
         Title title = Title.builder()
                 .title(Text.of(battlePoint))
-                .subtitle(Text.of(ColorUtils.bossBarColorToTextColor(battlePoint.getBossBar().getColor()), "Entering Battleground..."))
+                .subtitle(Text.of(battlePoint.getColor(), "Entering Battleground..."))
                 .fadeIn(config.TITLE_FADE_TICKS)
                 .stay(config.TITLE_STAY_TICKS)
                 .fadeOut(config.TITLE_FADE_TICKS)
@@ -244,10 +295,10 @@ public class BattlePointFacade {
     }
 
 
-    private ServerBossBar createBattlePointBossBar(String battlePointName, BossBarColor color) {
+    private ServerBossBar createBattlePointBossBar(String battlePointName, TextColor color) {
         return ServerBossBar.builder()
-                .name(Text.of(ColorUtils.bossBarColorToTextColor(color), battlePointName))
-                .color(color)
+                .name(Text.of(color, battlePointName))
+                .color(BossBarColors.WHITE)
                 .overlay(BossBarOverlays.PROGRESS)
                 .playEndBossMusic(false)
                 .createFog(false)
