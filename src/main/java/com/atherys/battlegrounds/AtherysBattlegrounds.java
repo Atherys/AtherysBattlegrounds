@@ -10,7 +10,6 @@ import com.atherys.battlegrounds.listener.BattlePointListener;
 import com.atherys.battlegrounds.listener.PlayerListener;
 import com.atherys.battlegrounds.model.entity.TeamMember;
 import com.atherys.battlegrounds.persistence.TeamMemberRepository;
-import com.atherys.battlegrounds.serialize.DurationTypeSerializer;
 import com.atherys.battlegrounds.service.BattlePointService;
 import com.atherys.battlegrounds.service.RespawnService;
 import com.atherys.battlegrounds.service.TeamService;
@@ -70,8 +69,6 @@ public class AtherysBattlegrounds {
 
     private void init() {
         instance = this;
-
-        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Duration.class), new DurationTypeSerializer());
 
         components = new Components();
         battlegroundsInjector = spongeInjector.createChildInjector();
