@@ -173,6 +173,8 @@ public class BattlePointService {
     private void captureBattlePoint(BattlePoint battlePoint, BattleTeam battleTeam, Set<Player> membersWithinInner) {
         battlePoint.setControllingTeam(battleTeam);
         battlePoint.setLastCapture(Instant.now());
+        battlePoint.getTeamProgress().clear();
+        battlePoint.getTeamProgress().put(battleTeam, 1.0f);
 
         // distribute awards for capturing the point
         teamService.distributeAward(battlePoint.getCaptureAward(), battleTeam);
