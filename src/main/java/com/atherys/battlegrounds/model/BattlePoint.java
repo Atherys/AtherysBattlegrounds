@@ -1,7 +1,6 @@
 package com.atherys.battlegrounds.model;
 
 import com.atherys.battlegrounds.config.AwardConfig;
-import com.atherys.battlegrounds.utils.ColorUtils;
 import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.text.Text;
@@ -42,6 +41,8 @@ public class BattlePoint implements TextRepresentable {
     private Duration respawnTimeout;
 
     private Duration captureCooldown;
+
+    private boolean warned;
 
     private Instant lastCapture;
 
@@ -151,6 +152,14 @@ public class BattlePoint implements TextRepresentable {
 
     public void setCaptureCooldown(Duration captureCooldown) {
         this.captureCooldown = captureCooldown;
+    }
+
+    public boolean isWarned() {
+        return warned;
+    }
+
+    public void setWarned(boolean warned) {
+        this.warned = warned;
     }
 
     public Instant getLastCapture() {

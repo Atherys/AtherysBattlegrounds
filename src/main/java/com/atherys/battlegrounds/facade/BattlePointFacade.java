@@ -245,7 +245,7 @@ public class BattlePointFacade {
     }
 
     public void warnCapturableBattlePoint(BattlePoint battlePoint) {
-        msg.broadcast(battlePoint, " will be capturable in ", timeLeft, " minutes.");
+        msg.broadcast(battlePoint, " will be capturable in ", timeLeft, ".");
     }
 
     private void setBeaconColor(BattlePoint battlePoint, DyeColor color) {
