@@ -109,7 +109,7 @@ public class BattlePointService {
                 battlePoint.setLastCapture(null);
 
             // If the warning time is up
-            } else if (sinceCapture.compareTo(config.WARNING_TIME) <= 0 && !battlePoint.isWarned()) {
+            } else if (battlePoint.getCaptureCooldown().minus(sinceCapture).compareTo(config.WARNING_TIME) <= 0 && !battlePoint.isWarned()) {
                 Sponge.getEventManager().post(new BattlePointEvent.Warning(battlePoint));
                 battlePoint.setWarned(true);
                 return;
