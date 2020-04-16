@@ -60,6 +60,9 @@ public class BattlegroundsConfig extends PluginConfig {
     @Setting("title-stay-ticks")
     public int TITLE_STAY_TICKS = 10;
 
+    @Setting("award-automatically")
+    public boolean AWARD_AUTO = true;
+
     protected BattlegroundsConfig() throws IOException {
         super("config/" + AtherysBattlegrounds.ID, "config.conf");
         init();

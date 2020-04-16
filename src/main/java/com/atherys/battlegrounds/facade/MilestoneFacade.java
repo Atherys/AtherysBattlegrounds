@@ -65,12 +65,16 @@ public class MilestoneFacade {
         }
 
         if (i != member.getMilestone() && user instanceof Player) {
-            Text message = Text.builder()
-                    .append(Text.of(DARK_GREEN, "You have unlocked rewards! Click or /rewards to receive them."))
-                    .onClick(TextActions.executeCallback(commandSource -> awardMilestones((Player) user)))
-                    .build();
+            if (config.AWARD_AUTO) {
+                awardMilestones((Player) user);
+            } else {
+                Text message = Text.builder()
+                        .append(Text.of(DARK_GREEN, "You have unlocked rewards! Click or /rewards to receive them."))
+                        .onClick(TextActions.executeCallback(commandSource -> awardMilestones((Player) user)))
+                        .build();
 
-            msg.info((MessageReceiver) user, message);
+                msg.info((MessageReceiver) user, message);
+            }
         }
 
         teamMemberService.setMilestone(member, i);
@@ -82,7 +86,7 @@ public class MilestoneFacade {
         for (int i = member.getMilestonesAwarded() + 1; i <= member.getMilestone(); i++) {
             MilestoneConfig milestoneConfig = config.MILESTONES.get(i);
 
-            msg.info(source, TextSerializers.FORMATTING_CODE.deserialize(milestoneConfig.getMessage()));
+            msg.info(source, DARK_GREEN, TextSerializers.FORMATTING_CODE.deserialize(milestoneConfig.getMessage()));
             teamService.distributeAwardsToMembers(milestoneConfig.getAward(), Collections.singleton(source));
         }
 
