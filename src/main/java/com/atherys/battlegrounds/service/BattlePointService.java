@@ -163,7 +163,6 @@ public class BattlePointService {
         // then a change of ownership has occurred. Distribute capture awards to the new controlling team
         if (postTickControllingTeam.isPresent() && !postTickControllingTeam.get().equals(battlePoint.getControllingTeam())) {
             captureBattlePoint(battlePoint, postTickControllingTeam.get(), membersWithinInner.get(postTickControllingTeam.get()));
-            return;
         }
 
         // trigger the tick event
