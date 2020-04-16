@@ -2,7 +2,6 @@ package com.atherys.battlegrounds.config;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.text.format.TextColor;
 
 import java.time.Duration;

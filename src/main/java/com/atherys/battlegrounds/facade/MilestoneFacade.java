@@ -1,5 +1,6 @@
 package com.atherys.battlegrounds.facade;
 
+import com.atherys.battlegrounds.AtherysBattlegrounds;
 import com.atherys.battlegrounds.BattlegroundsConfig;
 import com.atherys.battlegrounds.config.MilestoneConfig;
 import com.atherys.battlegrounds.model.entity.TeamMember;
@@ -11,16 +12,16 @@ import com.google.inject.Singleton;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.spongepowered.api.text.format.TextColors.*;
 
@@ -41,15 +42,15 @@ public class MilestoneFacade {
     public void onTransaction(TransactionResult result) {
         if (result.getAccount() instanceof UniqueAccount && result.getCurrency().equals(config.MILESTONE_CURRENCY)) {
             UniqueAccount account = (UniqueAccount) result.getAccount();
-            User user = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(account.getUniqueId()).get();
+            Optional<Player> player = Sponge.getServer().getPlayer(account.getUniqueId());
+            User user = player.isPresent() ? player.get() : Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(account.getUniqueId()).get();
             checkMilestones(user, account);
         }
     }
 
     public void checkMilestones(User user) {
-        Economy.getAccount(user.getUniqueId()).ifPresent(account -> {
-            checkMilestones(user, account);
-        });
+        UniqueAccount account = Economy.getAccount(user.getUniqueId()).get();
+        checkMilestones(user, account);
     }
 
     private void checkMilestones(User user, UniqueAccount account) {
@@ -64,20 +65,11 @@ public class MilestoneFacade {
             }
         }
 
-        if (i != member.getMilestone() && user instanceof Player) {
-            if (config.AWARD_AUTO) {
-                awardMilestones((Player) user);
-            } else {
-                Text message = Text.builder()
-                        .append(Text.of(DARK_GREEN, "You have unlocked rewards! Click or /rewards to receive them."))
-                        .onClick(TextActions.executeCallback(commandSource -> awardMilestones((Player) user)))
-                        .build();
-
-                msg.info((MessageReceiver) user, message);
-            }
-        }
-
         teamMemberService.setMilestone(member, i);
+
+        if (member.getMilestone() != member.getMilestonesAwarded() && user instanceof Player) {
+            Task.builder().delayTicks(0).execute(() -> awardMilestones((Player) user)).submit(AtherysBattlegrounds.getInstance());
+        }
     }
 
     public void awardMilestones(Player source) {
@@ -103,15 +95,8 @@ public class MilestoneFacade {
                 DARK_GRAY, " ]====[]", Text.NEW_LINE));
 
         for (MilestoneConfig milestoneConfig : config.MILESTONES) {
-            if (i <= member.getMilestonesAwarded() && member.getMilestonesAwarded() < member.getMilestone()) {
-                milestones.append(Text.of(Text.builder()
-                        .onHover(TextActions.showText(Text.of(DARK_GRAY, "Click to receive awards!")))
-                        .onClick(TextActions.executeCallback(src -> awardMilestones(source)))
-                        .append(Text.of(GOLD, milestoneConfig.getDisplay()))
-                        .build())
-                );
-            } else if (i <= member.getMilestone()) {
-                milestones.append(Text.of(GREEN, milestoneConfig.getDisplay() + "✓"));
+            if (i <= member.getMilestone()) {
+                milestones.append(Text.of(GREEN, milestoneConfig.getDisplay() + " ✓"));
             } else {
                 milestones.append(Text.of(DARK_GRAY, milestoneConfig.getDisplay()));
             }

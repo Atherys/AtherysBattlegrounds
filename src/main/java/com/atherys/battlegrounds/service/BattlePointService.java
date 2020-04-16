@@ -1,33 +1,25 @@
 package com.atherys.battlegrounds.service;
 
-import com.atherys.battlegrounds.AtherysBattlegrounds;
 import com.atherys.battlegrounds.BattlegroundsConfig;
 import com.atherys.battlegrounds.config.AwardConfig;
 import com.atherys.battlegrounds.event.BattlePointEvent;
 import com.atherys.battlegrounds.model.BattlePoint;
-import com.atherys.battlegrounds.model.RespawnPoint;
 import com.atherys.battlegrounds.model.BattleTeam;
+import com.atherys.battlegrounds.model.RespawnPoint;
 import com.atherys.battlegrounds.model.entity.TeamMember;
-import com.atherys.battlegrounds.utils.ColorUtils;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.boss.ServerBossBar;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Singleton

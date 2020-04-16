@@ -5,7 +5,9 @@ import com.atherys.battlegrounds.persistence.TeamConverter;
 import com.atherys.core.db.SpongeIdentifiable;
 
 import javax.annotation.Nonnull;
-import javax.persistence.*;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.util.Objects;
 import java.util.UUID;
 

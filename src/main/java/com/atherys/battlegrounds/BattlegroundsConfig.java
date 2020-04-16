@@ -5,18 +5,17 @@ import com.atherys.battlegrounds.config.BattlePointConfig;
 import com.atherys.battlegrounds.config.MilestoneConfig;
 import com.atherys.battlegrounds.config.TeamConfig;
 import com.atherys.core.utils.PluginConfig;
-import com.google.common.reflect.TypeToken;
 import com.google.inject.Singleton;
-import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollection;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.spongepowered.api.service.economy.Currency;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Singleton
 public class BattlegroundsConfig extends PluginConfig {
@@ -59,9 +58,6 @@ public class BattlegroundsConfig extends PluginConfig {
 
     @Setting("title-stay-ticks")
     public int TITLE_STAY_TICKS = 10;
-
-    @Setting("award-automatically")
-    public boolean AWARD_AUTO = true;
 
     protected BattlegroundsConfig() throws IOException {
         super("config/" + AtherysBattlegrounds.ID, "config.conf");
