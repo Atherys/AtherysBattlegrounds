@@ -13,7 +13,7 @@ import org.spongepowered.api.entity.living.player.Player;
 
 import javax.annotation.Nonnull;
 
-@Aliases("awards")
+@Aliases("rank")
 @Permission("atherysbattlegrounds.awards")
 @Description("Lists all milestones.")
 @Children(ReceiveMilestonesCommand.class)

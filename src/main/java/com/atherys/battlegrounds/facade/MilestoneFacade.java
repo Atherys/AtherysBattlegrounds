@@ -94,6 +94,9 @@ public class MilestoneFacade {
         int i = 0;
         Text.Builder milestones = Text.builder().append(Text.of(DARK_GRAY, "[]====[ ", GOLD, config.MILESTONES_TITLE, DARK_GRAY, " ]====[]", Text.NEW_LINE));
 
+        BigDecimal amount = Economy.getAccount(source.getUniqueId()).get().getBalance(config.MILESTONE_CURRENCY);
+        milestones.append(Text.of(config.MILESTONE_CURRENCY.format(amount), Text.NEW_LINE));
+
         for (MilestoneConfig milestoneConfig : config.MILESTONES) {
             if (i <= member.getMilestonesAwarded() && member.getMilestonesAwarded() < member.getMilestone()) {
                 milestones.append(Text.of(Text.builder()
