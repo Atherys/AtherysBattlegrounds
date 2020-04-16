@@ -88,7 +88,7 @@ public class MilestoneFacade {
     public void displayMilestones(Player source) {
         TeamMember member = teamMemberService.getOrCreateTeamMember(source);
         int i = 0;
-        int amount = Economy.getAccount(source.getUniqueId()).get().getBalance(config.MILESTONE_CURRENCY).intValue();
+        int amount = Economy.getAccount(source.getUniqueId()).get().getBalance(config.MILESTONE_CURRENCY).intValue() - config.CURRENCY_BASE;
         Text.Builder milestones = Text.builder().append(Text.of(
                 DARK_GRAY, "[]====[ ", GOLD, config.MILESTONES_TITLE,
                 DARK_GREEN, " (", GOLD, amount, DARK_GREEN, ")",

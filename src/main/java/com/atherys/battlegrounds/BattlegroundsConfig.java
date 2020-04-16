@@ -26,6 +26,9 @@ public class BattlegroundsConfig extends PluginConfig {
     @Setting("milestones-title")
     public String MILESTONES_TITLE = "Rewards";
 
+    @Setting("milestones-currency-base")
+    public int CURRENCY_BASE = 300;
+
     @Setting("milestones")
     public List<MilestoneConfig> MILESTONES = new ArrayList<>();
 
