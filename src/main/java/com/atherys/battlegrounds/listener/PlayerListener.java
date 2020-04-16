@@ -46,7 +46,7 @@ public class PlayerListener {
     }
 
     @Listener
-    public void onPlayerDeathAny(DestructEntityEvent event, @Getter("getTargetEntity") Player victim) {
+    public void onPlayerDeathAny(DestructEntityEvent.Death event, @Getter("getTargetEntity") Player victim) {
         respawnFacade.offerRespawn(victim);
     }
 
