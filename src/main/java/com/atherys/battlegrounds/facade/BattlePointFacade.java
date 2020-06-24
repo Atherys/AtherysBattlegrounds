@@ -32,6 +32,7 @@ import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.Location;
