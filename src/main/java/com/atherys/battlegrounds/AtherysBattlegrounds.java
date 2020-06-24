@@ -80,7 +80,9 @@ public class AtherysBattlegrounds {
 
         try {
             AtherysCore.getCommandService().register(new TeamCommand(), this);
-            AtherysCore.getCommandService().register(new ListMilestonesCommand(), this);
+            if (components.config.MILESTONES_ENABLED) {
+                AtherysCore.getCommandService().register(new ListMilestonesCommand(), this);
+            }
         } catch (CommandService.AnnotatedCommandException e) {
             e.printStackTrace();
         }
