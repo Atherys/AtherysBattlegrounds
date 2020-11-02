@@ -1,5 +1,6 @@
 package com.atherys.battlegrounds.model;
 
+import org.spongepowered.api.scoreboard.Team;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextRepresentable;
 import org.spongepowered.api.text.format.TextColor;
@@ -7,7 +8,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Objects;
 
-public class Team implements TextRepresentable {
+public class BattleTeam implements TextRepresentable {
 
     private String id;
 
@@ -15,7 +16,9 @@ public class Team implements TextRepresentable {
 
     private TextColor color;
 
-    public Team(String id) {
+    private Team scoreboardTeam;
+
+    public BattleTeam(String id) {
         this.id = id;
     }
 
@@ -39,11 +42,19 @@ public class Team implements TextRepresentable {
         this.color = color;
     }
 
+    public Team getScoreboardTeam() {
+        return scoreboardTeam;
+    }
+
+    public void setScoreboardTeam(Team scoreboardTeam) {
+        this.scoreboardTeam = scoreboardTeam;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Team team = (Team) o;
+        BattleTeam team = (BattleTeam) o;
         return id.equals(team.id) &&
                 Objects.equals(name, team.name) &&
                 Objects.equals(color, team.color);

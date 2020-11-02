@@ -1,16 +1,14 @@
 package com.atherys.battlegrounds.service;
 
 import com.atherys.battlegrounds.BattlegroundsConfig;
-import com.atherys.battlegrounds.model.Team;
-import com.atherys.battlegrounds.model.entity.PlayerRanking;
+import com.atherys.battlegrounds.model.BattleTeam;
 import com.atherys.battlegrounds.model.entity.TeamMember;
-import com.atherys.battlegrounds.persistence.PlayerRankingRepository;
 import com.atherys.battlegrounds.persistence.TeamMemberRepository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -22,48 +20,25 @@ public class TeamMemberService {
     private BattlegroundsConfig config;
 
     @Inject
-    private PlayerRankingRepository playerRankingRepository;
-
-    @Inject
     private TeamMemberRepository teamMemberRepository;
 
     public TeamMemberService() {
     }
 
-    public TeamMember getOrCreateTeamMember(Player player) {
-        return teamMemberRepository.findById(player.getUniqueId()).orElseGet(() -> {
-            TeamMember teamMember = new TeamMember(player.getUniqueId());
-
-            PlayerRanking playerRanking = new PlayerRanking();
-            playerRankingRepository.saveOne(playerRanking);
-
-            teamMember.setRanking(playerRanking);
+    public TeamMember getOrCreateTeamMember(User user) {
+        return teamMemberRepository.findById(user.getUniqueId()).orElseGet(() -> {
+            TeamMember teamMember = new TeamMember(user.getUniqueId());
 
             teamMemberRepository.saveOne(teamMember);
             return teamMember;
         });
     }
 
-    protected Optional<Team> determineCapturingTeam(Set<TeamMember> onlineTeamMembersWithinInnerRadius) {
-        Map<Team, Integer> numberOfPlayersFromEachTeam = new HashMap<>();
+    protected Optional<BattleTeam> determineCapturingTeam(Map<BattleTeam, Set<Player>> onlineTeamMembersWithinInnerRadius) {
+        BattleTeam capturingTeam = null;
 
-        onlineTeamMembersWithinInnerRadius.forEach(teamMember -> {
-            // if the player isn't part of a team, just return
-            if (teamMember.getTeam() == null) {
-                return;
-            }
-
-            if (numberOfPlayersFromEachTeam.containsKey(teamMember.getTeam())) {
-                numberOfPlayersFromEachTeam.merge(teamMember.getTeam(), 1, Integer::sum);
-            } else {
-                numberOfPlayersFromEachTeam.put(teamMember.getTeam(), 1);
-            }
-        });
-
-        Team capturingTeam = null;
-
-        for (Map.Entry<Team, Integer> entry : numberOfPlayersFromEachTeam.entrySet()) {
-            if (entry.getValue() >= config.MINIMUM_PLAYERS_REQUIRED_TO_CAPTURE_POINT) {
+        for (Map.Entry<BattleTeam, Set<Player>> entry : onlineTeamMembersWithinInnerRadius.entrySet()) {
+            if (entry.getValue().size() >= config.MINIMUM_PLAYERS_REQUIRED_TO_CAPTURE_POINT) {
 
                 // If a capturing team has already been found, and another also meets the criteria,
                 // then return that no team is currently capturing until there is only one single team that meets the criteria
@@ -79,33 +54,23 @@ public class TeamMemberService {
         return Optional.ofNullable(capturingTeam);
     }
 
-    public void removeTeamMemberFromTeam(Team team, TeamMember teamMember) {
+    public void removeTeamMemberFromTeam(TeamMember teamMember) {
         teamMember.setTeam(null);
         teamMemberRepository.saveOne(teamMember);
     }
 
-    public void addTeamMemberToTeam(Team team, TeamMember teamMember) {
+    public void addTeamMemberToTeam(BattleTeam team, TeamMember teamMember) {
         teamMember.setTeam(team);
         teamMemberRepository.saveOne(teamMember);
     }
 
-    public void switchRankings(TeamMember victimTeamMember, TeamMember attackerTeamMember) {
-        PlayerRanking temp = victimTeamMember.getRanking();
-
-        victimTeamMember.setRanking(attackerTeamMember.getRanking());
-        attackerTeamMember.setRanking(temp);
-
-        teamMemberRepository.saveOne(victimTeamMember);
-        teamMemberRepository.saveOne(attackerTeamMember);
+    public void setMilestone(TeamMember teamMember, int milestone) {
+        teamMember.setMilestone(milestone);
+        teamMemberRepository.saveOne(teamMember);
     }
 
-    public String getTeamMemberRankName(TeamMember teamMember) {
-        return teamMemberRepository.fetchTeamMemberRankName(teamMember);
-    }
-
-    public void rankPlayerLast(TeamMember teamMember) {
-        teamMember.setRanking(new PlayerRanking());
-
+    public void setAwardedMilestones(TeamMember teamMember, int milestones) {
+        teamMember.setMilestonesAwarded(milestones);
         teamMemberRepository.saveOne(teamMember);
     }
 }

@@ -9,7 +9,9 @@ import org.apache.commons.lang3.RandomUtils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.TeleportHelper;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.teleport.TeleportHelperFilters;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -112,8 +114,14 @@ public class RespawnService {
         Location<World> initialLocation = new Location<>(respawnPoint.getLocation().getExtent(), initialPosition);
 
         return Sponge.getTeleportHelper()
-                .getSafeLocation(initialLocation, 3, 3)
-                .orElse(initialLocation);
+                .getSafeLocation(
+                        initialLocation,
+                        (int) respawnPoint.getRadius(),
+                        (int) respawnPoint.getRadius(),
+                        TeleportHelper.DEFAULT_FLOOR_CHECK_DISTANCE,
+                        TeleportHelperFilters.SURFACE_ONLY
+                )
+                .orElse(respawnPoint.getLocation());
     }
 
 }

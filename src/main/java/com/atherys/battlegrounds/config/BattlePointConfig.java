@@ -2,16 +2,12 @@ package com.atherys.battlegrounds.config;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import org.spongepowered.api.boss.BossBarColor;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.text.format.TextColor;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @ConfigSerializable
 public class BattlePointConfig {
@@ -23,10 +19,13 @@ public class BattlePointConfig {
     private String name;
 
     @Setting("color")
-    private BossBarColor color;
+    private TextColor color;
 
     @Setting("location")
     private LocationConfig location;
+
+    @Setting("beacon-location")
+    private LocationConfig beaconLocation;
 
     @ConfigSerializable
     public static class LocationConfig {
@@ -88,20 +87,32 @@ public class BattlePointConfig {
     @Setting("capture-amount-per-tick")
     private float perTickCaptureAmount = 0.01f;
 
+    @Setting("max-capture-amount-per-tick")
+    private float maxPerTickCaptureAmount = 0.01f;
+
+    @Setting("capture-amount-per-member-per-tick")
+    private float perMemberTickCaptureAmount = 0.01f;
+
     @Setting("respawn-interval")
     private Duration respawnInterval = Duration.of(1, ChronoUnit.SECONDS);
 
     @Setting("respawn-timeout")
     private Duration respawnTimeout = Duration.of(30, ChronoUnit.SECONDS);
 
+    @Setting("capture-cooldown")
+    private Duration captureCooldown = Duration.of(5, ChronoUnit.MINUTES);
+
     @Setting("respawn-points")
     private List<RespawnPointConfig> respawnPoints = new ArrayList<>();
 
     @Setting("on-capture-awards")
-    private Set<AwardConfig> onCaptureAwards = new HashSet<>();
+    private AwardConfig onCaptureAward = new AwardConfig();
 
     @Setting("on-tick-awards")
-    private Set<AwardConfig> onTickAwards = new HashSet<>();
+    private AwardConfig onTickAward = new AwardConfig();
+
+    @Setting("on-kill-awards")
+    private AwardConfig onKillAward = new AwardConfig();
 
     public BattlePointConfig() {
     }
@@ -114,12 +125,16 @@ public class BattlePointConfig {
         return name;
     }
 
-    public BossBarColor getColor() {
+    public TextColor getColor() {
         return color;
     }
 
     public LocationConfig getLocation() {
         return location;
+    }
+
+    public LocationConfig getBeaconLocation() {
+        return beaconLocation;
     }
 
     public double getInnerRadius() {
@@ -134,6 +149,14 @@ public class BattlePointConfig {
         return perTickCaptureAmount;
     }
 
+    public float getMaxPerTickCaptureAmount() {
+        return maxPerTickCaptureAmount;
+    }
+
+    public float getPerMemberTickCaptureAmount() {
+        return perMemberTickCaptureAmount;
+    }
+
     public Duration getRespawnInterval() {
         return respawnInterval;
     }
@@ -142,15 +165,23 @@ public class BattlePointConfig {
         return respawnTimeout;
     }
 
+    public Duration getCaptureCooldown() {
+        return captureCooldown;
+    }
+
     public List<RespawnPointConfig> getRespawnPoints() {
         return respawnPoints;
     }
 
-    public Set<AwardConfig> getOnCaptureAwards() {
-        return onCaptureAwards;
+    public AwardConfig getOnCaptureAward() {
+        return onCaptureAward;
     }
 
-    public Set<AwardConfig> getOnTickAwards() {
-        return onTickAwards;
+    public AwardConfig getOnTickAward() {
+        return onTickAward;
+    }
+
+    public AwardConfig getOnKillAward() {
+        return onKillAward;
     }
 }
