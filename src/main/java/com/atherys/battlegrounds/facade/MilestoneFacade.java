@@ -6,6 +6,7 @@ import com.atherys.battlegrounds.config.MilestoneConfig;
 import com.atherys.battlegrounds.model.entity.TeamMember;
 import com.atherys.battlegrounds.service.TeamMemberService;
 import com.atherys.battlegrounds.service.TeamService;
+import com.atherys.core.AtherysCore;
 import com.atherys.core.economy.Economy;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -13,6 +14,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
 import org.spongepowered.api.service.user.UserStorageService;
@@ -39,6 +41,12 @@ public class MilestoneFacade {
     @Inject
     private BattlegroundMessagingFacade msg;
 
+    private Currency currency;
+
+    public void init() {
+        this.currency = Sponge.getRegistry().getType(Currency.class, config.MILESTONE_CURRENCY).get();
+    }
+
     public void onTransaction(TransactionResult result) {
         if (result.getAccount() instanceof UniqueAccount && result.getCurrency().equals(config.MILESTONE_CURRENCY)) {
             UniqueAccount account = (UniqueAccount) result.getAccount();
@@ -58,7 +66,7 @@ public class MilestoneFacade {
 
         int i = -1;
         for (MilestoneConfig milestoneConfig : config.MILESTONES) {
-            if (account.getBalance(config.MILESTONE_CURRENCY).compareTo(BigDecimal.valueOf(milestoneConfig.getThreshold())) >= 0) {
+            if (account.getBalance(this.currency).compareTo(BigDecimal.valueOf(milestoneConfig.getThreshold())) >= 0) {
                 i++;
             } else {
                 break;
@@ -88,7 +96,7 @@ public class MilestoneFacade {
     public void displayMilestones(Player source) {
         TeamMember member = teamMemberService.getOrCreateTeamMember(source);
         int i = 0;
-        int amount = Economy.getAccount(source.getUniqueId()).get().getBalance(config.MILESTONE_CURRENCY).intValue() - config.CURRENCY_BASE;
+        int amount = Economy.getAccount(source.getUniqueId()).get().getBalance(this.currency).intValue() - config.CURRENCY_BASE;
         Text.Builder milestones = Text.builder().append(Text.of(
                 DARK_GRAY, "[]====[ ", GOLD, config.MILESTONES_TITLE,
                 DARK_GREEN, " (", GOLD, amount, DARK_GREEN, ")",

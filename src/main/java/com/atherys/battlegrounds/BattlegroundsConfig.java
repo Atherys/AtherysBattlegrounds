@@ -32,8 +32,11 @@ public class BattlegroundsConfig extends PluginConfig {
     @Setting("milestones")
     public List<MilestoneConfig> MILESTONES = new ArrayList<>();
 
+    @Setting("milestones-enabled")
+    public boolean MILESTONES_ENABLED;
+
     @Setting("milestone-currency")
-    public Currency MILESTONE_CURRENCY;
+    public String MILESTONE_CURRENCY;
 
     @Setting("teams")
     public Set<TeamConfig> TEAMS = new HashSet<>();

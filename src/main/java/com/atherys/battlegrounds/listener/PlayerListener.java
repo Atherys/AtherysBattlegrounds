@@ -1,5 +1,6 @@
 package com.atherys.battlegrounds.listener;
 
+import com.atherys.battlegrounds.BattlegroundsConfig;
 import com.atherys.battlegrounds.facade.BattlePointFacade;
 import com.atherys.battlegrounds.facade.MilestoneFacade;
 import com.atherys.battlegrounds.facade.RespawnFacade;
@@ -32,6 +33,9 @@ public class PlayerListener {
     @Inject
     private MilestoneFacade milestoneFacade;
 
+    @Inject
+    private BattlegroundsConfig config;
+
     public PlayerListener() {
     }
 
@@ -54,7 +58,9 @@ public class PlayerListener {
     public void onPlayerJoin(ClientConnectionEvent.Join event, @Root Player player) {
         battlePointFacade.onPlayerJoin(player);
         teamFacade.onPlayerJoin(player);
-        milestoneFacade.checkMilestones(player);
+        if (config.MILESTONES_ENABLED) {
+            milestoneFacade.checkMilestones(player);
+        }
     }
 
     @Listener
@@ -64,6 +70,8 @@ public class PlayerListener {
 
     @Listener
     public void onTransaction(EconomyTransactionEvent event) {
-        milestoneFacade.onTransaction(event.getTransactionResult());
+        if (config.MILESTONES_ENABLED) {
+            milestoneFacade.onTransaction(event.getTransactionResult());
+        }
     }
 }

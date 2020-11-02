@@ -22,7 +22,9 @@ import com.google.inject.Injector;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.game.GameReloadEvent;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Dependency;
@@ -44,7 +46,7 @@ public class AtherysBattlegrounds {
     static final String ID = "atherysbattlegrounds";
     static final String NAME = "A'therys Battlegrounds";
     static final String DESCRIPTION = "A capture-and-hold mini-game intended to be played in the open-world for the A'therys Horizons server";
-    static final String VERSION = "%PLUGIN_VERSION%";
+    static final String VERSION = "%PROJECT_VERSION%";
 
     private static AtherysBattlegrounds instance;
     private static boolean init;
@@ -78,7 +80,9 @@ public class AtherysBattlegrounds {
 
         try {
             AtherysCore.getCommandService().register(new TeamCommand(), this);
-            AtherysCore.getCommandService().register(new ListMilestonesCommand(), this);
+            if (components.config.MILESTONES_ENABLED) {
+                AtherysCore.getCommandService().register(new ListMilestonesCommand(), this);
+            }
         } catch (CommandService.AnnotatedCommandException e) {
             e.printStackTrace();
         }
@@ -102,8 +106,8 @@ public class AtherysBattlegrounds {
         event.registerEntity(TeamMember.class);
     }
 
-    @Listener
-    public void onHibernateInit(AtherysHibernateInitializedEvent event) {
+    @Listener(order = Order.LATE)
+    public void onInit(GameInitializationEvent event) {
         init();
     }
 
