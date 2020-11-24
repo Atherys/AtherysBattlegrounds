@@ -6,7 +6,11 @@ plugins {
 
 group 'com.atherys'
 
-version '1.1.0'
+version '1.1.1'
+
+dependencies {
+    shadow "com.atherys:AtherysTowns:master-SNAPSHOT"
+}
 
 blossom {
     replaceToken '%PROJECT_VERSION%', project.version

@@ -9,8 +9,10 @@ import com.atherys.battlegrounds.service.BattlePointService;
 import com.atherys.battlegrounds.service.TeamMemberService;
 import com.atherys.battlegrounds.service.TeamService;
 import com.atherys.core.economy.Economy;
+import com.atherys.towns.AtherysTowns;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scoreboard.Team;
@@ -47,9 +49,17 @@ public class TeamFacade {
     }
 
     public void init() {
-        List<Team> scoreboardTeams = config.TEAMS.stream()
-                .map(teamConfig -> teamService.createTeam(teamConfig.getId(), teamConfig.getName(), teamConfig.getColor()).getScoreboardTeam())
+        List<Team> scoreboardTeams;
+
+        if (Sponge.getPluginManager().isLoaded("atherystowns")) {
+            scoreboardTeams = AtherysTowns.getInstance().getNationService().getAllNations().stream()
+                .map(nation -> teamService.createTeam(nation.getId().toString(), nation.getName(), nation.getColor()).getScoreboardTeam())
                 .collect(Collectors.toList());
+        } else {
+            scoreboardTeams = config.TEAMS.stream()
+                    .map(teamConfig -> teamService.createTeam(teamConfig.getId(), teamConfig.getName(), teamConfig.getColor()).getScoreboardTeam())
+                    .collect(Collectors.toList());
+        }
 
         teamService.setScoreboard(scoreboardTeams);
     }
