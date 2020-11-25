@@ -16,7 +16,6 @@ import com.atherys.battlegrounds.service.TeamService;
 import com.atherys.core.AtherysCore;
 import com.atherys.core.command.CommandService;
 import com.atherys.core.event.AtherysHibernateConfigurationEvent;
-import com.atherys.core.event.AtherysHibernateInitializedEvent;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import org.slf4j.Logger;

@@ -2,6 +2,8 @@ package com.atherys.battlegrounds.facade;
 
 import com.atherys.battlegrounds.BattlegroundsConfig;
 import com.atherys.battlegrounds.config.AwardConfig;
+import com.atherys.battlegrounds.config.TeamConfig;
+import com.atherys.battlegrounds.integration.AtherysTownsIntegration;
 import com.atherys.battlegrounds.model.BattlePoint;
 import com.atherys.battlegrounds.model.BattleTeam;
 import com.atherys.battlegrounds.model.entity.TeamMember;
@@ -9,7 +11,6 @@ import com.atherys.battlegrounds.service.BattlePointService;
 import com.atherys.battlegrounds.service.TeamMemberService;
 import com.atherys.battlegrounds.service.TeamService;
 import com.atherys.core.economy.Economy;
-import com.atherys.towns.AtherysTowns;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.spongepowered.api.Sponge;
@@ -49,17 +50,15 @@ public class TeamFacade {
     }
 
     public void init() {
+        Set<TeamConfig> configs = config.TEAMS;
         List<Team> scoreboardTeams;
 
         if (Sponge.getPluginManager().isLoaded("atherystowns")) {
-            scoreboardTeams = AtherysTowns.getInstance().getNationService().getAllNations().stream()
-                .map(nation -> teamService.createTeam(nation.getId().toString(), nation.getName(), nation.getColor()).getScoreboardTeam())
-                .collect(Collectors.toList());
-        } else {
-            scoreboardTeams = config.TEAMS.stream()
-                    .map(teamConfig -> teamService.createTeam(teamConfig.getId(), teamConfig.getName(), teamConfig.getColor()).getScoreboardTeam())
-                    .collect(Collectors.toList());
+            configs = AtherysTownsIntegration.fetchNationsAndConvertToTeamConfigs();
         }
+        scoreboardTeams = configs.stream()
+                .map(teamConfig -> teamService.createTeam(teamConfig.getId(), teamConfig.getName(), teamConfig.getColor()).getScoreboardTeam())
+                .collect(Collectors.toList());
 
         teamService.setScoreboard(scoreboardTeams);
     }
