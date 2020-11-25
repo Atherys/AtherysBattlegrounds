@@ -35,7 +35,7 @@ public class TeamService {
                         Objective.builder()
                                 .criterion(Criteria.HEALTH)
                                 .name("health")
-                                .displayName(Text.of(TextColors.RED, ""))
+                                .displayName(Text.of(TextColors.RED, "❤"))
                                 .build()
                 ))
                 .build();
