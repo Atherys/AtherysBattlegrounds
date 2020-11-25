@@ -9,7 +9,7 @@ group 'com.atherys'
 version '1.1.1'
 
 dependencies {
-    shadow "com.atherys:AtherysTowns:master-SNAPSHOT"
+    shadow "com.github.Atherys-Horizons:AtherysTowns:master-SNAPSHOT"
 }
 
 blossom {
