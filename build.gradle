@@ -6,9 +6,10 @@ plugins {
 
 group 'com.atherys'
 
-version '1.1.1'
+version '2.0.0'
 
 dependencies {
+    shadow "com.github.Atherys-Horizons:AtherysCore:2.0.0-SNAPSHOT"
     shadow "com.github.Atherys-Horizons:AtherysTowns:master-SNAPSHOT"
 }
 
