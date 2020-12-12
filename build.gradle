@@ -1,18 +1,39 @@
 plugins {
     id 'com.github.johnrengelman.shadow' version '2.0.2'
-    id 'com.atherys.gradle' version '1.5.0'
+    id 'com.atherys.gradle' version '1.7.1'
     id 'net.kyori.blossom' version '1.1.0'
+    id 'maven-publish'
 }
 
 group 'com.atherys'
-
 version '2.0.0'
 
 dependencies {
-    shadow "com.github.Atherys-Horizons:AtherysCore:2.0.0-SNAPSHOT"
-    shadow "com.github.Atherys-Horizons:AtherysTowns:master-SNAPSHOT"
+    shadow "com.atherys:AtherysTowns:2.0.0-SNAPSHOT"
+    shadow "com.atherys:AtherysCore:2.0.0"
 }
 
 blossom {
     replaceToken '%PROJECT_VERSION%', project.version
+}
+
+publishing {
+    repositories {
+        maven {
+            version = project.hasProperty("release") ? project.version : project.version + "-SNAPSHOT";
+
+            def releasesRepoUrl = "https://repo.atherys.com/releases"
+            def snapshotsRepoUrl = "https://repo.atherys.com/snapshots"
+            url = project.hasProperty("release") ? releasesRepoUrl : snapshotsRepoUrl
+            credentials(PasswordCredentials) {
+                username = project.properties.getOrDefault("repoUploadAlias", "none")
+                password = project.properties.getOrDefault("repoUploadToken", "none")
+            }
+        }
+    }
+    publications {
+        shadow(MavenPublication) { publication ->
+            project.shadow.component(publication)
+        }
+    }
 }
