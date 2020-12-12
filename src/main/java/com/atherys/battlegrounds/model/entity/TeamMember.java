@@ -8,10 +8,12 @@ import javax.annotation.Nonnull;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Objects;
 import java.util.UUID;
 
 @Entity
+@Table(schema = "atherysbattlegrounds", name = "TeamMember")
 public class TeamMember implements SpongeIdentifiable {
 
     @Id

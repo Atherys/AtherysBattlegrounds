@@ -15,6 +15,7 @@ import com.atherys.battlegrounds.service.RespawnService;
 import com.atherys.battlegrounds.service.TeamService;
 import com.atherys.core.AtherysCore;
 import com.atherys.core.command.CommandService;
+import com.atherys.core.event.AtherysDatabaseMigrationEvent;
 import com.atherys.core.event.AtherysHibernateConfigurationEvent;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -125,6 +126,11 @@ public class AtherysBattlegrounds {
     public void onReload(GameReloadEvent event) {
         components.config.load();
         components.battlePointFacade.reload();
+    }
+
+    @Listener
+    public void onDatabaseMigration(AtherysDatabaseMigrationEvent event) {
+        event.registerForMigration(ID);
     }
 
     public TeamFacade getTeamFacade() {
