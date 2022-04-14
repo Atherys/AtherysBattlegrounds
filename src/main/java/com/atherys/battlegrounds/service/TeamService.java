@@ -61,7 +61,6 @@ public class TeamService {
         );
 
         teams.add(team);
-        AtherysBattlegrounds.getInstance().getLogger().info("Yup we added a team!");
 
         return team;
     }

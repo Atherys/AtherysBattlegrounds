@@ -23,7 +23,6 @@ public final class AtherysTownsIntegration {
         return AtherysTowns.getInstance().getNationService().getAllNations()
                 .stream()
                 .map(nation -> {
-                    AtherysBattlegrounds.getInstance().getLogger().info(nation.getName());
                     TeamConfig teamConfig = new TeamConfig();
                     teamConfig.setId(nation.getId().toString());
                     teamConfig.setName(nation.getName());

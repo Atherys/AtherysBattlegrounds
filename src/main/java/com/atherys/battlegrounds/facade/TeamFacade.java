@@ -56,7 +56,6 @@ public class TeamFacade {
 
         if (Sponge.getPluginManager().isLoaded("atherystowns")) {
             configs = AtherysTownsIntegration.fetchNationsAndConvertToTeamConfigs();
-            AtherysBattlegrounds.getInstance().getLogger().info("Configs: {}", configs.size());
         }
         scoreboardTeams = configs.stream()
                 .map(teamConfig -> teamService.createTeam(teamConfig.getId(), teamConfig.getName(), teamConfig.getColor()).getScoreboardTeam())
@@ -163,7 +162,6 @@ public class TeamFacade {
         Map<String, BattleTeam> choices = new HashMap<>();
 
         teamService.getAllTeams().forEach(team -> {
-            AtherysBattlegrounds.getInstance().getLogger().info("Yup we added a team!");
             choices.put(team.getId(), team);
         });
 

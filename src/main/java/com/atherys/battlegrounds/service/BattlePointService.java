@@ -136,7 +136,7 @@ public class BattlePointService {
             );
 
             boolean othersAreZero = battlePoint.getTeamProgress().entrySet().stream()
-                    .allMatch(team -> team.getKey() != capturingTeam && team.getValue() <= 0);
+                    .allMatch(team -> team.getKey() == capturingTeam || team.getValue() <= 0);
 
             if (othersAreZero) {
                 // increment the capturing team's progress
