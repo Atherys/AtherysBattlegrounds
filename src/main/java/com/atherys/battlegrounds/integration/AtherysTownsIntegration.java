@@ -1,11 +1,13 @@
 package com.atherys.battlegrounds.integration;
 
 import com.atherys.battlegrounds.AtherysBattlegrounds;
+import com.atherys.battlegrounds.config.AwardConfig;
 import com.atherys.battlegrounds.config.TeamConfig;
 import com.atherys.battlegrounds.model.BattleTeam;
+import com.atherys.core.economy.Economy;
 import com.atherys.towns.AtherysTowns;
 import com.atherys.towns.api.event.ResidentEvent;
-import com.atherys.towns.model.entity.Resident;
+import com.atherys.towns.model.entity.Nation;
 import com.atherys.towns.model.entity.Town;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -13,6 +15,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,7 +27,7 @@ public final class AtherysTownsIntegration {
                 .stream()
                 .map(nation -> {
                     TeamConfig teamConfig = new TeamConfig();
-                    teamConfig.setId(nation.getId().toString());
+                    teamConfig.setId(nation.getName());
                     teamConfig.setName(nation.getName());
                     teamConfig.setColor(nation.getColor());
 
@@ -42,6 +45,10 @@ public final class AtherysTownsIntegration {
         } else {
             AtherysBattlegrounds.getInstance().getTeamFacade().removePlayerFromTeam(player);
         }
+    }
+
+    public static String getNationBankForTeam(BattleTeam team) {
+        return AtherysTowns.getInstance().getNationService().getNationFromName(team.getId()).get().getBank().toString();
     }
 
     @Listener

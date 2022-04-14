@@ -2,6 +2,7 @@ package com.atherys.battlegrounds.service;
 
 import com.atherys.battlegrounds.AtherysBattlegrounds;
 import com.atherys.battlegrounds.config.AwardConfig;
+import com.atherys.battlegrounds.integration.AtherysTownsIntegration;
 import com.atherys.battlegrounds.model.BattleTeam;
 import com.atherys.core.economy.Economy;
 import com.google.inject.Singleton;
@@ -66,7 +67,12 @@ public class TeamService {
     }
 
     public void distributeAward(AwardConfig award, BattleTeam team) {
-        Economy.getAccount(team.getId()).ifPresent(account -> {
+        String accountId = team.getId();
+        if (Sponge.getPluginManager().isLoaded("atherystowns")) {
+            accountId = AtherysTownsIntegration.getNationBankForTeam(team);
+        }
+
+        Economy.getAccount(accountId).ifPresent(account -> {
             award.getCurrency().forEach(((currency, amount) -> {
                 account.deposit(currency, BigDecimal.valueOf(amount), Sponge.getCauseStackManager().getCurrentCause());
             }));
