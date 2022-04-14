@@ -6,6 +6,7 @@ import com.atherys.battlegrounds.facade.BattlePointFacade;
 import com.atherys.battlegrounds.facade.MilestoneFacade;
 import com.atherys.battlegrounds.facade.RespawnFacade;
 import com.atherys.battlegrounds.facade.TeamFacade;
+import com.atherys.battlegrounds.integration.AtherysTownsIntegration;
 import com.atherys.battlegrounds.listener.BattlePointListener;
 import com.atherys.battlegrounds.listener.PlayerListener;
 import com.atherys.battlegrounds.model.entity.TeamMember;
@@ -74,10 +75,24 @@ public class AtherysBattlegrounds {
         battlegroundsInjector.injectMembers(components);
 
         // init the team facade now in order to populate team choices for the team command
-        components.teamFacade.init();
+        components.milestoneFacade.init();
 
         Sponge.getEventManager().registerListeners(this, components.battlePointListener);
         Sponge.getEventManager().registerListeners(this, components.playerListener);
+
+        if (Sponge.getPluginManager().isLoaded("atherystowns")) {
+            Sponge.getEventManager().registerListeners(this, new AtherysTownsIntegration());
+        }
+
+        init = true;
+    }
+
+    private void start() {
+        components.battlePointFacade.init();
+        components.respawnFacade.init();
+        components.teamFacade.init();
+
+        components.teamMemberRepository.initCache();
 
         try {
             AtherysCore.getCommandService().register(new TeamCommand(), this);
@@ -88,14 +103,6 @@ public class AtherysBattlegrounds {
             e.printStackTrace();
         }
 
-        init = true;
-    }
-
-    private void start() {
-        components.battlePointFacade.init();
-        components.respawnFacade.init();
-
-        components.teamMemberRepository.initCache();
     }
 
     private void stop() {
@@ -112,7 +119,7 @@ public class AtherysBattlegrounds {
         init();
     }
 
-    @Listener
+    @Listener(order = Order.LATE)
     public void onStart(GameStartedServerEvent event) {
         if (init) start();
     }

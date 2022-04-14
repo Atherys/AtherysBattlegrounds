@@ -1,5 +1,6 @@
 package com.atherys.battlegrounds.service;
 
+import com.atherys.battlegrounds.AtherysBattlegrounds;
 import com.atherys.battlegrounds.config.AwardConfig;
 import com.atherys.battlegrounds.model.BattleTeam;
 import com.atherys.core.economy.Economy;
@@ -60,6 +61,7 @@ public class TeamService {
         );
 
         teams.add(team);
+        AtherysBattlegrounds.getInstance().getLogger().info("Yup we added a team!");
 
         return team;
     }

@@ -130,22 +130,28 @@ public class BattlePointService {
         // determine the capturing team, and if any, increment their progress by the configured amount
         // and decrement the progress of all other non-capturing teams
         teamMemberService.determineCapturingTeam(membersWithinInner).ifPresent(capturingTeam -> {
+            final float amount = Math.max(
+                    battlePoint.getPerTickCaptureAmount() + membersWithinInner.get(capturingTeam).size() * battlePoint.getPerMemberTickCaptureAmount(),
+                    battlePoint.getMaxPerTickCaptureAmount()
+            );
 
-            // increment the capturing team's progress
-            float amount = battlePoint.getPerTickCaptureAmount() + membersWithinInner.get(capturingTeam).size() * battlePoint.getPerMemberTickCaptureAmount();
-            amount = Math.max(amount, battlePoint.getMaxPerTickCaptureAmount());
+            boolean othersAreZero = battlePoint.getTeamProgress().entrySet().stream()
+                    .allMatch(team -> team.getKey() != capturingTeam && team.getValue() <= 0);
 
-            incrementTeamProgress(battlePoint, capturingTeam, amount);
+            if (othersAreZero) {
+                // increment the capturing team's progress
+                incrementTeamProgress(battlePoint, capturingTeam, amount);
+            } else {
+                // the other teams get their progress decremented by the same amount
+                battlePoint.getTeamProgress().keySet().forEach(otherTeam -> {
+                    if (otherTeam.equals(capturingTeam)) {
+                        return;
+                    }
 
-            // the other teams get their progress decremented by the same amount
-            battlePoint.getTeamProgress().keySet().forEach(otherTeam -> {
-                if (otherTeam.equals(capturingTeam)) {
-                    return;
-                }
-
-                // decrement the other non-capturing teams progress
-                incrementTeamProgress(battlePoint, otherTeam, -battlePoint.getPerTickCaptureAmount());
-            });
+                    // decrement the other non-capturing teams progress
+                    incrementTeamProgress(battlePoint, otherTeam, -amount);
+                });
+            }
         });
 
         // determine the controlling team after having modified the progress values for the battlepoint

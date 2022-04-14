@@ -40,5 +40,4 @@ public class AddPlayerTeamCommand implements ParameterizedCommand {
                 )
         };
     }
-
 }
