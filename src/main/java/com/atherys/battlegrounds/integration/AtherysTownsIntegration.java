@@ -40,7 +40,7 @@ public final class AtherysTownsIntegration {
         Optional<Town> town = AtherysTowns.getInstance().getResidentFacade().getPlayerTown(player);
 
         if (town.isPresent() && town.get().getNation() != null) {
-            BattleTeam team = AtherysBattlegrounds.getInstance().getTeamService().getTeamFromId(town.get().getNation().getId().toString()).get();
+            BattleTeam team = AtherysBattlegrounds.getInstance().getTeamService().getTeamFromId(town.get().getNation().getName()).get();
             AtherysBattlegrounds.getInstance().getTeamFacade().addPlayerToTeam(player, team);
         } else {
             AtherysBattlegrounds.getInstance().getTeamFacade().removePlayerFromTeam(player);
